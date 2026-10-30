@@ -22,6 +22,24 @@ stellt Text zum Kopieren bereit. Es werden dabei keine Daten an eine KI gesendet
 Wer den Text in einen anderen Dienst einfügt, entscheidet selbst über die Weitergabe.
 Nachrichtenlinks sind Recherchehinweise, keine bereits gelesenen Nachrichtenbelege.
 
+## Diagramme und Ansichten
+
+Alle enthaltenen Verlaufsgrafiken, Rendite-/Schwankungspunkte und Säulensegmente
+zeigen konkrete Werte per Maus oder Antippen. Linien lassen sich nach dem
+Fokussieren auch mit den Pfeiltasten, Home und End durchgehen. Punkte und
+Säulensegmente sind per Tab und Enter erreichbar; Escape schließt die Anzeige.
+Die Skalen werden dabei nicht gezoomt oder verschoben.
+
+Zusatzbereiche und die drei Bericht-Prompts werden einzeln in der Navigation
+gewählt und in fester Reihenfolge angezeigt. Schwankungsklassen verwenden die
+Grün-bis-Rot-Skala der lokalen Anwendung. Beim eigenen Portfolio wird dafür eine
+separate Referenzhistorie ab Beginn des importierten Testverlaufs verwendet,
+unabhängig vom gewählten Investitionsbeginn. Das bleibt eine historische
+Einordnung anhand der SRRI-Grenzen, keine offizielle Produkteinstufung.
+
+Nicht alle lokalen Funktionen sind bereits übertragen: insbesondere die
+modellbasierte Effizienzgrenze mit Kapitalmarktlinie/CAPM und der Bausparvertrag.
+
 ## Sicherheit und Datenschutz
 
 Keine Tracker, externen Schriftarten, Diagramm-CDNs oder Werbedienste. Externe

@@ -23,3 +23,24 @@ h1,h2,h3{font-weight:600}nav label>span{min-width:0;hyphens:manual;overflow-wrap
 @media(max-width:1080px){.scatter-chart .legend{flex-direction:row;flex-wrap:wrap;margin:10px 18px}}
 @media(min-width:761px) and (max-width:1080px){.chart svg .chart-tick{font-size:22px}.chart svg .chart-axis-title{font-size:20px}}
 @media(max-width:760px){.learning-step{grid-template-columns:36px minmax(0,1fr);column-gap:15px}.learning-step .number{width:32px;height:32px}.learning-step h3{font-size:17px;margin-top:3px}.chart{padding:18px 8px}.chart svg .chart-tick{font-size:22px}.chart svg .chart-axis-title{font-size:20px}.chart svg text{font-size:20px}.chart-unit{font-size:12px}.line-chart .legend{font-size:11px;margin:12px 10px 0}.tooltip>div{grid-template-columns:12px minmax(0,1fr)}.tooltip b{grid-column:2;padding-left:0}.tooltip small{grid-column:2}.chart-body{gap:0}}
+
+/* Analyseansichten: gleiche ruhige Gliederung und Bedienung wie lokal.
+   Die beiden Lernansichten werden von diesen Ergänzungen nicht verändert. */
+.chart [data-chart-mark]{cursor:pointer;outline:none}
+.chart [data-chart-mark]:hover,.chart [data-chart-mark]:focus-visible{stroke:#183e35;stroke-width:2.5;filter:brightness(1.05)}
+.chart svg:focus-visible{outline:2px solid #477b69;outline-offset:4px;border-radius:4px}
+.mark-tooltip{max-width:min(340px,calc(100% - 24px))}
+.mark-tooltip p{margin:0;font-size:12px;line-height:1.8;white-space:normal}
+.class-scale>button{background:var(--class-color);color:#fff;border:3px solid transparent;border-radius:7px;padding:14px 0;font-size:17px;font-weight:600;min-width:0;opacity:.68}
+.class-scale>button:hover,.class-scale>button:focus-visible{opacity:1}
+.class-scale>button.selected{opacity:1;border-color:#172d29;box-shadow:0 0 0 2px #fff,0 0 0 3px #172d29;font-weight:800}
+.class-card .scale-caption{margin-bottom:22px;gap:16px}
+.class-card>.field{max-width:520px}
+.report-section{padding:27px;border:1px solid var(--border);border-radius:12px;background:#fff}
+.report-section h2{font-size:23px}
+.chart .legend>span{min-width:0;overflow-wrap:break-word}
+.result-highlights{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:25px;padding:10px 0 20px}
+.result-highlights>div{padding-right:18px;border-right:1px solid var(--border)}
+.result-highlights>div:last-child{border:0;padding-right:0}
+.result-highlights h3{font-size:16px}.result-highlights .kpi{font-size:23px}
+@media(max-width:1100px){.result-highlights{grid-template-columns:1fr;gap:16px}.result-highlights>div{border:0;border-bottom:1px solid var(--border);padding:0 0 16px}.result-highlights>div:last-child{padding-bottom:0}}
