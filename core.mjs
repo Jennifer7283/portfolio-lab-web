@@ -6,6 +6,14 @@ export const endOfPreviousMonth = d => {const x=new Date(d+'T00:00:00Z');x.setUT
 export const finite = x=>typeof x==='number' && Number.isFinite(x);
 export const pretty = n=>n.replaceAll('_',' ').replace('Nasdaq 100','Nasdaq-100').replace('SP 500','S&P 500');
 
+// Eine Zusatzoption öffnet stets ihre zugehörige Ansicht, nicht nur das Menü.
+export function setViewOption(state,key,checked) {
+  const [page,section]=key.split(':');
+  if(!page||!section)throw Error('Ungültige Ansichtsoption.');
+  state.options[key]=Boolean(checked);state.page=page;state.navOpen[page]=true;
+  return page;
+}
+
 export function validateData(d) {
   if(d?.schema!=='portfolio-lab-web-v1'||d.currency!=='EUR'||!Array.isArray(d.dates)||d.dates.length<2||d.dates.length>1200) throw Error('Bitte eine Portfolio-Lab-Importdatei im Format v1 auswählen.');
   if(!d.assets||!d.portfolios||!d.assumptions||!Array.isArray(d.attribution)||!Array.isArray(d.trades)||!Array.isArray(d.sources)) throw Error('Die Importdatei ist unvollständig.');
