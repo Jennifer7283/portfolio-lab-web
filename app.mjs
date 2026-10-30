@@ -1,4 +1,4 @@
-import {validateData,simulate,customPortfolio,stats,savings,realValue,volatilityClass,compare,sum,mean,finite,pretty,endOfPreviousMonth,setViewOption} from './core.mjs';
+import {validateData,simulate,customPortfolio,stats,savings,realValue,volatilityClass,compare,sum,mean,finite,pretty,endOfPreviousMonth,setViewOption,explanationParagraphs} from './core.mjs';
 
 const $=id=>document.getElementById(id),esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=x=>finite(x)?new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',maximumFractionDigits:2}).format(x):'–';
@@ -14,11 +14,12 @@ const help={portfolio:'Name des untersuchten Portfolios. Verglichen werden diese
 const state={data:null,page:(location.hash.slice(1)||'lernen'),capital:10000,payment:0,start:0,selected:[],options:{'analysen:walkforward':true,'methodik:annahmen':true},navOpen:{},own:[{name:'',weight:100}],confidence:.95,riskName:'',allocationName:'',rate:2.5,nextRate:1,rateMonths:6};
 let infoMap=new Map(),infoSeq=0;
 const info=(title,text)=>{const id='i'+(++infoSeq);infoMap.set(id,{title,text});return `<button class="info" data-info="${id}" aria-label="${esc(title)} erklären">ⓘ</button>`;};
-const detail=(title,body)=>`<details><summary>${esc(title)}</summary><div class="detail-body">${body}</div></details>`;
+const prose=text=>explanationParagraphs(text).map(p=>`<p>${esc(p)}</p>`).join('');
+const detail=(title,body)=>`<details><summary>${esc(title)}</summary><div class="detail-body">${/<[a-z][\s\S]*>/i.test(body)?body:prose(body)}</div></details>`;
 const field=(label,id,value,type='number',extra='')=>`<label class="field"><span>${esc(label)}</span><input type="${type}" id="${id}" value="${esc(value)}" ${extra}></label>`;
 function table(headers,rows) {return `<div class="table-wrap"><table><thead><tr>${headers.map(h=>`<th scope="col"><div class="head-cell"><span>${h.label}</span>${info(h.label.replaceAll('<br>',' '),help[h.help]||h.text||'')}</div></th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${row.map((c,i)=>`<td data-label="${esc(headers[i].label.replaceAll('<br>',' '))}">${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;}
 function pageHeading(label,desc){return `<p class="eyebrow">PORTFOLIO LAB / ${esc(label)}</p><h1>${esc(label)}</h1><p class="lead">${esc(desc)}</p>`;}
-function showInfo(title,text){$('info-title').textContent=title;$('info-text').textContent=text;$('info-dialog').showModal();}
+function showInfo(title,text){$('info-title').textContent=title;$('info-text').innerHTML=prose(text);$('info-dialog').showModal();}
 const navText=text=>esc(text).replaceAll('Portfoliozusammensetzung','Portfolio&shy;zusammen&shy;setzung');
 function nav(){
   $('navigation').innerHTML=pages.map(([id,label])=>`<div class="nav-row ${state.page===id?'active':''}"><a href="#${id}" ${state.page===id?'aria-current="page"':''}>${navText(label)}</a>${extras[id]?`<button data-nav="${id}" aria-label="Optionen für ${esc(label)}" aria-controls="options-${id}" aria-expanded="${!!state.navOpen[id]}">${state.navOpen[id]?'⌄':'›'}</button>`:''}</div>${extras[id]&&state.navOpen[id]?`<div class="subnav" id="options-${id}"><p class="nav-caption">Zusätzlich anzeigen</p>${extras[id].map(([key,label])=>`<label><input type="checkbox" aria-label="${esc(label)}" data-option="${id}:${key}" ${state.options[id+':'+key]?'checked':''}><span>${navText(label)}</span></label>`).join('')}</div>`:''}`).join('');
@@ -71,14 +72,15 @@ function placeTooltip(wrap,tip,x,y){const r=wrap.getBoundingClientRect();tip.hid
 function chartEvents(){for(const [id,p] of chartPayload){const wrap=$(id),svg=wrap?.querySelector('svg'),tip=wrap?.querySelector('.tooltip'),cross=svg?.querySelector('[data-crosshair]');if(!svg)continue;
  let current=0;
  const hide=()=>{tip.hidden=true;cross?.setAttribute('visibility','hidden');};
- const show=(i,x,y)=>{current=i;tip.innerHTML=`<strong>${months(p.series[0].values[i].date)}</strong>`+p.series.map((s,k)=>{const v=s.values[i];return v?`<div><i class="swatch" style="background:${colors[k%colors.length]}"></i><span>${esc(s.name)}</span><b>${s.percent?pct(v.y/100):money(v.y)}</b>${finite(v.return)?`<small>Monatsrendite ${pct(v.return)}</small>`:''}</div>`:'';}).join('');placeTooltip(wrap,tip,x,y);cross?.setAttribute('x1',p.x(i));cross?.setAttribute('x2',p.x(i));cross?.setAttribute('visibility','visible');};
+ const show=(i,x,y)=>{current=i;tip.innerHTML=`<strong>${months(p.series[0].values[i].date)}</strong>`+p.series.map((s,k)=>{const v=s.values[i];return v?`<section class="tooltip-series"><h4><i class="swatch" style="background:${colors[k%colors.length]}"></i>${esc(s.name)}</h4><p>${s.percent?'Verlust':s.name==='Eingezahltes Kapital'?'Eingezahlt':'Vermögenswert'}: <b>${s.percent?pct(v.y/100):money(v.y)}</b></p>${finite(v.return)?`<p>Monatsrendite: <b>${pct(v.return)}</b></p>`:''}</section>`:'';}).join('');placeTooltip(wrap,tip,x,y);cross?.setAttribute('x1',p.x(i));cross?.setAttribute('x2',p.x(i));cross?.setAttribute('visibility','visible');};
  const point=e=>{const r=svg.getBoundingClientRect(),vx=(e.clientX-r.left)/r.width*p.W,vy=(e.clientY-r.top)/r.height*p.H;if(vx<p.L||vx>p.W-p.R||vy<p.T||vy>p.H-p.B){hide();return;}show(Math.max(0,Math.min(p.series[0].values.length-1,Math.round((vx-p.L)/(p.W-p.L-p.R)*(p.series[0].values.length-1)))),e.clientX,e.clientY);};
  svg.setAttribute('tabindex','0');svg.setAttribute('aria-label',svg.getAttribute('aria-label')+'. Monatswerte mit den Pfeiltasten ansehen.');
- svg.addEventListener('pointermove',point);svg.addEventListener('click',point);svg.addEventListener('pointerleave',hide);svg.addEventListener('blur',hide);
+ svg.addEventListener('pointermove',point);svg.addEventListener('click',point);svg.addEventListener('pointerleave',e=>{if(!tip.contains(e.relatedTarget))hide();});wrap.addEventListener('pointerleave',hide);svg.addEventListener('blur',hide);
  svg.addEventListener('keydown',e=>{if(e.key==='Escape'){hide();return;}if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const max=p.series[0].values.length-1,i=e.key==='Home'?0:e.key==='End'?max:Math.max(0,Math.min(max,current+(e.key==='ArrowLeft'?-1:1))),r=svg.getBoundingClientRect();show(i,r.left+p.x(i)/p.W*r.width,r.top+r.height*.25);});
  }
  for(const wrap of document.querySelectorAll('.chart:has([data-chart-mark])')){let tip=wrap.querySelector('.tooltip');if(!tip){tip=document.createElement('div');tip.className='tooltip mark-tooltip';tip.hidden=true;wrap.append(tip);}
-  for(const mark of wrap.querySelectorAll('[data-chart-mark]')){const show=e=>{const r=mark.getBoundingClientRect();tip.innerHTML=`<strong>${esc(mark.dataset.name)}</strong><p>${esc(mark.dataset.detail)}</p>`;placeTooltip(wrap,tip,e.clientX??r.right,e.clientY??r.top);};const hide=()=>{tip.hidden=true;};mark.addEventListener('pointermove',show);mark.addEventListener('click',show);mark.addEventListener('focus',show);mark.addEventListener('pointerleave',hide);mark.addEventListener('blur',hide);mark.addEventListener('keydown',e=>{if(e.key==='Escape')hide();if(e.key==='Enter'||e.key===' '){e.preventDefault();show(e);}});}
+  wrap.addEventListener('pointerleave',()=>{tip.hidden=true;});
+  for(const mark of wrap.querySelectorAll('[data-chart-mark]')){const show=e=>{const r=mark.getBoundingClientRect();tip.innerHTML=`<strong>${esc(mark.dataset.name)}</strong>`+mark.dataset.detail.split(' · ').map(metric=>`<p>${esc(metric)}</p>`).join('');placeTooltip(wrap,tip,e.clientX??r.right,e.clientY??r.top);};const hide=()=>{tip.hidden=true;};mark.addEventListener('pointermove',show);mark.addEventListener('click',show);mark.addEventListener('focus',show);mark.addEventListener('pointerleave',e=>{if(!tip.contains(e.relatedTarget))hide();});mark.addEventListener('blur',hide);mark.addEventListener('keydown',e=>{if(e.key==='Escape')hide();if(e.key==='Enter'||e.key===' '){e.preventDefault();show(e);}});}
  }
 }
 function resultTable(out){return table([{label:'Portfolio',help:'portfolio'},{label:'Insgesamt<br>eingezahlt',help:'paid'},{label:'Brutto-Endwert',help:'gross'},{label:'Netto-Endwert',help:'net'},{label:'Brutto-Differenz',help:'diff'},{label:'Netto-Differenz',help:'diff'},{label:'Handelskosten',help:'cost'}],[...out].sort((a,b)=>(a.rows.at(-1).value-a.rows.at(-1).paid)-(b.rows.at(-1).value-b.rows.at(-1).paid)).map(a=>{const r=a.rows.at(-1),gross=simulate(state.data,a.name,state.start,state.capital,state.payment,a.name==='Eigenes Portfolio'?{returns:a.returns,attr:a.attr,trades:a.events,initial:a.attr.filter(x=>x.datum===state.data.dates[state.start]).map(x=>x.startgewicht)}:null,false).rows.at(-1);return [esc(a.name),money(r.paid),money(gross.value),money(r.value),money(gross.value-r.paid),money(r.value-r.paid),money(r.totalCost)];}));}
@@ -190,11 +192,25 @@ function methodologyView(){
 }
 let lastResults=[];
 let renderTimer,pointerBusy=false,deferredRender=false;
+function formatExplanationParagraphs(){
+ if(['lernen','kurz'].includes(state.page))return;
+ // Hervorhebungen und Links bleiben erhalten; nur Absatzgrenzen ergänzen.
+ for(const original of [...$('content').querySelectorAll('p')]){
+  if(original.closest('.detail-body,.tooltip')||original.matches('.eyebrow'))continue;
+  const text=original.textContent,blocks=explanationParagraphs(text);if(blocks.length<2)continue;
+  const walker=document.createTreeWalker(original,NodeFilter.SHOW_TEXT),nodes=[];let offset=0,node;
+  while((node=walker.nextNode())){nodes.push({node,start:offset,end:offset+node.length});offset+=node.length;}
+  const locate=position=>{const item=nodes.find(n=>position<=n.end);return [item.node,position-item.start];};
+  const wrapper=document.createElement('div');wrapper.className=original.className+' explanation-prose';let cursor=0;
+  for(const block of blocks){const start=text.indexOf(block,cursor),end=start+block.length,range=document.createRange();range.setStart(...locate(start));range.setEnd(...locate(end));const p=document.createElement('p');p.append(range.cloneContents());wrapper.append(p);cursor=end;}
+  original.replaceWith(wrapper);
+ }
+}
 function formatScatterPlots(){for(const svg of document.querySelectorAll('svg[aria-label="Rendite und Schwankungen"]')){const chart=svg.parentElement,legend=chart.querySelector('.legend'),body=document.createElement('div'),plot=document.createElement('div');chart.classList.add('scatter-chart');body.className='chart-body';plot.className='chart-plot';plot.append(svg);body.append(plot);if(legend){const title=document.createElement('h3');title.textContent='Portfolios';legend.prepend(title);body.append(legend);}chart.append(body);}}
 function queueRender(){clearTimeout(renderTimer);renderTimer=setTimeout(()=>{if(pointerBusy||document.activeElement?.matches('input[type="number"]')){deferredRender=true;return;}render();},160);}
 function render(){clearTimeout(renderTimer);deferredRender=false;const focused=document.activeElement,focusId=focused?.id,ownIndex=focused?.dataset?.ownWeight;infoMap=new Map();infoSeq=0;chartPayload=new Map();lastResults=[];if(!pages.some(([id])=>id===state.page))state.page='lernen';nav();const d=state.data;$('data-status').innerHTML=d&&!['lernen','kurz'].includes(state.page)?`<div class="data-strip"><span>IMPORTIERTER ANALYSESTICHTAG<b>${esc(d.asOf)}</b></span><span>VERFÜGBARE MONATE<b>${month(d.dates[0])} – ${month(d.dates.at(-1))}</b></span><span>BERICHTSMODUS<b>Kopierbare Prompts · ohne API</b></span></div>`:'';
  try{$('content').innerHTML=state.page==='lernen'?learningView():state.page==='kurz'?learningView(true):state.page==='simulation'?simulationPage():state.page==='eigen'?simulationPage(true):state.page==='minimum'?simulationPage(false,true):state.page==='sparen'?savingsPage():state.page==='inflation'?savingsPage(true):state.page==='analysen'?analyses():methodologyView();}catch(e){$('content').innerHTML=`<h1>Die Ansicht konnte nicht berechnet werden.</h1><p class="error">${esc(e.message)}</p><p>Bitte prüfe deine Eingaben oder importiere eine vollständige Analysedatei.</p>`;}
- formatScatterPlots();chartEvents();bind();
+ formatExplanationParagraphs();formatScatterPlots();chartEvents();bind();
  if(focused?.tagName==='INPUT'){const replacement=ownIndex!==undefined?document.querySelector(`[data-own-weight="${ownIndex}"]`):focusId?$(focusId):null;replacement?.focus({preventScroll:true});}
 }
 function bind(){

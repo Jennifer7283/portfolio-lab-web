@@ -6,6 +6,17 @@ export const endOfPreviousMonth = d => {const x=new Date(d+'T00:00:00Z');x.setUT
 export const finite = x=>typeof x==='number' && Number.isFinite(x);
 export const pretty = n=>n.replaceAll('_',' ').replace('Nasdaq 100','Nasdaq-100').replace('SP 500','S&P 500');
 
+// Nur Textgliederung: keine Änderungen an Zahlen, Aussagen oder Berechnungen.
+// Die deutsche Satzsegmentierung lässt Datums- und Dezimalwerte zusammen.
+export function explanationParagraphs(text) {
+  return String(text??'').split(/\n\s*\n/).flatMap(block=>{
+    const clean=block.trim();if(!clean)return [];
+    return typeof Intl.Segmenter==='function'
+      ? [...new Intl.Segmenter('de',{granularity:'sentence'}).segment(clean)].map(s=>s.segment.trim()).filter(Boolean)
+      : clean.split(/(?<=[.!?])\s+(?=[A-ZÄÖÜ])/).filter(Boolean);
+  });
+}
+
 // Eine Zusatzoption öffnet stets ihre zugehörige Ansicht, nicht nur das Menü.
 export function setViewOption(state,key,checked) {
   const [page,section]=key.split(':');
