@@ -6,6 +6,70 @@ export const endOfPreviousMonth = d => {const x=new Date(d+'T00:00:00Z');x.setUT
 export const finite = x=>typeof x==='number' && Number.isFinite(x);
 export const pretty = n=>n.replaceAll('_',' ').replace('Nasdaq 100','Nasdaq-100').replace('SP 500','S&P 500');
 
+// Deutsche Arbeitsübersetzung des vom Nutzer bereitgestellten Appendix A,
+// Kuzniak et al. (2015), S. 189–191; Grable & Lytton (1999).
+// Dollarbeträge und Antwortoptionen bleiben unverändert. Keine Kurzskala.
+export const profileQuestions = [
+ ['Wie würde dein bester Freund oder deine beste Freundin deine Risikobereitschaft beschreiben?', ['Ausgesprochen risikofreudig','Nach gründlicher Recherche bereit, Risiken einzugehen','Vorsichtig','Sehr darauf bedacht, Risiken zu vermeiden'],[4,3,2,1]],
+ ['Du darfst in einer Fernsehshow wählen. Was nimmst du?', ['Sicher 1.000 US-Dollar','Eine Chance von 50 % auf 5.000 US-Dollar','Eine Chance von 25 % auf 10.000 US-Dollar','Eine Chance von 5 % auf 100.000 US-Dollar'],[1,2,3,4]],
+ ['Du hast für eine einmalige Traumreise gespart. Drei Wochen vor der Abreise verlierst du deinen Arbeitsplatz. Was würdest du tun?', ['Die Reise absagen','Eine deutlich günstigere Reise machen','Wie geplant reisen, um mich auf die Arbeitssuche vorzubereiten','Die Reise verlängern, weil es die letzte Gelegenheit für eine luxuriöse Reise sein könnte'],[1,2,3,4]],
+ ['Du erhältst unerwartet 20.000 US-Dollar zum Anlegen. Was würdest du tun?', ['Auf ein Bankkonto, Geldmarktkonto oder in eine versicherte Termineinlage einzahlen','In als sicher geltende Anleihen guter Schuldner oder entsprechende Anleihenfonds investieren','In Aktien oder Aktienfonds investieren'],[1,2,3]],
+ ['Wie wohl fühlst du dich aufgrund deiner bisherigen Erfahrung beim Investieren in Aktien oder Aktienfonds?', ['Überhaupt nicht wohl','Einigermaßen wohl','Sehr wohl'],[1,2,3]],
+ ['Welches Wort kommt dir beim Begriff Risiko zuerst in den Sinn?', ['Verlust','Unsicherheit','Chance','Nervenkitzel'],[1,2,3,4]],
+ ['Angenommen, Fachleute erwarten steigende Preise für Sachwerte wie Gold und Immobilien sowie fallende Anleihenkurse. Dein Anlagevermögen liegt überwiegend in hoch verzinsten Staatsanleihen, die als relativ sicher gelten. Was würdest du tun?', ['Die Anleihen behalten','Verkaufen und je die Hälfte auf Geldmarktkonten sowie in Sachwerte anlegen','Verkaufen und den gesamten Erlös in Sachwerte anlegen','Verkaufen, alles in Sachwerte anlegen und dafür zusätzlich Geld leihen'],[1,2,3,4]],
+ ['Welche Anlage würdest du anhand ihres besten und schlechtesten möglichen Ergebnisses wählen?', ['Bestenfalls 200 US-Dollar Gewinn, schlimmstenfalls kein Gewinn oder Verlust','Bestenfalls 800 US-Dollar Gewinn, schlimmstenfalls 200 US-Dollar Verlust','Bestenfalls 2.600 US-Dollar Gewinn, schlimmstenfalls 800 US-Dollar Verlust','Bestenfalls 4.800 US-Dollar Gewinn, schlimmstenfalls 2.400 US-Dollar Verlust'],[1,2,3,4]],
+ ['Zusätzlich zu deinem bisherigen Vermögen erhältst du 1.000 US-Dollar. Welche weitere Möglichkeit wählst du?', ['Sicher 500 US-Dollar zusätzlich gewinnen','Mit je 50 % Wahrscheinlichkeit zusätzlich 1.000 US-Dollar oder nichts gewinnen'],[1,3]],
+ ['Zusätzlich zu deinem bisherigen Vermögen erhältst du 2.000 US-Dollar. Welche Möglichkeit wählst du?', ['Sicher 500 US-Dollar verlieren','Mit je 50 % Wahrscheinlichkeit 1.000 US-Dollar oder nichts verlieren'],[1,3]],
+ ['Du erbst 100.000 US-Dollar und musst den gesamten Betrag in genau eine der folgenden Möglichkeiten investieren. Welche wählst du?', ['Ein Sparkonto oder einen Geldmarktfonds','Einen Fonds mit Aktien und Anleihen','Ein Portfolio aus 15 einzelnen Aktien','Rohstoffe wie Gold, Silber und Öl'],[1,2,3,4]],
+ ['Welche Aufteilung für 20.000 US-Dollar spricht dich am ehesten an?', ['60 % in Anlagen mit niedrigem, 30 % mit mittlerem und 10 % mit hohem Risiko','30 % in Anlagen mit niedrigem, 40 % mit mittlerem und 30 % mit hohem Risiko','10 % in Anlagen mit niedrigem, 40 % mit mittlerem und 50 % mit hohem Risiko'],[1,2,3]],
+ ['Ein vertrauter Freund mit Erfahrung in Geologie sucht Geld für eine Goldmine. Bei Erfolg könnte der Einsatz auf das 50- bis 100-Fache steigen; bei Misserfolg ist alles verloren. Die Erfolgschance wird auf 20 % geschätzt. Wie viel würdest du investieren, falls das Geld verfügbar wäre?', ['Nichts','Ein Monatsgehalt','Drei Monatsgehälter','Sechs Monatsgehälter'],[1,2,3,4]]
+];
+
+export function scoreRiskAnswers(answers) {
+ if(!Array.isArray(answers)||answers.length!==13||answers.some((a,i)=>!Number.isInteger(a)||a<0||a>=profileQuestions[i][2].length))return null;
+ // Alle 13 Items addieren, keine optionale Mittelung der Fragen 9 und 10.
+ const score=sum(answers.map((a,i)=>profileQuestions[i][2][a]));
+ const band=score<=18?0:score<=22?1:score<=28?2:score<=32?3:4;
+ return {score,band,label:['Geringe Risikobereitschaft','Eher geringe Risikobereitschaft','Mittlere Risikobereitschaft','Eher hohe Risikobereitschaft','Hohe Risikobereitschaft'][band]};
+}
+
+export const profileFields = [
+ ['goal','Wofür möchtest du anlegen?',[['reserve','Geld für einen festen Zweck erhalten'],['save','Regelmäßig Vermögen aufbauen'],['learn','Anlagen erst einmal kennenlernen']]],
+ ['horizon','Wann könntest du das Geld benötigen?',[['short','In weniger als fünf Jahren'],['medium','In fünf bis zehn Jahren'],['long','In mehr als zehn Jahren'],['unknown','Das weiß ich noch nicht']]],
+ ['reserve','Hast du eine getrennte Reserve für unerwartete Ausgaben?',[['yes','Ja'],['no','Nein'],['unknown','Unsicher']]],
+ ['loss','Könntest du Verluste tragen, ohne laufende Ausgaben oder dein Anlageziel zu gefährden?',[['yes','Ja'],['no','Nein'],['unknown','Unsicher']]],
+ ['debt','Müsstest du Geld leihen oder laufende Kreditraten gefährden, um zu investieren?',[['no','Nein'],['yes','Ja'],['unknown','Unsicher']]],
+ ['income','Bleibt nach deinen laufenden Ausgaben verlässlich Geld übrig?',[['yes','Ja'],['no','Nein'],['unknown','Das ist unregelmäßig oder noch unklar']]],
+ ['experience','Wie viel Erfahrung hast du mit ETFs und Portfolios?',[['new','Ich beginne gerade'],['some','Ich kenne die Grundlagen'],['experienced','Ich habe praktische Erfahrung']]],
+ ['effort','Wie möchtest du dich mit der Anlage beschäftigen?',[['low','Möglichst wenig Aufwand'],['active','Regelmäßig prüfen und bei Bedarf umschichten']]]
+];
+
+export function profilePolicy(profile) {
+ const assessment=scoreRiskAnswers(profile?.answers),f=profile?.context;
+ if(!assessment||!f||profileFields.some(([key,,values])=>!values.some(([v])=>v===f[key])))return null;
+ const warnings=[];
+ if(f.reserve!=='yes')warnings.push('Eine getrennte Reserve ist nicht bestätigt. Ein Kursverlust oder unerwarteter Geldbedarf könnte einen Verkauf zu einem ungünstigen Zeitpunkt erzwingen.');
+ if(f.loss!=='yes')warnings.push('Dein finanzieller Spielraum für Verluste ist nicht bestätigt. Auch historisch ruhige Portfolios können Geld verlieren.');
+ if(f.debt!=='no')warnings.push('Die Finanzierung ist nicht geklärt. Geliehenes Geld und laufende Verpflichtungen erhöhen die Belastung bei Verlusten.');
+ if(f.income!=='yes')warnings.push('Ein verlässlicher Überschuss ist nicht bestätigt. Die Anwendung berechnet deshalb keine für dich tragbare Sparrate.');
+ if(f.horizon==='short'||f.horizon==='unknown')warnings.push('Das Geld könnte bald benötigt werden oder der Zeitpunkt ist offen. Der historische Vergleich zeigt nicht, ob Verluste bis dahin aufgeholt wären. Sieh dir auch den Sparformenvergleich an.');
+ const cautious=assessment.band<=1||f.goal==='reserve'||f.horizon==='short'||f.horizon==='unknown'||warnings.length>0;
+ return {...assessment,warnings,mode:cautious?'calm':f.effort==='low'?'simple':'neutral',simple:f.effort==='low'};
+}
+
+// Eigene, offen ausgewiesene Anzeigeregel – keine validierte Eignungszuordnung.
+// Nie historische Rendite maximieren; Fünfjahresrisiko unabhängig vom Startregler.
+export function profileOrder(data,names,profile) {
+ const policy=profilePolicy(profile);if(!policy)return names.map(name=>({name}));
+ const simpleNames=['Welt-ETF','70/30 Welt/Schwellenländer','60/40 Welt/US-Anleihen','S&P 500 (SPY)','Nasdaq-100 (QQQ)','US-Marktportfolio (VTI)'];
+ const entries=names.map((name,index)=>({name,index,simple:simpleNames.includes(name),risk:volatilityClass(data,data.portfolios[name])}));
+ return entries.sort((a,b)=>{
+   if(policy.mode==='calm'){const d=(a.risk?.vol??Infinity)-(b.risk?.vol??Infinity);if(d)return d;}
+   if(policy.simple&&a.simple!==b.simple)return a.simple?-1:1;
+   return a.index-b.index;
+ });
+}
+
 // Nur Textgliederung: keine Änderungen an Zahlen, Aussagen oder Berechnungen.
 // Die deutsche Satzsegmentierung lässt Datums- und Dezimalwerte zusammen.
 export function explanationParagraphs(text) {

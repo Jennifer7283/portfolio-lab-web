@@ -1,5 +1,21 @@
 # Portfolio Lab – GitHub Pages
 
+## Optionales Profil
+
+„Mein Profil“ enthält eine deutsche Arbeitsübersetzung der vollständigen
+13-Item-Skala von Grable und Lytton aus Kuzniak et al. (2015), Appendix A.
+Punkteschlüssel und Einordnung: [Rutgers-Auswertung](https://njaes.rutgers.edu/money/assessment-tools/investment-risk-tolerance-quiz.pdf).
+Die Übersetzung ist nicht gesondert validiert. Risikobereitschaft ist weder
+finanzielle Verlusttragfähigkeit noch eine offizielle Portfolio-Risikoklasse.
+
+Zusätzliche Rahmenbedingungen steuern eine ausdrücklich eigene Anzeigeregel:
+historisch ruhigere Verläufe oder feste Vergleichsmischungen zuerst. Keine
+wissenschaftlich validierte Eignungszuordnung, keine Kaufempfehlungen, keine
+Optimierung nach rückblickender Rendite. Alle Portfolios bleiben auswählbar.
+Ungeklärte finanzielle Rahmenbedingungen verhindern eine automatische Auswahl.
+Profil und Antworten existieren nur im Arbeitsspeicher, nicht in Browser-Speichern,
+Analyseexporten oder KI-Prompts. Neuladen verwirft sie.
+
 Statische öffentliche Testversion, unabhängig von der lokalen Streamlit-App.
 Keine Installation, kein Backend, keine API-Schlüssel und kein KI-Verbindungsaufbau.
 GitHub Pages: Branch `main`, Ordner `/ (root)`.
