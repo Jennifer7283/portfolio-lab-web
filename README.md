@@ -12,7 +12,10 @@ Zusätzliche Rahmenbedingungen steuern eine ausdrücklich eigene Anzeigeregel:
 historisch ruhigere Verläufe oder feste Vergleichsmischungen zuerst. Keine
 wissenschaftlich validierte Eignungszuordnung, keine Kaufempfehlungen, keine
 Optimierung nach rückblickender Rendite. Alle Portfolios bleiben auswählbar.
-Ungeklärte finanzielle Rahmenbedingungen verhindern eine automatische Auswahl.
+Teilweise beantwortete Rahmenbedingungen werden einzeln genutzt. „Unsicher“ ist
+eine gültige Angabe und führt gegebenenfalls zu einer vorsichtigeren Sortierung,
+nicht zum Ausschluss des Profils oder der Startauswahl. Nur wenn kein Punkt
+beantwortet wurde, wird der übersprungene Abschnitt als solcher benannt.
 Profil und Antworten existieren nur im Arbeitsspeicher, nicht in Browser-Speichern,
 Analyseexporten oder KI-Prompts. Neuladen verwirft sie.
 

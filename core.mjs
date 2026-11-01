@@ -45,16 +45,23 @@ export const profileFields = [
 ];
 
 export function profilePolicy(profile) {
- const assessment=scoreRiskAnswers(profile?.answers),f=profile?.context;
- if(!assessment||!f||profileFields.some(([key,,values])=>!values.some(([v])=>v===f[key])))return null;
+ const assessment=scoreRiskAnswers(profile?.answers),f=profile?.context??{};
+ // Leer bedeutet übersprungen. „Unsicher“ ist dagegen eine gültige Angabe.
+ if(!assessment||profileFields.some(([key,,values])=>f[key]!==undefined&&f[key]!==''&&!values.some(([v])=>v===f[key])))return null;
+ const contextCount=profileFields.filter(([key,,values])=>values.some(([v])=>v===f[key])).length;
  const warnings=[];
- if(f.reserve!=='yes')warnings.push('Eine getrennte Reserve ist nicht bestätigt. Ein Kursverlust oder unerwarteter Geldbedarf könnte einen Verkauf zu einem ungünstigen Zeitpunkt erzwingen.');
- if(f.loss!=='yes')warnings.push('Dein finanzieller Spielraum für Verluste ist nicht bestätigt. Auch historisch ruhige Portfolios können Geld verlieren.');
- if(f.debt!=='no')warnings.push('Die Finanzierung ist nicht geklärt. Geliehenes Geld und laufende Verpflichtungen erhöhen die Belastung bei Verlusten.');
- if(f.income!=='yes')warnings.push('Ein verlässlicher Überschuss ist nicht bestätigt. Die Anwendung berechnet deshalb keine für dich tragbare Sparrate.');
- if(f.horizon==='short'||f.horizon==='unknown')warnings.push('Das Geld könnte bald benötigt werden oder der Zeitpunkt ist offen. Der historische Vergleich zeigt nicht, ob Verluste bis dahin aufgeholt wären. Sieh dir auch den Sparformenvergleich an.');
+ if(f.reserve==='no')warnings.push('Du hast keine getrennte Reserve angegeben. Unerwartete Ausgaben könnten einen Verkauf zu einem ungünstigen Zeitpunkt erzwingen.');
+ if(f.reserve==='unknown')warnings.push('Du bist bei deiner Reserve unsicher. Diese Unsicherheit wird berücksichtigt: Historisch ruhigere Verläufe stehen zuerst, ohne dass damit Kapitalsicherheit zugesagt wird.');
+ if(f.loss==='no')warnings.push('Du hast angegeben, dass Verluste deine laufenden Ausgaben oder dein Anlageziel gefährden könnten. Auch historisch ruhige Portfolios können Geld verlieren.');
+ if(f.loss==='unknown')warnings.push('Dein finanzieller Verlustspielraum ist für dich noch unsicher. Deshalb werden vorsichtigere historische Vergleiche zuerst angezeigt.');
+ if(f.debt==='yes')warnings.push('Du hast angegeben, dass geliehenes Geld oder laufende Kreditraten betroffen wären. Das erhöht die Belastung bei Verlusten.');
+ if(f.debt==='unknown')warnings.push('Du bist hinsichtlich der Finanzierung unsicher. Diese Angabe führt zu einer vorsichtigeren Sortierung, nicht zum Ausschluss deines Profils.');
+ if(f.income==='no')warnings.push('Du hast keinen verlässlichen Überschuss angegeben. Die Anwendung berechnet deshalb keine für dich tragbare Sparrate.');
+ if(f.income==='unknown')warnings.push('Dein Überschuss ist unregelmäßig oder unklar. Das wird bei der vorsichtigen Sortierung berücksichtigt; eine tragbare Sparrate wird nicht geschätzt.');
+ if(f.horizon==='short')warnings.push('Du könntest das Geld in weniger als fünf Jahren benötigen. Der Vergleich zeigt nicht, ob Verluste bis dahin aufgeholt wären. Sieh dir auch den Sparformenvergleich an.');
+ if(f.horizon==='unknown')warnings.push('Du weißt noch nicht, wann du das Geld benötigen könntest. Deshalb stehen historisch ruhigere Verläufe zuerst; der Sparformenvergleich bleibt ebenfalls wichtig.');
  const cautious=assessment.band<=1||f.goal==='reserve'||f.horizon==='short'||f.horizon==='unknown'||warnings.length>0;
- return {...assessment,warnings,mode:cautious?'calm':f.effort==='low'?'simple':'neutral',simple:f.effort==='low'};
+ return {...assessment,warnings,contextCount,mode:cautious?'calm':f.effort==='low'?'simple':'neutral',simple:f.effort==='low'};
 }
 
 // Eigene, offen ausgewiesene Anzeigeregel – keine validierte Eignungszuordnung.
