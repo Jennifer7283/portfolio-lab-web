@@ -1,0 +1,24 @@
+name: Recover stuck Pages deployment
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      pages: write
+    steps:
+      - name: Cancel the stale Pages deployment and request a fresh build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          stale="886c25e53a1f0adbcc44c294895bd9f17169a82f"
+          gh api "repos/$GH_REPO/pages/deployments/$stale"
+          gh api --method POST "repos/$GH_REPO/pages/deployments/$stale/cancel"
+          gh api --method POST "repos/$GH_REPO/pages/builds"
