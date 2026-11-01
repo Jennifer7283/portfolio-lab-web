@@ -54,4 +54,37 @@ h1,h2,h3{font-weight:600}nav label>span{min-width:0;hyphens:manual;overflow-wrap
 .tooltip-series p:last-child,.mark-tooltip p:last-child{margin-bottom:0}
 .tooltip-series b{padding-left:0}
 .tooltip{max-height:calc(100vh - 40px);overflow-y:auto;pointer-events:auto;overscroll-behavior:contain}
+
+/* Keine willkürlichen Umbrüche innerhalb eines Wortes. Die deutsche Sprache
+   ist am Dokument gesetzt; längere Wörter dürfen regelgerecht getrennt werden. */
+body,button,select,summary,p,h1,h2,h3,h4,th,td,.head-cell>span,
+nav a,nav label>span,.chart .legend>span,.tooltip,.explanation-prose{
+ word-break:normal;overflow-wrap:normal;hyphens:auto;-webkit-hyphens:auto;
+}
+textarea.prompt{white-space:pre-wrap;overflow-wrap:normal;word-break:normal;hyphens:none}
+th,td{hyphenate-limit-chars:8 3 3}
+th .head-cell{align-items:flex-start}
+th[data-metric="annual"] .head-cell>span{white-space:nowrap;hyphens:none}
+table:has(th[data-metric="sharpe"]) th[data-metric="portfolio"]{width:25%}
+table:has(th[data-metric="sharpe"]) th[data-metric="annual"]{width:19%}
+table:has(th[data-metric="sharpe"]) th[data-metric="vol"]{width:23%}
+table:has(th[data-metric="sharpe"]) th[data-metric="sharpe"]{width:15%}
+table:has(th[data-metric="sharpe"]) th[data-metric="drawdown"]{width:18%}
+.table-wrap{container-type:inline-size}
+.cell-caption{display:none}.cell-value{display:block;min-width:0}
+/* Entscheidend ist der tatsächlich verfügbare Tabellenplatz, nicht die
+   Fensterbreite. Unterhalb davon bleiben Begriffe und Werte lesbar, ohne sie
+   mitten im Wort zu zerschneiden oder die Tabelle seitlich zu scrollen. */
+@container(max-width:650px){
+ table,tbody,tr,td{display:block}thead{display:none}
+ table{font-size:13px}tr{border-bottom:1px solid var(--border);margin:0;border-radius:0}
+ tr:last-child{border-bottom:0}
+ td{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:11px 12px;border-width:0 0 1px;font-size:13px;overflow-wrap:normal;word-break:normal}
+ td::before{content:none!important}
+ td:first-child{background:#eff5ec;font-weight:600}
+ .cell-caption{display:flex;align-items:flex-start;gap:6px;flex:0 0 48%;font-weight:500;color:#657b6b;min-width:0}
+ .cell-caption>span{min-width:0;flex:1}
+ .cell-caption .info{flex:0 0 24px}
+ .cell-value{flex:1;min-width:0;text-align:left}
+}
 @media(max-width:1100px){.result-highlights{grid-template-columns:1fr;gap:16px}.result-highlights>div{border:0;border-bottom:1px solid var(--border);padding:0 0 16px}.result-highlights>div:last-child{padding-bottom:0}}
