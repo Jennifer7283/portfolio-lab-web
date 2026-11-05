@@ -6,6 +6,20 @@ export const endOfPreviousMonth = d => {const x=new Date(d+'T00:00:00Z');x.setUT
 export const finite = x=>typeof x==='number' && Number.isFinite(x);
 export const pretty = n=>n.replaceAll('_',' ').replace('Nasdaq 100','Nasdaq-100').replace('SP 500','S&P 500');
 
+// Keine implizite Auswahl aus der Reihenfolge der importierten Anlagen.
+export function ownPortfolioWeights(data,rows) {
+ const weights={};
+ for(const row of rows){
+  if(!row.name)throw Error('Bitte einen ETF auswählen. Für jede hinzugefügte Zeile ist eine Auswahl erforderlich.');
+  if(!Object.hasOwn(data.assets,row.name)||data.assets[row.name].role==='MARKTINDEX')throw Error('Bitte eine verfügbare Anlage auswählen.');
+  if(Object.hasOwn(weights,row.name))throw Error('Bitte wähle jeden ETF nur einmal aus.');
+  if(!finite(row.weight)||row.weight<0||row.weight>100)throw Error('Bitte gültige Anteile zwischen 0 und 100 Prozent eingeben.');
+  weights[row.name]=row.weight/100;
+ }
+ if(!rows.length||Math.abs(sum(Object.values(weights))-1)>1e-8)throw Error('Die Anteile müssen zusammen 100 Prozent ergeben.');
+ return weights;
+}
+
 // Deutsche Arbeitsübersetzung des vom Nutzer bereitgestellten Appendix A,
 // Kuzniak et al. (2015), S. 189–191; Grable & Lytton (1999).
 // Dollarbeträge und Antwortoptionen bleiben unverändert. Keine Kurzskala.

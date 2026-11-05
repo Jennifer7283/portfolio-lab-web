@@ -1,6 +1,20 @@
 # Portfolio Lab – GitHub Pages
 
-## Optionales Profil
+## Eigene Auswahl und Standardansicht
+
+Eigene Portfolios beginnen ohne vorausgewählte Anlage und ohne vorgegebenen Anteil.
+Auch neu hinzugefügte Zeilen beginnen mit „Bitte einen ETF auswählen“. Ein
+einzelner selbst ausgewählter ETF mit 100 Prozent ist weiterhin möglich.
+Unter jedem ausgewählten Baustein kann dessen vorhandene Beschreibung aus der
+Importdatei aufgeklappt werden. Für unvollständige Auswahlen wird keine Simulation
+oder Bericht-Prompt für ein eigenes Portfolio berechnet.
+
+Portfoliozusammensetzung sowie die drei Bericht-Bereiche gehören in der
+Vermögenssimulation zur Standardansicht. Bericht-Prompts werden weiterhin nur
+nach einem ausdrücklichen Klick erzeugt und stehen am Ende der Analyse.
+Im eigenen Portfolio bleiben die zusätzlichen Darstellungen und Berichte optional.
+
+## Optionales Profil (Auswertung)
 
 „Mein Profil“ enthält eine deutsche Arbeitsübersetzung der vollständigen
 13-Item-Skala von Grable und Lytton aus Kuzniak et al. (2015), Appendix A.
