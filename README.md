@@ -66,15 +66,22 @@ Fokussieren auch mit den Pfeiltasten, Home und End durchgehen. Punkte und
 Säulensegmente sind per Tab und Enter erreichbar; Escape schließt die Anzeige.
 Die Skalen werden dabei nicht gezoomt oder verschoben.
 
-Zusatzbereiche und die drei Bericht-Prompts werden einzeln in der Navigation
-gewählt und in fester Reihenfolge angezeigt. Schwankungsklassen verwenden die
+Zusatzbereiche werden einzeln in der Navigation gewählt und in fester Reihenfolge
+angezeigt. Die drei Bericht-Bereiche sind in Vermögenssimulation und eigenem
+Portfolio fest sichtbar; Prompts entstehen erst auf Knopfdruck. Schwankungsklassen verwenden die
 Grün-bis-Rot-Skala der lokalen Anwendung. Beim eigenen Portfolio wird dafür eine
 separate Referenzhistorie ab Beginn des importierten Testverlaufs verwendet,
 unabhängig vom gewählten Investitionsbeginn. Das bleibt eine historische
 Einordnung anhand der SRRI-Grenzen, keine offizielle Produkteinstufung.
 
 Nicht alle lokalen Funktionen sind bereits übertragen: insbesondere die
-modellbasierte Effizienzgrenze mit Kapitalmarktlinie/CAPM und der Bausparvertrag.
+modellbasierte Effizienzgrenze mit Kapitalmarktlinie/CAPM.
+
+Der Bausparvertrag ist optional im Sparformen- und Inflationsvergleich verfügbar.
+Berechnet wird dieselbe vereinfachte Sparphase wie lokal: Abschlussgebühr bei
+Beginn, Jahresentgelt nach zwölf Monaten vor der Verzinsung, Guthabenzins nur
+auf positives Guthaben. Förderungen, Steuern, Darlehen und Zuteilung fehlen.
+Die Beispielwerte sind kein historisches Angebot oder zugesicherter Auszahlungswert.
 
 ## Sicherheit und Datenschutz
 

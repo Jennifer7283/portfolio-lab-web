@@ -9,7 +9,9 @@ export const pretty = n=>n.replaceAll('_',' ').replace('Nasdaq 100','Nasdaq-100'
 // Zentraler Erklärungstext: auch ältere Importdateien erhalten dieselbe Fassung.
 // Quellen: Nasdaq NDX Overview und Invesco QQQ Produktinformation (05.11.2026).
 export const NASDAQ_DESCRIPTION = 'Der ETF QQQ bildet den Nasdaq-100 nach. Nasdaq ist eine US-Börse, also ein Handelsplatz für Aktien. Der Nasdaq-100 bündelt 100 der größten dort gelisteten Unternehmen außerhalb des Finanzsektors. Dazu können Unternehmen aus den USA und anderen Ländern gehören.\n\nTechnologieunternehmen haben einen großen Einfluss, etwa Anbieter von Software und Computerchips. Es sind aber auch andere Branchen vertreten, beispielsweise Handel und Gesundheit. Banken und Versicherungen gehören nicht dazu. Der ETF ist deshalb weder ein reiner Technologie-ETF noch ein Querschnitt durch den gesamten US-Aktienmarkt oder die Weltwirtschaft.\n\nDas Geld wird nicht gleichmäßig auf die Unternehmen verteilt. Große Positionen beeinflussen den Verlauf stärker. Wenn diese Unternehmen gleichzeitig an Wert verlieren, kann der ETF deutlich fallen. Viele enthaltene Aktien bedeuten also nicht automatisch eine gleichmäßige Streuung über alle Branchen.';
-export const assetDescription = asset => asset?.symbol==='QQQ'?NASDAQ_DESCRIPTION:(asset?.description||asset?.label||'Für diese Anlage ist noch keine Beschreibung hinterlegt.');
+export const NASDAQ_SHORT = 'Nasdaq ist eine US-Börse, also ein Handelsplatz für Aktien. Der Nasdaq-100 bündelt 100 der größten dort gelisteten Unternehmen außerhalb des Finanzsektors. Dazu können Unternehmen aus den USA und anderen Ländern gehören.\n\nTechnologieunternehmen haben einen großen Einfluss, etwa Anbieter von Software und Computerchips. Es sind aber auch andere Branchen vertreten, beispielsweise Handel und Gesundheit. Banken und Versicherungen gehören nicht dazu.';
+export const SP500_DESCRIPTION = 'Der S&P 500 ist ein Aktienindex: eine festgelegte Zusammenstellung von 500 großen US-Unternehmen aus verschiedenen Branchen, zum Beispiel Technologie, Gesundheit, Handel und Finanzen. Der ETF SPY bildet diesen Index nach.\n\nUnternehmen mit einem größeren Börsenwert haben mehr Einfluss auf den Verlauf. Der ETF deckt daher viele große US-Unternehmen ab, aber nicht den gesamten Weltaktienmarkt. Auch ein solcher breit gestreuter Aktien-ETF kann deutlich an Wert verlieren.';
+export const assetDescription = asset => asset?.symbol==='QQQ'?NASDAQ_DESCRIPTION:asset?.symbol==='SPY'?SP500_DESCRIPTION:(asset?.description||asset?.label||'Für diese Anlage ist noch keine Beschreibung hinterlegt.');
 
 // Keine implizite Auswahl aus der Reihenfolge der importierten Anlagen.
 export function ownPortfolioWeights(data,rows) {
@@ -183,6 +185,14 @@ export function volatilityClass(data,returns,start=0) {
 export function savings(dates,capital,payment,rate,months,nextRate) {
   let value=capital,paid=capital;const rows=[{date:endOfPreviousMonth(dates[0]),value,paid,totalCost:0}];
   dates.forEach((date,i)=>{paid+=payment;value=(value+payment)*(1+(i<months?rate:nextRate))**(1/12);rows.push({date,value,paid,totalCost:0});});return {name:'Tagesgeldkonto (Szenario)',rows};
+}
+// Entspricht der lokalen Bausparrechnung: nur die Sparphase, kein Darlehen.
+export function buildingSavings(dates,capital,payment,contractSum,rate,closingFee,annualFee=0) {
+  if(!dates.length||![capital,payment,contractSum,rate,closingFee,annualFee].every(finite)||capital<0||payment<0||contractSum<=0||rate<=-1||closingFee<0||annualFee<0)throw Error('Bitte gültige Angaben zum Bausparvertrag eingeben.');
+  let totalCost=contractSum*closingFee,value=capital-totalCost,paid=capital;
+  const rows=[{date:endOfPreviousMonth(dates[0]),value,paid,totalCost}];
+  dates.forEach((date,i)=>{paid+=payment;value+=payment;const cost=(i+1)%12===0?annualFee:0;value-=cost;totalCost+=cost;if(value>0)value*=(1+rate)**(1/12);rows.push({date,value,paid,totalCost});});
+  return {name:'Bausparvertrag – Sparphase (Szenario)',rows};
 }
 export function realValue(rows,cpi) {const base=cpi[rows[0].date];if(!finite(base)||base<=0)return [];return rows.filter(r=>finite(cpi[r.date])&&cpi[r.date]>0).map(r=>({...r,value:r.value*base/cpi[r.date]}));}
 
