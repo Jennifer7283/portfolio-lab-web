@@ -12,7 +12,10 @@ oder Bericht-Prompt für ein eigenes Portfolio berechnet.
 Portfoliozusammensetzung sowie die drei Bericht-Bereiche gehören in der
 Vermögenssimulation zur Standardansicht. Bericht-Prompts werden weiterhin nur
 nach einem ausdrücklichen Klick erzeugt und stehen am Ende der Analyse.
-Im eigenen Portfolio bleiben die zusätzlichen Darstellungen und Berichte optional.
+Auch beim eigenen Portfolio gehören alle drei Bericht-Bereiche fest dazu.
+Andere zusätzliche Darstellungen bleiben dort optional. ETF-Auswahl und
+Prozentfeld sind einheitlich hoch; die Auswahl erhält mehr Platz als der Anteil.
+Die Nasdaq-/QQQ-Erklärung wird zentral aktualisiert, auch für ältere Importdateien.
 
 ## Optionales Profil (Auswertung)
 

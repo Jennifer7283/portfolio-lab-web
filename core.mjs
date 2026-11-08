@@ -6,6 +6,11 @@ export const endOfPreviousMonth = d => {const x=new Date(d+'T00:00:00Z');x.setUT
 export const finite = x=>typeof x==='number' && Number.isFinite(x);
 export const pretty = n=>n.replaceAll('_',' ').replace('Nasdaq 100','Nasdaq-100').replace('SP 500','S&P 500');
 
+// Zentraler Erklärungstext: auch ältere Importdateien erhalten dieselbe Fassung.
+// Quellen: Nasdaq NDX Overview und Invesco QQQ Produktinformation (05.11.2026).
+export const NASDAQ_DESCRIPTION = 'Der ETF QQQ bildet den Nasdaq-100 nach. Nasdaq ist eine US-Börse, also ein Handelsplatz für Aktien. Der Nasdaq-100 bündelt 100 der größten dort gelisteten Unternehmen außerhalb des Finanzsektors. Dazu können Unternehmen aus den USA und anderen Ländern gehören.\n\nTechnologieunternehmen haben einen großen Einfluss, etwa Anbieter von Software und Computerchips. Es sind aber auch andere Branchen vertreten, beispielsweise Handel und Gesundheit. Banken und Versicherungen gehören nicht dazu. Der ETF ist deshalb weder ein reiner Technologie-ETF noch ein Querschnitt durch den gesamten US-Aktienmarkt oder die Weltwirtschaft.\n\nDas Geld wird nicht gleichmäßig auf die Unternehmen verteilt. Große Positionen beeinflussen den Verlauf stärker. Wenn diese Unternehmen gleichzeitig an Wert verlieren, kann der ETF deutlich fallen. Viele enthaltene Aktien bedeuten also nicht automatisch eine gleichmäßige Streuung über alle Branchen.';
+export const assetDescription = asset => asset?.symbol==='QQQ'?NASDAQ_DESCRIPTION:(asset?.description||asset?.label||'Für diese Anlage ist noch keine Beschreibung hinterlegt.');
+
 // Keine implizite Auswahl aus der Reihenfolge der importierten Anlagen.
 export function ownPortfolioWeights(data,rows) {
  const weights={};
