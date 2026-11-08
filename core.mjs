@@ -149,9 +149,9 @@ export function simulate(data,name,start,capital,payment,custom=null,costs=true)
   const dates=data.dates.slice(start),returns=custom?custom.returns:data.portfolios[name]?.slice(start);
   if(!returns||returns.length!==dates.length)throw Error('Für das Portfolio fehlen Monatsrenditen.');
   const attr=custom?custom.attr:data.attribution.filter(a=>a.portfolio===name&&a.datum>=dates[0]);
-  const events=custom?custom.trades:data.trades.filter(t=>t.portfolio===name&&t.neuberechnung>=dates[0]);
-  const initial=custom?custom.initial:attr.filter(a=>a.datum===dates[0]).map(a=>a.startgewicht);
-  if(!initial.length)throw Error('Die Anfangsgewichte fehlen; Kosten können nicht zuverlässig berechnet werden.');
+  const events=custom?(custom.costTrades??custom.trades):data.trades.filter(t=>t.portfolio===name&&t.neuberechnung>=dates[0]);
+  const initial=custom?(custom.costInitial??custom.initial):attr.filter(a=>a.datum===dates[0]).map(a=>a.startgewicht);
+  if(!initial.length&&!custom?.costInitial)throw Error('Die Anfangsgewichte fehlen; Kosten können nicht zuverlässig berechnet werden.');
   let value=capital,paid=capital,cost=0;
   const rows=[{date:endOfPreviousMonth(dates[0]),value,paid,cost:0,totalCost:0}];
   dates.forEach((date,i)=>{

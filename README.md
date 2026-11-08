@@ -1,5 +1,86 @@
 # Portfolio Lab – GitHub Pages
 
+## Neue Lern- und Vergleichsansicht (08.11.2026)
+
+Portfolios sind in drei aufklappbare Gruppen mit Mehrfachauswahl eingeordnet.
+Nur die einfachen Vergleiche sind anfangs geöffnet. Geschlossene Gruppen zeigen
+die Zahl gewählter Portfolios; die kompakte Gesamtauswahl erlaubt das Entfernen.
+
+Die freiwillige Erklärungstiefe „Grundlagen“, „Verstehen“ oder „Vertiefung“ wird
+lokal im Browser gespeichert. Sie ist kein Wissenstest oder Risikoprofil und
+ändert keine Finanzwerte. Profilantworten und Finanzdaten bleiben weiterhin nur
+in der geöffneten Sitzung. „Mehr erfahren“ hält die anderen Texte erreichbar.
+
+World/EM, World/Tagesgeld und World/US-Anleihen sind einstellbar. URTH ist dabei
+MSCI World (Industrieländer), kein All-Country-ETF. Ohne ausdrücklich importierten
+ACWI wird kein ACWI ergänzt. Die vorhandenen alten festen 70/30- und 60/40-Reihen
+bleiben im Import zulässig, werden in der Auswahl aber durch einstellbare
+Mischungen ersetzt. Bei gleichem ursprünglichem Start stimmt die 70/30-Einstellung
+mit dem alten Verlauf überein. Ein späterer Einstieg beginnt mit den neu gewählten
+Zielgewichten; er übernimmt nicht unbemerkt die vorher gedrifteten Altgewichte.
+
+Mischungen verwenden tatsächliche Monatsrenditen und driftende Gewichte, keine
+Mittelwerte fertiger Endwerte. Jährliche Bandprüfung: Bei Überschreiten einer
+importierten 5/25-Schwelle Rücksetzung aller Positionen. Einzahlungen werden
+entsprechend dem bestehenden vereinfachten Modell behandelt, nicht als
+vollständige Depotbuchhaltung. Nur ETF-Orders tragen Handelskosten; Umbuchungen
+in das Tagesgeld-Szenario sind hier kostenfrei. Tagesgeld nutzt die sichtbaren
+eingegebenen Zinsen ab Anlagebeginn, keine historische Bankofferte. AGG sind
+US-Dollar-Anleihen ohne unterstellte Währungssicherung; Euro-Umrechnung ist keine
+Absicherung. Steuern bleiben ausgeschlossen.
+
+Minimum-Varianz hat keinen Hauptnavigationseintrag mehr. Shrinkage steht in der
+Gruppe Optimierungsverfahren; alle importierten Varianten bleiben unter der
+Zusatzansicht „Schätzverfahren vergleichen“ erhalten. Fama-French schätzt hier
+Kovarianzen, statt ein Faktorprämienportfolio zusammenzustellen.
+
+Alle drei Portfolio-Prompttypen enthalten aktuelle Zielgewichte, Zinsszenario,
+Zeitraum, Einzahlungen, Kosten/Bänder, Datenstand und Erklärungstiefe. Ein alter
+Prompt bleibt nach Eingabeänderungen sichtbar, ist aber als veraltet markiert.
+Ein externer KI-Bericht kann hier nicht automatisch überprüft oder aktualisiert
+werden. Es werden weiterhin keine Daten an einen KI-Dienst gesendet.
+
+## ETF-Monatsradar: getrennte Datenversorgung
+
+Der Radar startet ohne Ranglisten, bis ein belegter Monatsimport vorliegt.
+Es werden keine Beispiel-Rankings oder aus Portfolio-Renditen abgeleiteten
+Kaufempfehlungen veröffentlicht. Kandidat für Umsatzdaten:
+[Deutsche Börse, ETF-/ETP-Monatsstatistiken](https://www.cashmarket.deutsche-boerse.com/cash-de/Daten-Tech/statistiken/etf-etp-statistiken).
+Getrennte Kauf-/Verkaufsstatistiken brauchen eine klar benannte Brokerpopulation.
+Ein freigegebener Medienkorpus zur ETF-Erwähnungszählung liegt noch nicht vor.
+Quellenzugänglichkeit ersetzt keine Prüfung der Weiterverwendungsrechte.
+
+Dateikopf: `schema: "portfolio-lab-radar-v1"`, `month: "YYYY-MM"`, `asOf:
+"YYYY-MM-DD"`, `products: []`, `categories: []`. Der Monat muss abgeschlossen
+sein; der Datenstand muss nach seinem Abschluss liegen. Die Schaltfläche in der
+Anwendung lädt einen leeren Container herunter.
+
+Produkte: `isin` (mit korrekter Prüfziffer), `name`, `focus`, `type: "ETF"`.
+ETCs und ETNs werden nicht untergeschoben. Jede Anteilsklasse besitzt eine ISIN;
+mehrere Börsennotierungen ergeben keine mehrfachen Produktplätze.
+
+Kategorien: `id`, `kind`, `unit`, `scope`, `coverage`, `method`, `rights`,
+`complete` (Boolean), `from` und `to` (ganzer Monat), `observations` (Liste).
+Zulässige Paare: buys/Orders, sells/Orders, turnover/EUR, mentions/Beiträge,
+flows/EUR. Getrennte Populationen und Messlogiken benötigen getrennte Kategorien.
+
+Jeder Beleg: `id`, `isin`, `value`, `source`, `url` (HTTPS). Zahlenbelege brauchen
+zusätzlich `basis: "monthly-total"`, `from`, `to`. Keine Tagesmomentaufnahme.
+Mehrere Zahlenbelege je ISIN müssen nach dokumentierter Vorprüfung nicht
+überlappende Mengen darstellen. Derselbe Gesamtwert aus zwei Quellen darf nicht
+doppelt gezählt werden; dies kann ein Formvalidator nicht inhaltlich beweisen.
+
+Medienbelege: `value: 1`, `date`, `canonicalId`, `match: "exact-etf-isin"`.
+Nur konkrete ETF-Zuordnungen zählen, keine reinen Indexnennungen. Ein Beitrag
+zählt je ISIN höchstens einmal; wiederholte Nennungen und alternative URLs mit
+derselben kanonischen ID werden bereinigt.
+
+Summiert wird je Kategorie und ISIN, absteigend sortiert. Gleichstand = gleicher
+Rang; bei der Anzeige entscheidet zusätzlich die ISIN. Maximal drei Produkte,
+keine aufgefüllten Plätze. Unvollständige Kategorien erhalten keine Top 3.
+ETF- und zusammenfassende Radar-Prompts übernehmen nur diese Quelldaten.
+Der Import prüft Struktur, nicht Lizenz, Tatsachen oder behauptete Abdeckung.
+
 ## Eigene Auswahl und Standardansicht
 
 Eigene Portfolios beginnen ohne vorausgewählte Anlage und ohne vorgegebenen Anteil.
