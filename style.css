@@ -130,3 +130,11 @@ nav .subnav label{gap:7px}
 .portfolio-group>summary::before{content:'›';font-size:22px;color:var(--green);flex:none}.portfolio-group[open]>summary::before{content:'⌄'}
 .nav-toggle{z-index:40}aside{z-index:30}
 @media(max-width:760px){.depth-header{padding-left:46px}.depth-header>span{width:100%}}
+
+/* Gleicher Inhaltsrahmen wie die übrigen Analyseansichten, ohne schmale Radar-Spalte. */
+.radar-page{width:100%;max-width:none;min-width:0}
+.radar-page :is(.lead,.radar-description,.radar-ranking-title){width:100%;max-width:none}
+.radar-page :is(h1,h2,h3,p,a){word-break:normal;overflow-wrap:normal;hyphens:manual}
+.radar-page .radar-product{margin:20px 0;padding:25px;border-radius:15px}
+.radar-page .radar-product footer{margin:14px 0 0;padding:14px 0 0;line-height:1.55}
+@media(max-width:760px){.radar-page .radar-product{padding:18px}}
