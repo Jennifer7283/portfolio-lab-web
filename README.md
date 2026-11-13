@@ -42,7 +42,11 @@ werden. Es werden weiterhin keine Daten an einen KI-Dienst gesendet.
 
 ## ETF-Monatsradar: getrennte Datenversorgung
 
-Der Radar startet ohne Ranglisten, bis ein belegter Monatsimport vorliegt.
+Der Radar startet mit einer redaktionell geprüften Top 3 nach Xetra-Handelsumsatz
+für September 2026 (Quelle veröffentlicht am 01.10.2026, Übersicht geprüft am
+09.11.2026). Erklärungen, Produktlinks und kopierbare KI-Prompts funktionieren
+ohne Analyseimport. Neuere Monate werden nicht automatisch behauptet oder
+geschätzt. Eigene Monatsimporte bleiben optional und können zurückgesetzt werden.
 Es werden keine Beispiel-Rankings oder aus Portfolio-Renditen abgeleiteten
 Kaufempfehlungen veröffentlicht. Kandidat für Umsatzdaten:
 [Deutsche Börse, ETF-/ETP-Monatsstatistiken](https://www.cashmarket.deutsche-boerse.com/cash-de/Daten-Tech/statistiken/etf-etp-statistiken).
