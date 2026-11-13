@@ -42,14 +42,18 @@ werden. Es werden weiterhin keine Daten an einen KI-Dienst gesendet.
 
 ## ETF-Monatsradar: getrennte Datenversorgung
 
-Der Radar startet mit einer redaktionell geprüften Top 3 nach Xetra-Handelsumsatz
-für September 2026 (Quelle veröffentlicht am 01.10.2026, Übersicht geprüft am
-09.11.2026). Erklärungen, Produktlinks und kopierbare KI-Prompts funktionieren
-ohne Analyseimport. Neuere Monate werden nicht automatisch behauptet oder
-geschätzt. Eigene Monatsimporte bleiben optional und können zurückgesetzt werden.
+Der Radar startet mit der öffentlichen ETF-Kauf-Top-3 der Consorsbank, abgerufen
+am 13.11.2026: Alle Kunden / Letzter Monat / Gekauft / ETFs. Es werden nur die
+Quellenplätze übernommen, keine unbekannten Kundenzahlen oder Kaufvolumina.
+Die Quelle misst nach Anzahl kaufender Kunden und nennt nur „Letzter Monat“,
+keine Datumsgrenzen. Die rechnerische Zuordnung zu Oktober 2026 ist deshalb
+keine Bestätigung eines ausdrücklich datierten Oktoberberichts. Die Rangliste
+ist nicht repräsentativ für den gesamten Börsenhandel. Verkäufe und Bestände
+aus dem eingeloggten Bereich werden nicht übernommen. ETF-Erklärungen und
+kopierbare Prompts funktionieren ohne Analyseimport. Keine Live-Aktualisierung.
 Es werden keine Beispiel-Rankings oder aus Portfolio-Renditen abgeleiteten
-Kaufempfehlungen veröffentlicht. Kandidat für Umsatzdaten:
-[Deutsche Börse, ETF-/ETP-Monatsstatistiken](https://www.cashmarket.deutsche-boerse.com/cash-de/Daten-Tech/statistiken/etf-etp-statistiken).
+Kaufempfehlungen veröffentlicht. Quelle der aktuellen Platzierungen:
+[Consorsbank, Kundenfavoriten](https://www.consorsbank.de/web/Sparen-Anlegen/Anlegen/Das-kauften-Kunden).
 Getrennte Kauf-/Verkaufsstatistiken brauchen eine klar benannte Brokerpopulation.
 Ein freigegebener Medienkorpus zur ETF-Erwähnungszählung liegt noch nicht vor.
 Quellenzugänglichkeit ersetzt keine Prüfung der Weiterverwendungsrechte.
@@ -67,6 +71,12 @@ Kategorien: `id`, `kind`, `unit`, `scope`, `coverage`, `method`, `rights`,
 `complete` (Boolean), `from` und `to` (ganzer Monat), `observations` (Liste).
 Zulässige Paare: buys/Orders, sells/Orders, turnover/EUR, mentions/Beiträge,
 flows/EUR. Getrennte Populationen und Messlogiken benötigen getrennte Kategorien.
+
+Zusätzlich `customer-buys/Quellenrang`: Belege enthalten `rank` und
+`basis: "published-ranking"`, aber ausdrücklich kein `value`. Es werden die
+veröffentlichten Plätze sortiert, nicht Messwerte summiert. Für eine vollständige
+Top 3 sind die eindeutigen Plätze 1 bis 3 erforderlich. `periodLabel` und
+`periodNote` bewahren die relative Zeitangabe der Originalquelle.
 
 Jeder Beleg: `id`, `isin`, `value`, `source`, `url` (HTTPS). Zahlenbelege brauchen
 zusätzlich `basis: "monthly-total"`, `from`, `to`. Keine Tagesmomentaufnahme.
