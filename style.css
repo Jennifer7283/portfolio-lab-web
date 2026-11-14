@@ -138,3 +138,10 @@ nav .subnav label{gap:7px}
 .radar-page .radar-product{margin:20px 0;padding:25px;border-radius:15px}
 .radar-page .radar-product footer{margin:14px 0 0;padding:14px 0 0;line-height:1.55}
 @media(max-width:760px){.radar-page .radar-product{padding:18px}}
+
+/* Profil als kompakter Fließtext, technische Auswertung nur auf Wunsch. */
+.profile-summary p{line-height:1.6;margin:8px 0 14px}
+.profile-summary h2{margin:0 0 14px}.profile-summary h3{margin:0 0 8px}
+.profile-summary h4{font-size:16px;margin:18px 0 6px;font-weight:600}
+.profile-summary section{margin:0}.profile-summary details{margin:12px 0}
+.profile-summary .small{margin-top:14px}.profile-summary>a{display:inline-block;margin-top:10px}

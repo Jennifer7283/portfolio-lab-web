@@ -85,6 +85,40 @@ export function profilePolicy(profile) {
  return {...assessment,warnings,contextCount,mode:cautious?'calm':f.effort==='low'?'simple':'neutral',simple:f.effort==='low'};
 }
 
+// Textliche Rückmeldung aus vorhandenen Antworten, keine neue Typologie oder Punkteskala.
+export function profileReflection(profile){
+ const p=profilePolicy(profile);if(!p)return null;const f=profile.context??{};
+ const risk=[
+ 'Deine Antworten sprechen dafür, dass du finanzielle Risiken möglichst vermeiden möchtest. Ein ruhiger Verlauf und der Umgang mit möglichen Verlusten sind für dich besonders wichtige Vergleichspunkte.',
+ 'Deine Antworten deuten auf einen eher vorsichtigen Umgang mit Geldanlagen hin. Du bist nicht grundsätzlich gegen Risiken, möchtest mögliche Verluste aber eher begrenzen.',
+ 'Deine Antworten zeigen eine mittlere Risikobereitschaft. Du scheinst zwischen möglichen Gewinnen und der Unsicherheit durch Verluste abwägen zu wollen.',
+ 'Deine Antworten deuten darauf hin, dass du für mögliche Gewinne auch stärkere Schwankungen akzeptieren würdest. Prüfe im Vergleich deshalb nicht nur den Gewinn, sondern auch die zwischenzeitlichen Verluste.',
+ 'Deine Antworten zeigen eine hohe Bereitschaft, finanzielle Risiken einzugehen. Das bedeutet nicht automatisch, dass du größere Verluste finanziell tragen kannst.'
+ ][p.band];
+ const preferences=[];
+ if(f.goal==='save')preferences.push('Du möchtest regelmäßig Vermögen aufbauen.');
+ if(f.goal==='reserve')preferences.push('Dir geht es darum, Geld für einen bestimmten Zweck zu erhalten.');
+ if(f.goal==='learn')preferences.push('Du möchtest Geldanlagen zunächst kennenlernen.');
+ if(f.effort==='low')preferences.push('Dabei ist dir wenig laufender Aufwand wichtig; achte beim Vergleich darauf, wie oft du die Aufteilung prüfen und anpassen müsstest.');
+ if(f.effort==='active')preferences.push('Du bist bereit, die Anlage regelmäßig zu prüfen und bei Bedarf umzuschichten; häufigerer Handel allein garantiert allerdings kein besseres Ergebnis.');
+ const focus=[];
+ if(f.horizon==='short')focus.push('Da du das Geld möglicherweise schon in weniger als fünf Jahren brauchst, sind seine rechtzeitige Verfügbarkeit und mögliche Verluste bei einem frühen Verkauf besonders wichtig.');
+ if(f.horizon==='medium')focus.push('Für deinen Zeitraum von fünf bis zehn Jahren lohnt sich ein Blick darauf, wie lange frühere Verlustphasen dauerten – ohne Garantie, dass sich Verluste künftig rechtzeitig erholen.');
+ if(f.horizon==='long')focus.push('Du planst mit mehr als zehn Jahren; betrachte deshalb neben dem langfristigen Verlauf auch, ob du zwischenzeitliche Einbrüche aushalten könntest.');
+ if(f.horizon==='unknown')focus.push('Wann du das Geld brauchst, ist noch offen; die Verfügbarkeit des Geldes bleibt deshalb ein wichtiger Punkt.');
+ if(f.reserve==='no')focus.push('Du hast noch keine getrennte Reserve für unerwartete Ausgaben angegeben; sonst könnten diese einen Verkauf während einer Verlustphase erzwingen.');
+ if(f.reserve==='unknown')focus.push('Bei deiner Reserve bist du noch unsicher; kläre, welcher Betrag für unerwartete Ausgaben verfügbar bleiben muss.');
+ if(f.loss==='no')focus.push('Nach deiner Angabe könnten Verluste laufende Ausgaben oder dein Ziel gefährden; dieser begrenzte finanzielle Spielraum ist unabhängig von deiner Risikobereitschaft wichtig.');
+ if(f.loss==='unknown')focus.push('Wie viel Verlust du finanziell verkraften könntest, ist noch unklar und sollte nicht aus deiner Risikobereitschaft abgeleitet werden.');
+ if(f.debt==='yes')focus.push('Weil geliehenes Geld oder Kreditraten betroffen wären, könnten Verluste deine finanzielle Belastung zusätzlich erhöhen.');
+ if(f.debt==='unknown')focus.push('Ob die Finanzierung laufende Verpflichtungen berührt, ist noch unklar.');
+ if(f.income==='no'||f.income==='unknown')focus.push('Dein verfügbarer Überschuss ist nicht verlässlich; eine regelmäßige Einzahlung sollte laufende Ausgaben nicht gefährden.');
+ if(f.experience==='new')focus.push('Da du gerade erst einsteigst, stehen zunächst das Verständnis der Anlagen und ihrer Verlustrisiken im Vordergrund.');
+ if(f.experience==='some')focus.push('Du kennst bereits die Grundlagen; vertiefe beim Vergleich besonders die Unterschiede zwischen Rendite, Schwankungen und Verlusten.');
+ if(f.experience==='experienced')focus.push('Du bringst praktische Erfahrung mit; prüfe trotzdem, ob deine bisherigen Erfahrungen auch zu den hier betrachteten Anlagen und Verlustphasen passen.');
+ return {label:p.label,risk,preferences:preferences.join(' '),focus:focus.join(' '),contextCount:p.contextCount};
+}
+
 // Eigene, offen ausgewiesene Anzeigeregel – keine validierte Eignungszuordnung.
 // Nie historische Rendite maximieren; Fünfjahresrisiko unabhängig vom Startregler.
 export function profileOrder(data,names,profile) {
