@@ -101,22 +101,26 @@ export function profileReflection(profile){
  if(f.goal==='learn')preferences.push('Du möchtest Geldanlagen zunächst kennenlernen.');
  if(f.effort==='low')preferences.push('Dabei ist dir wenig laufender Aufwand wichtig; achte beim Vergleich darauf, wie oft du die Aufteilung prüfen und anpassen müsstest.');
  if(f.effort==='active')preferences.push('Du bist bereit, die Anlage regelmäßig zu prüfen und bei Bedarf umzuschichten; häufigerer Handel allein garantiert allerdings kein besseres Ergebnis.');
- const focus=[];
- if(f.horizon==='short')focus.push('Da du das Geld möglicherweise schon in weniger als fünf Jahren brauchst, sind seine rechtzeitige Verfügbarkeit und mögliche Verluste bei einem frühen Verkauf besonders wichtig.');
- if(f.horizon==='medium')focus.push('Für deinen Zeitraum von fünf bis zehn Jahren lohnt sich ein Blick darauf, wie lange frühere Verlustphasen dauerten – ohne Garantie, dass sich Verluste künftig rechtzeitig erholen.');
- if(f.horizon==='long')focus.push('Du planst mit mehr als zehn Jahren; betrachte deshalb neben dem langfristigen Verlauf auch, ob du zwischenzeitliche Einbrüche aushalten könntest.');
- if(f.horizon==='unknown')focus.push('Wann du das Geld brauchst, ist noch offen; die Verfügbarkeit des Geldes bleibt deshalb ein wichtiger Punkt.');
- if(f.reserve==='no')focus.push('Du hast noch keine getrennte Reserve für unerwartete Ausgaben angegeben; sonst könnten diese einen Verkauf während einer Verlustphase erzwingen.');
- if(f.reserve==='unknown')focus.push('Bei deiner Reserve bist du noch unsicher; kläre, welcher Betrag für unerwartete Ausgaben verfügbar bleiben muss.');
- if(f.loss==='no')focus.push('Nach deiner Angabe könnten Verluste laufende Ausgaben oder dein Ziel gefährden; dieser begrenzte finanzielle Spielraum ist unabhängig von deiner Risikobereitschaft wichtig.');
- if(f.loss==='unknown')focus.push('Wie viel Verlust du finanziell verkraften könntest, ist noch unklar und sollte nicht aus deiner Risikobereitschaft abgeleitet werden.');
- if(f.debt==='yes')focus.push('Weil geliehenes Geld oder Kreditraten betroffen wären, könnten Verluste deine finanzielle Belastung zusätzlich erhöhen.');
- if(f.debt==='unknown')focus.push('Ob die Finanzierung laufende Verpflichtungen berührt, ist noch unklar.');
- if(f.income==='no'||f.income==='unknown')focus.push('Dein verfügbarer Überschuss ist nicht verlässlich; eine regelmäßige Einzahlung sollte laufende Ausgaben nicht gefährden.');
- if(f.experience==='new')focus.push('Da du gerade erst einsteigst, stehen zunächst das Verständnis der Anlagen und ihrer Verlustrisiken im Vordergrund.');
- if(f.experience==='some')focus.push('Du kennst bereits die Grundlagen; vertiefe beim Vergleich besonders die Unterschiede zwischen Rendite, Schwankungen und Verlusten.');
- if(f.experience==='experienced')focus.push('Du bringst praktische Erfahrung mit; prüfe trotzdem, ob deine bisherigen Erfahrungen auch zu den hier betrachteten Anlagen und Verlustphasen passen.');
- return {label:p.label,risk,preferences:preferences.join(' '),focus:focus.join(' '),contextCount:p.contextCount};
+ const timing=[],budget=[],portfolio=[];
+ if(f.horizon==='short')timing.push('Lege zuerst fest, welchen Betrag du in den nächsten fünf Jahren tatsächlich brauchst. Prüfe für diesen Teil besonders, ob ein Kursverlust zum geplanten Auszahlungstermin dein Ziel gefährden würde; ein ETF kann verkäuflich sein und trotzdem gerade im Minus stehen.');
+ if(f.horizon==='medium')timing.push('Vergleiche für deinen Zeitraum von fünf bis zehn Jahren nicht nur den Endwert, sondern auch die Verlustphasen: Wie tief fiel das Portfolio, und wie lange lag es unter seinem früheren Höchststand? Eine Erholung bis zu deinem Auszahlungstermin ist nicht garantiert.');
+ if(f.horizon==='long')timing.push('Du planst mit mehr als zehn Jahren. Prüfe deshalb, ob du die Mischung auch während eines längeren Einbruchs halten könntest, statt nur auf den höchsten historischen Endwert zu schauen; ein langer Zeitraum garantiert keine Erholung.');
+ if(f.horizon==='unknown')timing.push('Kläre zunächst, welcher Teil des Geldes möglicherweise kurzfristig gebraucht wird. Für diesen Teil ist entscheidend, ob du auch bei fallenden Kursen auf das Geld angewiesen wärst.');
+ if(f.reserve==='no')timing.push('Du hast keine getrennte Reserve angegeben: Plane unerwartete Ausgaben getrennt vom investierten Kapital ein, damit sie dich nicht zu einem Verkauf während einer Verlustphase zwingen.');
+ if(f.reserve==='unknown')timing.push('Bei deiner Reserve bist du noch unsicher; prüfe, welcher Betrag jederzeit für unerwartete Ausgaben verfügbar bleiben muss.');
+ if(f.loss==='no')budget.push('Du hast angegeben, dass Verluste Ausgaben oder dein Ziel gefährden könnten. Rechne deshalb mögliche Verluste auch in Euro durch und kläre, welcher Betrag ohne diese Folgen verloren gehen dürfte; Risikobereitschaft ersetzt diesen finanziellen Spielraum nicht. Vergleiche diesen Betrag mit den Werten unter „Risiko verstehen“; historische Verluste und VaR sind keine Obergrenze für künftige Verluste.');
+ if(f.loss==='unknown')budget.push('Deine finanziell verkraftbare Verlusthöhe ist noch unklar und sollte nicht aus deiner Risikobereitschaft abgeleitet werden. Lege dafür einen Betrag in Euro fest und vergleiche ihn mit den historischen Verlusten; diese sind keine Obergrenze künftiger Verluste.');
+ if(f.loss==='yes')budget.push('Prüfe unter „Risiko verstehen“ neben den Schwankungen auch den größten historischen Einbruch und den VaR in Euro. Frage dich, ob ein solcher Verlust bei deinem Startkapital noch tragbar wäre; künftig können Verluste höher ausfallen.');
+ if(f.debt==='yes')budget.push('Da geliehenes Geld oder Kreditraten betroffen wären, rechne auch durch, ob Zinsen und Rückzahlungen ohne Erträge oder Verkäufe aus dem Portfolio bezahlt werden könnten.');
+ if(f.debt==='unknown')budget.push('Kläre außerdem, ob das investierte Geld für Kreditraten oder andere feste Verpflichtungen benötigt wird.');
+ if(f.income==='no'||f.income==='unknown')budget.push('Vergleiche wegen deines unklaren oder fehlenden regelmäßigen Überschusses auch eine Simulation mit geringeren oder ohne monatliche Einzahlungen, statt eine dauerhaft verfügbare Sparrate vorauszusetzen.');
+ if(p.contextCount){portfolio.push('Schau bei der Portfoliozusammensetzung auf die größten Anteile und darauf, welche Länder und Branchen dahinterstehen. Mehrere ETFs sind nicht automatisch breiter gestreut, wenn sie dieselben Unternehmen enthalten.');
+  if(f.effort==='low')portfolio.push('Weil du wenig Aufwand möchtest, vergleiche außerdem Umschichtungsquote und Handelskosten: Wie häufig müsste die Mischung angepasst werden, und was kostet das? Ein historisch höherer Gewinn allein beantwortet diese Fragen nicht.');
+  else if(f.effort==='active')portfolio.push('Beziehe bei deinem Wunsch nach regelmäßiger Prüfung die Umschichtungsquote und Handelskosten ein: Häufige Anpassungen verursachen Aufwand und können den Gewinn schmälern.');
+  else portfolio.push('Vergleiche auch die Handelskosten und den Aufwand für spätere Anpassungen, nicht nur die Rendite.');
+ }
+ const focusParagraphs=[timing,budget,portfolio].map(x=>x.join(' ')).filter(Boolean);
+ return {label:p.label,risk,preferences:preferences.join(' '),focus:focusParagraphs.join(' '),focusParagraphs,contextCount:p.contextCount};
 }
 
 // Eigene, offen ausgewiesene Anzeigeregel – keine validierte Eignungszuordnung.
