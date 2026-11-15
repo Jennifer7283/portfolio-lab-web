@@ -157,6 +157,12 @@ nav .subnav label{gap:7px}
 .profile-learning-actions>.profile-learning-action:hover{background:#1c493a;border-color:#1c493a}
 .profile-learning-actions>.profile-learning-action:focus-visible{outline:3px solid #9b803e;outline-offset:3px}
 @media(max-width:900px){.profile-learning-actions{grid-template-columns:minmax(0,1fr);gap:12px}}
+.learning-journey{margin-top:36px;padding-top:28px;border-top:1px solid var(--border)}
+.learning-journey h2{margin:0 0 16px}
+.profile-learning-actions.learning-journey-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+.profile-learning-actions.learning-journey-profile{grid-template-columns:minmax(0,1fr);max-width:360px;margin:12px 0 24px}
+.journey-profile p{line-height:1.6;margin:10px 0}
+@media(max-width:600px){.profile-learning-actions.learning-journey-actions{grid-template-columns:minmax(0,1fr)}.profile-learning-actions.learning-journey-profile{max-width:none}}
 .learning-lab p{line-height:1.6;margin:10px 0 16px}
 .learning-lab .card .card{padding:0;border:0;box-shadow:none}
 .learning-lab h3{margin-top:28px}.learning-lab .grid{align-items:end}

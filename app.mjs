@@ -196,7 +196,7 @@ function profileView(){
  let html=pageHeading('Mein Profil','Finde einen verständlichen Einstieg. Der vollständige Risikofragebogen ist freiwillig.');
  html+=`<p>Kein Konto und keine Einkommensbeträge nötig. Antworten bleiben beim Wechsel zwischen Bereichen in dieser geöffneten Seite erhalten. Beim Neuladen oder Schließen gehen sie verloren. Du kannst jederzeit unterbrechen und hier fortfahren. Profilantworten gelangen nicht in KI-Prompts.</p><nav class="prompt-actions profile-actions" aria-label="Profilabschnitte"><button class="secondary" data-profile-step="entry">Deinen Einstieg finden</button><button class="secondary" data-profile-step="context">Finanzielle Rahmenbedingungen</button><button class="secondary" data-profile-step="intro">Deine Risikobereitschaft einschätzen</button><button class="secondary" data-profile-step="result">Deine Auswertung</button></nav>`;
  if(state.profileStep==='entry'){
-  html+=`<section class="card"><h2>Deinen Einstieg finden</h2><label class="field"><span>Was möchtest du zuerst tun?</span><select id="profile-entry"><option value="">Noch offen</option><option value="basics" ${draft.entry==='basics'?'selected':''}>Grundlagen kennenlernen</option><option value="compare" ${draft.entry==='compare'?'selected':''}>Portfolios vergleichen</option></select></label><div class="grid">${profileFieldView('experience')}${profileFieldView('effort')}</div>${detail('Optional: Ziel und mögliche Geldentnahme',`<p>Für eine persönliche Orientierung hilft es zu wissen, wofür und wann du das Geld benötigen könntest. Unbeantwortete Angaben bleiben offen.</p>${profileFieldView('goal')}${profileFieldView('horizon')}`)}<p>Das Ergebnis ist ein Lernweg, kein Risikowert und keine Portfolioempfehlung. Alle Werkzeuge bleiben auch ohne Fragebogen zugänglich.</p><div class="prompt-actions"><button class="primary" data-profile-step="result">Meinen Lernweg ansehen</button><button class="secondary" data-profile-step="context">Rahmenbedingungen ergänzen</button></div></section>`;
+  html+=`<section class="card"><h2>Deinen Einstieg finden</h2><label class="field"><span>Was möchtest du zuerst tun?</span><select id="profile-entry"><option value="">Noch offen</option><option value="basics" ${draft.entry==='basics'?'selected':''}>Grundlagen kennenlernen</option><option value="compare" ${draft.entry==='compare'?'selected':''}>Portfolios vergleichen</option></select></label><div class="grid">${profileFieldView('experience')}${profileFieldView('effort')}</div>${detail('Optional: Ziel und mögliche Geldentnahme',`<p>Für eine persönliche Orientierung hilft es zu wissen, wofür und wann du das Geld benötigen könntest. Unbeantwortete Angaben bleiben offen.</p>${profileFieldView('goal')}${profileFieldView('horizon')}`)}<p>Das Ergebnis ist ein Lernweg, kein Risikowert und keine Portfolioempfehlung. Alle Werkzeuge bleiben auch ohne Fragebogen zugänglich.</p><div class="prompt-actions"><button class="primary" data-profile-step="result">Meinen Lernweg ansehen</button><button class="secondary" data-profile-step="context">Profil weiter ausfüllen</button></div></section>`;
  }else if(state.profileStep==='context'){
   html+=`<section class="card"><h2>Finanzielle Rahmenbedingungen</h2><p>Diese freiwilligen Angaben helfen, Einschränkungen vor einer persönlichen Einordnung sichtbar zu machen. Sie sind keine vollständige Prüfung deiner finanziellen Situation.</p>${['reserve','debt','income','loss'].map(profileFieldView).join('')}<div class="prompt-actions"><button class="primary" data-profile-step="intro">Zum optionalen Risikofragebogen</button><button class="secondary" data-profile-step="result">Ohne Fragebogen zur Auswertung</button></div></section>`;
  }else if(state.profileStep==='intro'){
@@ -270,11 +270,20 @@ function analyses(){
  return html+detail('Funktionsumfang der Webversion','Effizienzgrenze, Kapitalmarktlinie und CAPM-Diagramme sind noch nicht übertragen. Das historische Rendite-Schwankungs-Diagramm ist keine Effizienzgrenze und wird nicht als solche dargestellt.');
 }
 // Derselbe Lerninhalt, aber ein ruhiger vertikaler Lesefluss statt Kartenraster.
+function profileJourneyState(profile){
+ const complete=!!scoreRiskAnswers(profile?.answers)&&profileFields.every(([key,,values])=>values.some(([value])=>value===profile?.context?.[key]));
+ return {complete,target:complete?'result':'context',label:complete?'Profil ansehen':'Profil weiter ausfüllen'};
+}
+function learningJourney(short=false){
+ const p=profileJourneyState(state.profileDraft);
+ const profileButton=`<button class="secondary profile-learning-action" data-profile-continue data-profile-target="${p.target}">${p.label}</button>`;
+ return `<section class="section learning-journey" aria-label="Weiter durch Portfolio Lab"><h2>Wie möchtest du weitermachen?</h2>${short?`<div class="journey-profile"><p>Dein Profil ist freiwillig. ${p.complete?'Du kannst deine Angaben und die Einordnung jederzeit ansehen.':'Du kannst es auch jetzt noch ergänzen; bisherige Antworten bleiben erhalten.'}</p><div class="profile-learning-actions learning-journey-profile">${profileButton}</div></div>`:''}<div class="profile-learning-actions learning-journey-actions">${short?'<a class="secondary profile-learning-action" href="#lernen">Grundlagen kennenlernen</a><a class="secondary profile-learning-action" href="#simulation" data-standard-simulation>Zur Vermögenssimulation</a>':profileButton+'<a class="secondary profile-learning-action" href="#kurz">Investieren in a nutshell</a>'}</div></section>`;
+}
 function learningView(short=false){
  const template=document.createElement('template');template.innerHTML=learning(short);
  const list=template.content.querySelector('.grid');
  if(list){list.className=short?'knowledge-list':'learning-path';for(const [i,item] of [...list.children].entries()){item.className=short?'knowledge-item':'learning-step';const number=item.querySelector('.number');if(number)number.textContent=String(i+1).padStart(2,'0');}}
- return template.innerHTML;
+ return template.innerHTML+learningJourney(short);
 }
 function methodologyView(){
  const template=document.createElement('template');template.innerHTML=methodology();
@@ -308,7 +317,8 @@ function render(){clearTimeout(renderTimer);deferredRender=false;const focused=d
  if(focused?.tagName==='INPUT'||focusId==='explanation-depth'||exampleKey){const replacement=mixKey?document.querySelector(`[data-mix-key="${mixKey}"][type="${focused.type}"]`):selectedPortfolio?document.querySelector(`[data-portfolio="${CSS.escape(selectedPortfolio)}"]`):exampleKey?document.querySelector(`[data-mix-example="${exampleKey}"]`):ownIndex!==undefined?document.querySelector(`[data-own-weight="${ownIndex}"]`):focusId?$(focusId):null;replacement?.focus({preventScroll:true});}
 }
 function bind(){
- for(const button of document.querySelectorAll('[data-profile-continue]'))button.addEventListener('click',()=>{state.profileStep='context';state.page='profil';location.hash='profil';render();$('content').querySelector('h1')?.scrollIntoView({block:'start'});});
+ for(const button of document.querySelectorAll('[data-profile-continue]'))button.addEventListener('click',()=>{state.profileStep=button.dataset.profileTarget==='result'?'result':'context';state.page='profil';location.hash='profil';render();$('content').querySelector('h1')?.scrollIntoView({block:'start'});});
+ for(const link of document.querySelectorAll('[data-standard-simulation]'))link.addEventListener('click',()=>{state.learningOpen=false;});
  $('profile-entry')?.addEventListener('change',e=>{state.profileDraft.entry=e.target.value;});
  $('portfolio-sort')?.addEventListener('change',e=>{state.portfolioSort=e.target.value;render();});
  for(const button of document.querySelectorAll('[data-learning-start]'))button.addEventListener('click',()=>{if(state.page==='profil'&&profilePolicy(state.profileDraft))state.profile=structuredClone(state.profileDraft);state.learningOpen=true;state.page='simulation';location.hash='simulation';render();$('learning-lab')?.scrollIntoView({block:'start'});});
