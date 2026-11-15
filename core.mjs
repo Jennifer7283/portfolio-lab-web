@@ -90,6 +90,57 @@ export function profilePolicy(profile) {
   reason:constraints.length?'Deine angegebenen finanziellen Einschränkungen stehen zuerst.':missing.length||uncertain.length?'Einige finanzielle Voraussetzungen sind noch offen.':shortFixed?'Du könntest das Geld für einen festen Zweck bald benötigen.':f.experience==='new'||profile.entry==='basics'?'Du möchtest zuerst die Grundlagen verstehen.':'Du möchtest verschiedene Verläufe bewusst vergleichen.'};
 }
 
+// Redaktionelle Lernhilfen: keine neue Risikoskala oder persönliche Anlagequote.
+export function profileComparisonGuide(profile,depth='Grundlagen'){
+ const p=profilePolicy(profile);if(!p)return null;
+ const f=profile.context??{};let lead,reason,questions,example,next;
+ const budget=p.prerequisitesOpen||f.horizon==='short';
+ if(budget){
+  lead='Bevor du Portfolios vergleichst, trenne kurzfristig benötigtes Geld von langfristigem Anlagegeld.';
+  const reasons=[];
+  if(f.horizon==='short')reasons.push('Du hast angegeben, dass du das Geld möglicherweise in den nächsten Jahren brauchst.');
+  else if(!f.horizon||f.horizon==='unknown')reasons.push('Wann du das Geld benötigen könntest, ist noch offen.');
+  if(f.reserve==='no')reasons.push('Du hast bisher keine getrennte Reserve angegeben.');
+  else if(f.reserve==='unknown')reasons.push('Ob deine Reserve ausreicht, ist nach deiner Angabe noch unsicher.');
+  else if(!f.reserve)reasons.push('Zu einer getrennten Reserve hast du noch keine Angabe gemacht.');
+  if(f.loss==='no')reasons.push('Nach deiner Angabe könnten Verluste wichtige Ausgaben oder dein Ziel gefährden.');
+  else if(f.debt==='yes')reasons.push('Nach deiner Angabe wären geliehenes Geld oder laufende Kreditraten betroffen.');
+  else reasons.push('Ein Kursverlust könnte dazu führen, dass für eine wichtige Ausgabe weniger Geld verfügbar ist.');
+  reason=reasons.join(' ');
+  questions=['Welche größeren Ausgaben stehen in den nächsten Jahren an?','Welchen Betrag möchtest du für unerwartete Ausgaben verfügbar halten?','Welches Geld könntest du darüber hinaus länger liegen lassen, ohne Verpflichtungen zu gefährden?'];
+  example='Ein fiktives Beispiel: Du besitzt 10.000 Euro und brauchst davon voraussichtlich 4.000 Euro in zwei Jahren. Betrachte diese 4.000 Euro getrennt. Die übrigen 6.000 Euro sind nicht automatisch vollständig für eine Anlage verfügbar: Davon könnte noch Geld für deine Reserve oder andere Verpflichtungen benötigt werden.';
+  next='Prüfe mit einem frei gewählten Beispielbetrag, ob ein solcher Verlust wichtige Ausgaben oder dein Ziel gefährden würde. Du kannst die Simulation unabhängig davon zum Lernen nutzen.';
+ }else if(p.assessment&&p.band<=1){
+  lead='Vergleiche zuerst die Verlustphasen und erst danach die Endwerte.';
+  reason='Deine Antworten sprechen für einen vorsichtigen Umgang mit finanziellen Risiken. Du hast einen längeren Zeitraum und nach deiner Einschätzung günstige finanzielle Voraussetzungen angegeben. Trotzdem kann die Anlage beim benötigten Verkauf im Minus stehen.';
+  questions=['Wie viele Euro hättest du während des größten Rückgangs vorübergehend weniger gehabt?','Wie lange blieb die Anlage unter ihrem früheren Höchststand – und wurde dieser überhaupt wieder erreicht?','Würdest du die Mischung auch während einer solchen Verlustphase noch verstehen und weiter beobachten können?'];
+  example='Ein fiktives Beispiel: Aus 10.000 Euro werden zwischenzeitlich 8.000 Euro. Das wären 2.000 Euro beziehungsweise 20 Prozent Verlust. Auch wenn die Anlage später wieder steigt, müsste das fehlende Geld zwischenzeitlich entbehrlich sein. Ob und wann eine Erholung erfolgt, ist damit nicht gesagt.';
+  next='Probiere zunächst einen Verlust in Euro aus. Vergleiche anschließend bei den Lernmischungen, wie sich unterschiedliche Aktienanteile in Verlustphasen verhalten haben. Keine der Quoten wird dadurch persönlich empfohlen.';
+ }else if(p.assessment&&p.band>=3){
+  lead='Prüfe, von welchen Anlagen ein gutes Ergebnis besonders abhängt.';
+  reason='Deine Antworten sprechen für eine höhere Risikobereitschaft. Die finanziellen Voraussetzungen beschreibst du selbst als günstig; vollständig geprüft sind sie damit nicht. Entscheidend ist nicht, möglichst viel Risiko auszuschöpfen, sondern mögliche Verluste und Abhängigkeiten zu verstehen.';
+  questions=['Wie viel Geld steckt in der größten Position oder in derselben Branche?','Enthalten mehrere ETFs dieselben Unternehmen, sodass sie gemeinsam fallen könnten?','Wie unterscheiden sich die Verluste und Handelskosten gegenüber einer breiter verteilten Mischung?'];
+  example='Ein fiktives Beispiel: Von 10.000 Euro liegen 6.000 Euro in einem einzelnen Bereich. Fällt nur dieser Teil um 30 Prozent und bleibt der Rest unverändert, verliert die gesamte Mischung 1.800 Euro. Viele weitere kleine Positionen würden diese große Abhängigkeit nicht aufheben.';
+  next='Rechne einen möglichen Verlust in Euro durch. Schau danach in der Portfoliozusammensetzung auf die größten Positionen und vergleiche, wie die Mischungen in denselben Verlustphasen abgeschnitten haben.';
+ }else{
+  lead='Vergleiche Geldzuwachs, zwischenzeitliche Verluste und Verwaltungsaufwand gemeinsam.';
+  reason=p.assessment?'Deine Antworten zeigen keine eindeutige Ausrichtung allein auf Sicherheit oder auf hohe Risiken. Ein höherer historischer Endwert allein beantwortet deshalb nicht, welche Verlustphasen und welchen Aufwand du akzeptieren würdest.':'Deine Risikobereitschaft ist noch nicht vollständig eingeordnet. Du kannst trotzdem mit einem frei gewählten Betrag erkunden, was Verluste und unterschiedliche Verläufe bedeuten.';
+  questions=['Wie viel hätte dieselbe Anlage zwischenzeitlich in Euro verloren?','Wäre das Geld zu deinem gewünschten Zeitpunkt verfügbar gewesen, ohne einen Verlust hinnehmen zu müssen?','Wie oft müsste die Aufteilung geprüft oder angepasst werden, und welche Kosten wären angefallen?'];
+  example='Ein fiktives Beispiel: Eine Mischung endet mit mehr Geld als eine andere, verliert zwischendurch aber 2.000 Euro. Für jemanden, der genau dann eine Ausgabe bezahlen muss, ist dieser Rückgang wichtig – auch wenn der spätere Endwert höher liegt.';
+  next='Prüfe zuerst einen Beispielverlust in Euro und vergleiche anschließend zwei oder drei Verläufe mit demselben Startbetrag und Beginn. Betrachte die Verlustphase, bevor du die Endwerte vergleichst.';
+ }
+ if(f.effort==='low'&&!budget)questions.push('Wie viel laufende Kontrolle und wie viele Anpassungen möchtest du tatsächlich übernehmen?');
+ const extra=[];
+ if(depth!=='Grundlagen')extra.push('Ein langer Anlagezeitraum verhindert keine Verluste und garantiert keine Erholung bis zum Auszahlungstermin. Ein ETF kann verkäuflich sein und beim Verkauf trotzdem im Minus stehen: Verfügbarkeit ist nicht dasselbe wie Werterhalt.');
+ if(depth==='Vertiefung')extra.push('Die Hinweise folgen deinen Selbstauskünften und redaktionellen Lernregeln, nicht einer validierten Eignungsprüfung. Historische Rückgänge sind Beobachtungen und keine Grenze zukünftiger Verluste. Die Beispielrechnung unterstellt lediglich den eingegebenen prozentualen Rückgang.');
+ return {lead,reason,questions,example,trial:'Im Tool kannst du ausprobieren, was ein Verlust für einen frei gewählten Anlagebetrag bedeuten würde. Bei 5.000 Euro wären beispielsweise 20 Prozent Verlust gleich 1.000 Euro. Das ist ein Rechenbeispiel, keine Prognose oder Verlustgrenze.',extra,next,limit:'Aus diesen Angaben bestimmen wir keine passende Aktienquote und wählen kein Portfolio für dich aus.'};
+}
+
+export function calculateLossExample(amount,percent){
+ if(!finite(amount)||amount<0||amount>1e9||!finite(percent)||percent<0||percent>100)throw Error('Bitte einen Betrag von null bis einer Milliarde Euro und einen Verlust von null bis hundert Prozent eingeben.');
+ const loss=amount*percent/100;return {loss,remaining:amount-loss};
+}
+
 export function profileReflection(profile,depth='Grundlagen'){
  const p=profilePolicy(profile);if(!p)return null;
  const f=profile.context??{},outlook=[],finances=[];
@@ -113,19 +164,10 @@ export function profileReflection(profile,depth='Grundlagen'){
  'Deine Antworten sprechen für eine eher hohe Risikobereitschaft. Das sagt nicht, welche Verluste du dir finanziell leisten kannst.',
  'Deine Antworten sprechen für eine hohe Risikobereitschaft. Das bedeutet nicht automatisch, dass du größere Verluste finanziell tragen kannst.'
  ][p.band]:'Deine Risikobereitschaft ist noch nicht eingeordnet. Dafür werden alle dreizehn Antworten benötigt; es wird keine Punktzahl hochgerechnet. Die Lern- und Vergleichsfunktionen bleiben zugänglich.';
- const comparison=[];
- if(p.shortFixed)comparison.push('Für deinen festen Zweck ist wichtig, dass das Geld zum benötigten Termin verfügbar ist. Ein ETF kann jederzeit verkäuflich sein und beim Verkauf trotzdem im Minus stehen. Verfügbarkeit ist nicht dasselbe wie Werterhalt.');
- else if(!f.horizon||f.horizon==='unknown')comparison.push('Kläre zuerst, welcher Geldbetrag möglicherweise bald gebraucht wird. Ein historisch ruhiger Verlauf garantiert nicht, dass das Geld dann ohne Verlust verfügbar ist.');
- else comparison.push('Betrachte zuerst eine Verlustphase und erst danach die Endwerte. Ein langer Zeitraum verhindert keine Verluste und garantiert keine Erholung bis zu deinem Auszahlungstermin.');
- if(p.constraints.length||p.missing.length||p.uncertain.length)comparison.push('Beschäftige dich zuerst mit Reserve, Verpflichtungen und möglichen Verlusten in Euro. Wir wählen daraus kein vermeintlich geeignetes Portfolio für dich aus.');
- else if(p.assessment?.band>=3)comparison.push('Achte auch bei hoher Risikobereitschaft auf große Einzelpositionen, gemeinsame Verluste und Handelskosten. Du musst nicht das höchstmögliche Risiko ausschöpfen.');
- else comparison.push('Ein höherer Aktienanteil beteiligt dich stärker an den Aktienmärkten und kann größere Verluste bedeuten. Ein Tagesgeld-Szenario verläuft anders; seine Kaufkraft kann durch steigende Preise sinken.');
- if(f.effort==='low')comparison.push('Einfache Mischungen erleichtern das Kennenlernen. Auch sie können später Anpassungen benötigen. Aufwendigere Verfahren bleiben zugänglich.');
- if(depth!=='Grundlagen')comparison.push('Viele ETFs bedeuten nicht automatisch breite Streuung: Enthalten sie dieselben Unternehmen oder Branchen, können sie gemeinsam fallen. Häufiges Umschichten kann Kosten verursachen, ohne das Ergebnis zu verbessern.');
- if(depth==='Vertiefung')comparison.push('Der Fragebogen misst Risikobereitschaft, nicht finanzielle Verlusttragfähigkeit. Die ergänzenden Fragen und die Lernreihenfolge sind redaktionelle Regeln, keine validierte Eignungszuordnung. Schwellen bei den Zeitangaben sind keine sichere Mindesthaltedauer.');
- const next=p.mode==='basics'?'Beginne mit den Grundlagen zu Reserve, Anlagezeit und Verlusten. Anschließend kannst du die drei Lernmischungen unter denselben Bedingungen vergleichen.':'Vergleiche drei Lernbeispiele mit unterschiedlichen Aktienanteilen. Beobachte erst die Verlustphasen und danach den historischen Endwert.';
+ const guide=profileComparisonGuide(profile,depth),comparison=[guide.lead,guide.reason,guide.example,guide.trial,...guide.extra];
+ const next=guide.next;
  return {label:p.assessment?.label||'Risikobereitschaft noch offen',conflict:p.conflict?'Bei deinen Angaben gibt es einen wichtigen Widerspruch: Du bist bereit, finanzielle Risiken einzugehen. Gleichzeitig '+(p.constraints.length?'bestehen nach deinen Angaben finanzielle Einschränkungen.':'könntest du das Geld für einen festen Zweck bald benötigen.')+' Risikobereitschaft ersetzt keinen finanziellen Spielraum.':'',
-  sections:[{title:'Deine Ausgangslage',paragraphs:[outlook.join(' '),'Finanzielle Rahmenbedingungen: '+finances.join(' ')]},{title:'Dein Umgang mit Risiko',paragraphs:[risk]},{title:'Was das für deinen Vergleich bedeutet',paragraphs:comparison},{title:'Dein nächster Schritt',paragraphs:[next,'Die Beispiele sind keine persönlich berechneten Anlageempfehlungen. Sie helfen dir, die Unterschiede zu verstehen.']}],
+  sections:[{title:'Deine Ausgangslage',paragraphs:[outlook.join(' '),'Finanzielle Rahmenbedingungen: '+finances.join(' ')]},{title:'Dein Umgang mit Risiko',paragraphs:[risk]},{title:'Was das für deinen Vergleich bedeutet',paragraphs:comparison,guide},{title:'Dein nächster Schritt',paragraphs:[next],action:'loss-example',limit:guide.limit}],
   contextCount:p.contextCount,path:p.path,reason:p.reason,mode:p.mode};
 }
 
