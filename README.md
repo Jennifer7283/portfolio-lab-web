@@ -120,14 +120,30 @@ Punkteschlüssel und Einordnung: [Rutgers-Auswertung](https://njaes.rutgers.edu/
 Die Übersetzung ist nicht gesondert validiert. Risikobereitschaft ist weder
 finanzielle Verlusttragfähigkeit noch eine offizielle Portfolio-Risikoklasse.
 
-Zusätzliche Rahmenbedingungen steuern eine ausdrücklich eigene Anzeigeregel:
-historisch ruhigere Verläufe oder feste Vergleichsmischungen zuerst. Keine
-wissenschaftlich validierte Eignungszuordnung, keine Kaufempfehlungen, keine
-Optimierung nach rückblickender Rendite. Alle Portfolios bleiben auswählbar.
-Teilweise beantwortete Rahmenbedingungen werden einzeln genutzt. „Unsicher“ ist
-eine gültige Angabe und führt gegebenenfalls zu einer vorsichtigeren Sortierung,
-nicht zum Ausschluss des Profils oder der Startauswahl. Nur wenn kein Punkt
-beantwortet wurde, wird der übersprungene Abschnitt als solcher benannt.
+Seit 15.11.2026 sind Lernweg und vollständiger Risikofragebogen getrennt.
+Rahmenbedingungen verändern Lernfragen und Erklärungen, nicht automatisch die
+Portfolioauswahl oder Reihenfolge. Eine Risikosortierung muss ausdrücklich
+gewählt werden. Teilweise Angaben werden einzeln genutzt; „Unsicher“ bleibt
+offen und wird weder zu geringer Risikobereitschaft noch zu finanziell günstigen
+Voraussetzungen. Hohe Bereitschaft mit finanziellen Einschränkungen oder einem
+kurzen festen Zweck wird zuerst als Konflikt angezeigt. Günstige Selbstauskünfte
+sind keine geprüfte Verlusttragfähigkeit. Die zusätzlichen Fragen, Texte und
+Lernregeln sind nicht gesondert validiert und keine Eignungszuordnung.
+
+Die Auswertung folgt Ausgangslage, Umgang mit Risiko, Vergleich und nächstem
+Schritt. Ohne vollständige dreizehn Antworten gibt es keinen Risikowert, aber
+weiterhin Zugang zu allen Lernfunktionen. Antworten und aktuelle Frage bleiben
+bei Abschnittswechseln erhalten. Eine Aktivierung überschreibt keine Auswahl.
+
+Der geführte Lernbereich in der Vermögenssimulation vergleicht 25/50/75 Prozent
+MSCI World (URTH, Industrieländer ohne Schwellenländer) mit demselben Tagesgeld-
+Szenario. Ein Regler ergänzt eigene Anteile. Zuerst Verlustphasen und Erholung,
+danach Endwerte. Monatsweise Drift, jährliche Bandprüfung und importierte
+Modellkosten bleiben erhalten; keine Mischung fertiger Endwerte. Zinsen sind
+eingegebene Beispiele, keine historischen Bankangebote. Einzahlungsbereinigte
+Anlageerholung und tatsächlicher Euro-Kontorückgang werden getrennt erläutert.
+Ohne passende lokal importierte Monatsrenditen gibt es keine erfundenen Kurven.
+
 Profil und Antworten existieren nur im Arbeitsspeicher, nicht in Browser-Speichern,
 Analyseexporten oder KI-Prompts. Neuladen verwirft sie.
 
