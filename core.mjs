@@ -65,75 +65,76 @@ export const profileFields = [
  ['effort','Wie möchtest du dich mit der Anlage beschäftigen?',[['low','Möglichst wenig Aufwand'],['active','Regelmäßig prüfen und bei Bedarf umschichten']]]
 ];
 
+// Profilregeln steuern Lernhinweise, niemals eine persönliche Anlagequote.
 export function profilePolicy(profile) {
- const assessment=scoreRiskAnswers(profile?.answers),f=profile?.context??{};
- // Leer bedeutet übersprungen. „Unsicher“ ist dagegen eine gültige Angabe.
- if(!assessment||profileFields.some(([key,,values])=>f[key]!==undefined&&f[key]!==''&&!values.some(([v])=>v===f[key])))return null;
- const contextCount=profileFields.filter(([key,,values])=>values.some(([v])=>v===f[key])).length;
- const warnings=[];
- if(f.reserve==='no')warnings.push('Du hast keine getrennte Reserve angegeben. Unerwartete Ausgaben könnten einen Verkauf zu einem ungünstigen Zeitpunkt erzwingen.');
- if(f.reserve==='unknown')warnings.push('Du bist bei deiner Reserve unsicher. Diese Unsicherheit wird berücksichtigt: Historisch ruhigere Verläufe stehen zuerst, ohne dass damit Kapitalsicherheit zugesagt wird.');
- if(f.loss==='no')warnings.push('Du hast angegeben, dass Verluste deine laufenden Ausgaben oder dein Anlageziel gefährden könnten. Auch historisch ruhige Portfolios können Geld verlieren.');
- if(f.loss==='unknown')warnings.push('Dein finanzieller Verlustspielraum ist für dich noch unsicher. Deshalb werden vorsichtigere historische Vergleiche zuerst angezeigt.');
- if(f.debt==='yes')warnings.push('Du hast angegeben, dass geliehenes Geld oder laufende Kreditraten betroffen wären. Das erhöht die Belastung bei Verlusten.');
- if(f.debt==='unknown')warnings.push('Du bist hinsichtlich der Finanzierung unsicher. Diese Angabe führt zu einer vorsichtigeren Sortierung, nicht zum Ausschluss deines Profils.');
- if(f.income==='no')warnings.push('Du hast keinen verlässlichen Überschuss angegeben. Die Anwendung berechnet deshalb keine für dich tragbare Sparrate.');
- if(f.income==='unknown')warnings.push('Dein Überschuss ist unregelmäßig oder unklar. Das wird bei der vorsichtigen Sortierung berücksichtigt; eine tragbare Sparrate wird nicht geschätzt.');
- if(f.horizon==='short')warnings.push('Du könntest das Geld in weniger als fünf Jahren benötigen. Der Vergleich zeigt nicht, ob Verluste bis dahin aufgeholt wären. Sieh dir auch den Sparformenvergleich an.');
- if(f.horizon==='unknown')warnings.push('Du weißt noch nicht, wann du das Geld benötigen könntest. Deshalb stehen historisch ruhigere Verläufe zuerst; der Sparformenvergleich bleibt ebenfalls wichtig.');
- const cautious=assessment.band<=1||f.goal==='reserve'||f.horizon==='short'||f.horizon==='unknown'||warnings.length>0;
- return {...assessment,warnings,contextCount,mode:cautious?'calm':f.effort==='low'?'simple':'neutral',simple:f.effort==='low'};
+ if(!profile)return null;
+ const assessment=scoreRiskAnswers(profile.answers),f=profile.context??{};
+ if(profileFields.some(([key,,values])=>f[key]!==undefined&&f[key]!==''&&!values.some(([v])=>v===f[key])))return null;
+ const financialKeys=['reserve','loss','debt','income'];
+ const missing=financialKeys.filter(k=>!f[k]);
+ const uncertain=financialKeys.filter(k=>f[k]==='unknown');
+ const constraints=[];
+ if(f.reserve==='no')constraints.push('Du hast keine getrennte Reserve für unerwartete Ausgaben angegeben.');
+ if(f.loss==='no')constraints.push('Nach deiner Angabe könnten Verluste laufende Ausgaben oder dein Anlageziel gefährden.');
+ if(f.debt==='yes')constraints.push('Nach deiner Angabe wären geliehenes Geld oder laufende Kreditraten betroffen.');
+ if(f.income==='no')constraints.push('Du hast keinen verlässlich verfügbaren Überschuss angegeben.');
+ const shortFixed=f.horizon==='short'&&f.goal==='reserve';
+ const conflict=assessment?.band>=3&&(constraints.length>0||shortFixed);
+ const prerequisitesOpen=missing.length>0||uncertain.length>0||constraints.length>0||!f.horizon||f.horizon==='unknown'||shortFixed;
+ const basic=prerequisitesOpen||profile.entry==='basics'||f.experience==='new';
+ return {...assessment,assessment,missing,uncertain,constraints,shortFixed,conflict,prerequisitesOpen,
+  contextCount:profileFields.filter(([k])=>!!f[k]).length,
+  financialStatus:constraints.length?'eingeschränkt':missing.length||uncertain.length?'offen':'nach Selbstauskunft günstig',
+  mode:basic?'basics':'examples',simple:f.effort==='low',
+  path:basic?'Grundlagen und Verlustphasen kennenlernen':'Unterschiedliche Aktienanteile kennenlernen',
+  reason:constraints.length?'Deine angegebenen finanziellen Einschränkungen stehen zuerst.':missing.length||uncertain.length?'Einige finanzielle Voraussetzungen sind noch offen.':shortFixed?'Du könntest das Geld für einen festen Zweck bald benötigen.':f.experience==='new'||profile.entry==='basics'?'Du möchtest zuerst die Grundlagen verstehen.':'Du möchtest verschiedene Verläufe bewusst vergleichen.'};
 }
 
-// Textliche Rückmeldung aus vorhandenen Antworten, keine neue Typologie oder Punkteskala.
-export function profileReflection(profile){
- const p=profilePolicy(profile);if(!p)return null;const f=profile.context??{};
- const risk=[
- 'Deine Antworten sprechen dafür, dass du finanzielle Risiken möglichst vermeiden möchtest. Ein ruhiger Verlauf und der Umgang mit möglichen Verlusten sind für dich besonders wichtige Vergleichspunkte.',
- 'Deine Antworten deuten auf einen eher vorsichtigen Umgang mit Geldanlagen hin. Du bist nicht grundsätzlich gegen Risiken, möchtest mögliche Verluste aber eher begrenzen.',
- 'Deine Antworten zeigen eine mittlere Risikobereitschaft. Du scheinst zwischen möglichen Gewinnen und der Unsicherheit durch Verluste abwägen zu wollen.',
- 'Deine Antworten deuten darauf hin, dass du für mögliche Gewinne auch stärkere Schwankungen akzeptieren würdest. Prüfe im Vergleich deshalb nicht nur den Gewinn, sondern auch die zwischenzeitlichen Verluste.',
- 'Deine Antworten zeigen eine hohe Bereitschaft, finanzielle Risiken einzugehen. Das bedeutet nicht automatisch, dass du größere Verluste finanziell tragen kannst.'
- ][p.band];
- const preferences=[];
- if(f.goal==='save')preferences.push('Du möchtest regelmäßig Vermögen aufbauen.');
- if(f.goal==='reserve')preferences.push('Dir geht es darum, Geld für einen bestimmten Zweck zu erhalten.');
- if(f.goal==='learn')preferences.push('Du möchtest Geldanlagen zunächst kennenlernen.');
- if(f.effort==='low')preferences.push('Dabei ist dir wenig laufender Aufwand wichtig; achte beim Vergleich darauf, wie oft du die Aufteilung prüfen und anpassen müsstest.');
- if(f.effort==='active')preferences.push('Du bist bereit, die Anlage regelmäßig zu prüfen und bei Bedarf umzuschichten; häufigerer Handel allein garantiert allerdings kein besseres Ergebnis.');
- const timing=[],budget=[],portfolio=[];
- if(f.horizon==='short')timing.push('Lege zuerst fest, welchen Betrag du in den nächsten fünf Jahren tatsächlich brauchst. Prüfe für diesen Teil besonders, ob ein Kursverlust zum geplanten Auszahlungstermin dein Ziel gefährden würde; ein ETF kann verkäuflich sein und trotzdem gerade im Minus stehen.');
- if(f.horizon==='medium')timing.push('Vergleiche für deinen Zeitraum von fünf bis zehn Jahren nicht nur den Endwert, sondern auch die Verlustphasen: Wie tief fiel das Portfolio, und wie lange lag es unter seinem früheren Höchststand? Eine Erholung bis zu deinem Auszahlungstermin ist nicht garantiert.');
- if(f.horizon==='long')timing.push('Du planst mit mehr als zehn Jahren. Prüfe deshalb, ob du die Mischung auch während eines längeren Einbruchs halten könntest, statt nur auf den höchsten historischen Endwert zu schauen; ein langer Zeitraum garantiert keine Erholung.');
- if(f.horizon==='unknown')timing.push('Kläre zunächst, welcher Teil des Geldes möglicherweise kurzfristig gebraucht wird. Für diesen Teil ist entscheidend, ob du auch bei fallenden Kursen auf das Geld angewiesen wärst.');
- if(f.reserve==='no')timing.push('Du hast keine getrennte Reserve angegeben: Plane unerwartete Ausgaben getrennt vom investierten Kapital ein, damit sie dich nicht zu einem Verkauf während einer Verlustphase zwingen.');
- if(f.reserve==='unknown')timing.push('Bei deiner Reserve bist du noch unsicher; prüfe, welcher Betrag jederzeit für unerwartete Ausgaben verfügbar bleiben muss.');
- if(f.loss==='no')budget.push('Du hast angegeben, dass Verluste Ausgaben oder dein Ziel gefährden könnten. Rechne deshalb mögliche Verluste auch in Euro durch und kläre, welcher Betrag ohne diese Folgen verloren gehen dürfte; Risikobereitschaft ersetzt diesen finanziellen Spielraum nicht. Vergleiche diesen Betrag mit den Werten unter „Risiko verstehen“; historische Verluste und VaR sind keine Obergrenze für künftige Verluste.');
- if(f.loss==='unknown')budget.push('Deine finanziell verkraftbare Verlusthöhe ist noch unklar und sollte nicht aus deiner Risikobereitschaft abgeleitet werden. Lege dafür einen Betrag in Euro fest und vergleiche ihn mit den historischen Verlusten; diese sind keine Obergrenze künftiger Verluste.');
- if(f.loss==='yes')budget.push('Prüfe unter „Risiko verstehen“ neben den Schwankungen auch den größten historischen Einbruch und den VaR in Euro. Frage dich, ob ein solcher Verlust bei deinem Startkapital noch tragbar wäre; künftig können Verluste höher ausfallen.');
- if(f.debt==='yes')budget.push('Da geliehenes Geld oder Kreditraten betroffen wären, rechne auch durch, ob Zinsen und Rückzahlungen ohne Erträge oder Verkäufe aus dem Portfolio bezahlt werden könnten.');
- if(f.debt==='unknown')budget.push('Kläre außerdem, ob das investierte Geld für Kreditraten oder andere feste Verpflichtungen benötigt wird.');
- if(f.income==='no'||f.income==='unknown')budget.push('Vergleiche wegen deines unklaren oder fehlenden regelmäßigen Überschusses auch eine Simulation mit geringeren oder ohne monatliche Einzahlungen, statt eine dauerhaft verfügbare Sparrate vorauszusetzen.');
- if(p.contextCount){portfolio.push('Schau bei der Portfoliozusammensetzung auf die größten Anteile und darauf, welche Länder und Branchen dahinterstehen. Mehrere ETFs sind nicht automatisch breiter gestreut, wenn sie dieselben Unternehmen enthalten.');
-  if(f.effort==='low')portfolio.push('Weil du wenig Aufwand möchtest, vergleiche außerdem Umschichtungsquote und Handelskosten: Wie häufig müsste die Mischung angepasst werden, und was kostet das? Ein historisch höherer Gewinn allein beantwortet diese Fragen nicht.');
-  else if(f.effort==='active')portfolio.push('Beziehe bei deinem Wunsch nach regelmäßiger Prüfung die Umschichtungsquote und Handelskosten ein: Häufige Anpassungen verursachen Aufwand und können den Gewinn schmälern.');
-  else portfolio.push('Vergleiche auch die Handelskosten und den Aufwand für spätere Anpassungen, nicht nur die Rendite.');
- }
- const focusParagraphs=[timing,budget,portfolio].map(x=>x.join(' ')).filter(Boolean);
- return {label:p.label,risk,preferences:preferences.join(' '),focus:focusParagraphs.join(' '),focusParagraphs,contextCount:p.contextCount};
+export function profileReflection(profile,depth='Grundlagen'){
+ const p=profilePolicy(profile);if(!p)return null;
+ const f=profile.context??{},outlook=[],finances=[];
+ const goals={save:'Du möchtest regelmäßig Vermögen aufbauen.',reserve:'Du möchtest Geld für einen festen Zweck erhalten.',learn:'Du möchtest Anlagen zunächst kennenlernen.'};
+ if(goals[f.goal])outlook.push(goals[f.goal]);
+ const horizons={short:'Du hast angegeben, dass du das Geld in weniger als fünf Jahren benötigen könntest.',medium:'Du hast einen möglichen Zeitraum von fünf bis zehn Jahren angegeben.',long:'Du hast angegeben, das Geld voraussichtlich länger als zehn Jahre nicht zu benötigen.',unknown:'Wann du das Geld benötigen könntest, ist nach deiner Angabe noch unklar.'};
+ outlook.push(horizons[f.horizon]||'Der mögliche Zeitpunkt der Geldentnahme ist noch offen.');
+ if(f.effort==='low')outlook.push('Du möchtest möglichst wenig laufenden Verwaltungsaufwand.');
+ if(f.effort==='active')outlook.push('Du möchtest die Anlage regelmäßig prüfen und bei Bedarf anpassen.');
+ const favorable={reserve:'Du hast eine getrennte Reserve angegeben.',loss:'Nach deiner Einschätzung würden Verluste weder laufende Ausgaben noch dein Ziel gefährden.',debt:'Nach deiner Angabe brauchst du für die Anlage keinen Kredit und gefährdest keine Kreditraten.',income:'Du hast verlässlich verfügbare Überschüsse angegeben.'};
+ for(const k of ['reserve','loss','debt','income'])if(f[k]===(k==='debt'?'no':'yes'))finances.push(favorable[k]);
+ finances.push(...p.constraints);
+ const shortLabels={reserve:'Reserve',loss:'mögliche Folgen von Verlusten',debt:'finanzielle Verpflichtungen',income:'regelmäßige Überschüsse'};
+ if(p.missing.length)finances.push('Noch nicht beantwortet: '+p.missing.map(k=>shortLabels[k]).join(', ')+'.');
+ if(p.uncertain.length)finances.push('Als unsicher oder unklar angegeben: '+p.uncertain.map(k=>shortLabels[k]).join(', ')+'. Diese Angaben werden nicht durch Annahmen ersetzt.');
+ finances.push('Das sind Selbstauskünfte. Welcher Betrag tatsächlich verfügbar ist und welche Verluste finanziell tragbar wären, haben wir damit noch nicht vollständig geprüft.');
+ const risk=p.assessment?[
+ 'Deine Antworten sprechen für eine geringe Risikobereitschaft. Sicherheit ist dir wichtig; zwischenzeitliche Verluste könnten dich belasten. Das ist kein Nachteil. Entscheidend ist, dass du mögliche Kursrückgänge verstehst.',
+ 'Deine Antworten sprechen für eine eher geringe Risikobereitschaft. Schau dir zuerst an, was ein Rückgang zwischenzeitlich für den Geldbetrag bedeuten würde.',
+ 'Deine Antworten sprechen für eine mittlere Risikobereitschaft. Vergleiche mögliche Gewinne mit den zwischenzeitlichen Verlusten, statt nur den Endwert anzusehen.',
+ 'Deine Antworten sprechen für eine eher hohe Risikobereitschaft. Das sagt nicht, welche Verluste du dir finanziell leisten kannst.',
+ 'Deine Antworten sprechen für eine hohe Risikobereitschaft. Das bedeutet nicht automatisch, dass du größere Verluste finanziell tragen kannst.'
+ ][p.band]:'Deine Risikobereitschaft ist noch nicht eingeordnet. Dafür werden alle dreizehn Antworten benötigt; es wird keine Punktzahl hochgerechnet. Die Lern- und Vergleichsfunktionen bleiben zugänglich.';
+ const comparison=[];
+ if(p.shortFixed)comparison.push('Für deinen festen Zweck ist wichtig, dass das Geld zum benötigten Termin verfügbar ist. Ein ETF kann jederzeit verkäuflich sein und beim Verkauf trotzdem im Minus stehen. Verfügbarkeit ist nicht dasselbe wie Werterhalt.');
+ else if(!f.horizon||f.horizon==='unknown')comparison.push('Kläre zuerst, welcher Geldbetrag möglicherweise bald gebraucht wird. Ein historisch ruhiger Verlauf garantiert nicht, dass das Geld dann ohne Verlust verfügbar ist.');
+ else comparison.push('Betrachte zuerst eine Verlustphase und erst danach die Endwerte. Ein langer Zeitraum verhindert keine Verluste und garantiert keine Erholung bis zu deinem Auszahlungstermin.');
+ if(p.constraints.length||p.missing.length||p.uncertain.length)comparison.push('Beschäftige dich zuerst mit Reserve, Verpflichtungen und möglichen Verlusten in Euro. Wir wählen daraus kein vermeintlich geeignetes Portfolio für dich aus.');
+ else if(p.assessment?.band>=3)comparison.push('Achte auch bei hoher Risikobereitschaft auf große Einzelpositionen, gemeinsame Verluste und Handelskosten. Du musst nicht das höchstmögliche Risiko ausschöpfen.');
+ else comparison.push('Ein höherer Aktienanteil beteiligt dich stärker an den Aktienmärkten und kann größere Verluste bedeuten. Ein Tagesgeld-Szenario verläuft anders; seine Kaufkraft kann durch steigende Preise sinken.');
+ if(f.effort==='low')comparison.push('Einfache Mischungen erleichtern das Kennenlernen. Auch sie können später Anpassungen benötigen. Aufwendigere Verfahren bleiben zugänglich.');
+ if(depth!=='Grundlagen')comparison.push('Viele ETFs bedeuten nicht automatisch breite Streuung: Enthalten sie dieselben Unternehmen oder Branchen, können sie gemeinsam fallen. Häufiges Umschichten kann Kosten verursachen, ohne das Ergebnis zu verbessern.');
+ if(depth==='Vertiefung')comparison.push('Der Fragebogen misst Risikobereitschaft, nicht finanzielle Verlusttragfähigkeit. Die ergänzenden Fragen und die Lernreihenfolge sind redaktionelle Regeln, keine validierte Eignungszuordnung. Schwellen bei den Zeitangaben sind keine sichere Mindesthaltedauer.');
+ const next=p.mode==='basics'?'Beginne mit den Grundlagen zu Reserve, Anlagezeit und Verlusten. Anschließend kannst du die drei Lernmischungen unter denselben Bedingungen vergleichen.':'Vergleiche drei Lernbeispiele mit unterschiedlichen Aktienanteilen. Beobachte erst die Verlustphasen und danach den historischen Endwert.';
+ return {label:p.assessment?.label||'Risikobereitschaft noch offen',conflict:p.conflict?'Bei deinen Angaben gibt es einen wichtigen Widerspruch: Du bist bereit, finanzielle Risiken einzugehen. Gleichzeitig '+(p.constraints.length?'bestehen nach deinen Angaben finanzielle Einschränkungen.':'könntest du das Geld für einen festen Zweck bald benötigen.')+' Risikobereitschaft ersetzt keinen finanziellen Spielraum.':'',
+  sections:[{title:'Deine Ausgangslage',paragraphs:[outlook.join(' '),'Finanzielle Rahmenbedingungen: '+finances.join(' ')]},{title:'Dein Umgang mit Risiko',paragraphs:[risk]},{title:'Was das für deinen Vergleich bedeutet',paragraphs:comparison},{title:'Dein nächster Schritt',paragraphs:[next,'Die Beispiele sind keine persönlich berechneten Anlageempfehlungen. Sie helfen dir, die Unterschiede zu verstehen.']}],
+  contextCount:p.contextCount,path:p.path,reason:p.reason,mode:p.mode};
 }
 
-// Eigene, offen ausgewiesene Anzeigeregel – keine validierte Eignungszuordnung.
-// Nie historische Rendite maximieren; Fünfjahresrisiko unabhängig vom Startregler.
-export function profileOrder(data,names,profile) {
- const policy=profilePolicy(profile);if(!policy)return names.map(name=>({name}));
- const simpleNames=['Welt-ETF','70/30 Welt/Schwellenländer','60/40 Welt/US-Anleihen','S&P 500 (SPY)','Nasdaq-100 (QQQ)','US-Marktportfolio (VTI)'];
- const entries=names.map((name,index)=>({name,index,simple:simpleNames.includes(name),risk:volatilityClass(data,data.portfolios[name])}));
- return entries.sort((a,b)=>{
-   if(policy.mode==='calm'){const d=(a.risk?.vol??Infinity)-(b.risk?.vol??Infinity);if(d)return d;}
-   if(policy.simple&&a.simple!==b.simple)return a.simple?-1:1;
-   return a.index-b.index;
- });
+// Nur eine ausdrückliche Sortierwahl verändert die fachliche Standardreihenfolge.
+// Ein Profilobjekt allein verändert weder Reihenfolge noch Auswahl.
+export function profileOrder(data,names,sort='standard'){
+ const entries=names.map((name,index)=>({name,index}));
+ if(sort!=='historical-risk')return entries;
+ return entries.sort((a,b)=>(volatilityClass(data,data.portfolios[a.name])?.vol??Infinity)-(volatilityClass(data,data.portfolios[b.name])?.vol??Infinity)||a.index-b.index);
 }
 
 // Nur Textgliederung: keine Änderungen an Zahlen, Aussagen oder Berechnungen.

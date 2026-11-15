@@ -1,5 +1,5 @@
 // Erklärinhalte und Mischungsdefinitionen, getrennt von der Darstellung.
-import {customPortfolio,simulate} from './core.mjs?v=20261108-lernen';
+import {customPortfolio,simulate} from './core.mjs?v=20261115-lernprofil';
 export const depths=['Grundlagen','Verstehen','Vertiefung'];
 export const depthRule={
  Grundlagen:'Erkläre Ziel und Grundidee in Alltagssprache, mit einem anschaulichen Beispiel und der wichtigsten Grenze. Keine Formeln.',
@@ -52,4 +52,37 @@ export function mixSimulation(data,id,settings,start,capital,payment,costs=true)
  }
  const result=simulate(d,spec.name,start,capital,payment,custom,costs);
  return {...result,mixId:id,targetWeights:spec.weights,custom,data:d,scenario:id==='mix-cash',settings:{...settings}};
+}
+
+// Geldverlust: tatsächlicher früherer Kontohöchststand minus späterer Tiefstand.
+// Zusätzlich ein um externe Einzahlungen bereinigter Nettoindex (zeitgewichtet).
+export function learningLoss(result){
+ const rows=result.rows;
+ const phase=values=>{
+  let peak=values[0],peakIndex=0,worst={fraction:0,euro:0,peak:0,trough:0};
+  for(let i=1;i<values.length;i++){
+   if(values[i]>=peak){peak=values[i];peakIndex=i;}
+   const fraction=peak>0?values[i]/peak-1:0;
+   if(fraction<worst.fraction)worst={fraction,euro:peak-values[i],peak:peakIndex,trough:i};
+  }
+  const recovery=worst.fraction<0?values.findIndex((v,i)=>i>worst.trough&&v>=values[worst.peak]):-1;
+  return {...worst,recovery,months:recovery>=0?recovery-worst.peak:null};
+ };
+ const account=phase(rows.map(r=>r.value));
+ let index=1,high=1;const indexes=[1],drawdowns=[0];
+ for(let i=1;i<rows.length;i++){
+  const base=rows[i-1].value+rows[i].paid-rows[i-1].paid;
+  // Ohne Anfangskapital und Einzahlung gibt es keinen messbaren Verlauf.
+  index*=base>0?rows[i].value/base:1;
+  high=Math.max(high,index);indexes.push(index);drawdowns.push(high>0?index/high-1:0);
+ }
+ return {account,investment:phase(indexes),indexes,drawdowns,measurable:rows.some(r=>r.paid>0)};
+}
+
+export function learningExamples(data,settings,start,capital,payment,ownShare=50){
+ if(!findAsset(data,'URTH'))return [];
+ return [...new Set([25,50,75,ownShare])].map(cashEquity=>{
+  const result=mixSimulation(data,'mix-cash',{...settings,cashEquity},start,capital,payment);
+  return {...result,share:cashEquity,loss:learningLoss(result)};
+ });
 }
