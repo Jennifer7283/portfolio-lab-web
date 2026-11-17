@@ -1,6 +1,8 @@
 :root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#203a34;background:#f6f8f5;font-size:16px;--green:#184c40;--muted:#697d75;--border:#dce5de;--pale:#eaf1e9}
 #welcome-guide:focus{outline:none}
 .guide-restore{display:inline-flex;align-items:center;margin:10px 0 20px;padding:9px 14px;border:1px solid var(--border);border-radius:12px;background:#fffdf4;color:var(--green);font-size:14px;cursor:pointer}.guide-restore:hover{background:var(--pale)}
+.lesson-feedback-content{border-top:1px solid var(--border);margin-top:16px;padding-top:14px;animation:lesson-response .25s ease-out}.lesson-feedback-content h3{font-size:17px;margin:0 0 8px}.lesson-feedback-content p{font-size:15px;line-height:1.65}.lesson-dialogue .guide-bubble.is-correct{border-color:#bdcfb7}.lesson-dialogue .guide-bubble.is-review{border-color:#d8c7a9}@keyframes lesson-response{from{opacity:.4;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}@media(prefers-reduced-motion:reduce){.lesson-feedback-content{animation:none}}
+/* Der Igel begleitet; Information und Analyse bleiben im Vordergrund. */
 /* Lumi: ganze Figur und Sprechblase statt separater Hinweiskarte. */
 .guide-message,.lesson-dialogue,.welcome-conversation{display:flex;gap:28px;align-items:flex-start;margin:24px 0}
 .guide-figure{display:block;width:148px;height:auto;flex:0 0 148px;overflow:visible}
@@ -22,15 +24,6 @@
 #disclaimer #welcome-title{font-size:21px;margin:22px 0 10px}
 #disclaimer .notice-warning{padding:12px 15px;margin:14px 0}
 #welcome-speech:focus{outline:none}
-.lumi-arm{transform-origin:120px 130px}
-.mood-welcome .lumi-arm{animation:lumi-wave 1.9s ease-in-out 2}
-.mood-think .lumi-body{transform-origin:90px 200px;animation:lumi-think 2.4s ease-in-out 1}
-.mood-happy .lumi-body{transform-origin:90px 200px;animation:lumi-happy .65s ease-in-out 2}
-.mood-explain .lumi-arm{animation:lumi-explain 1.7s ease-in-out 1}
-@keyframes lumi-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(15deg)}40%,80%{transform:rotate(-12deg)}}
-@keyframes lumi-think{0%,100%{transform:rotate(0)}45%,70%{transform:rotate(-4deg)}}
-@keyframes lumi-happy{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-@keyframes lumi-explain{0%,100%{transform:rotate(0)}50%{transform:rotate(-12deg)}}
 @media(prefers-reduced-motion:reduce){.guide-figure *{animation:none!important}}
 @media(max-width:600px){.guide-message,.lesson-dialogue,.welcome-conversation{gap:16px}.guide-figure,.lesson-dialogue .guide-figure{width:76px;flex-basis:76px}.guide-bubble{padding:17px;border-radius:18px}.guide-bubble::before{top:30px}.guide-bubble h2{font-size:19px}#disclaimer{padding:16px}#disclaimer .welcome-conversation{display:block}#welcome-guide{position:static;padding:0;margin:0 0 16px;width:90px}#disclaimer .guide-figure{width:90px}#disclaimer .guide-bubble{padding:20px}#disclaimer .welcome-speech::before{left:38px;top:-10px;transform:rotate(135deg)}}
 .radar-page .radar-ranking-title{font-size:clamp(25px,2.6vw,34px);line-height:1.25;font-weight:700;color:var(--green);border-left:5px solid var(--green);padding:4px 0 4px 18px;margin:30px 0 20px;max-width:850px}.radar-source-footer{border-top:1px solid var(--border);margin-top:30px;padding-top:14px}.radar-page .radar-source-footer .radar-update{margin-bottom:0}
@@ -253,10 +246,24 @@ button.guide-figure{display:block;position:relative;flex:0 0 168px;width:168px;h
 .lesson-dialogue button.guide-figure{width:148px;flex-basis:148px}
 #disclaimer{background:linear-gradient(135deg,#f9f6e9,#eff1df);border-radius:28px;box-shadow:0 24px 80px #3f392b33}
 #welcome-guide{flex-basis:188px}#disclaimer button.guide-figure{width:188px}#disclaimer .guide-bubble{background:#fffdf5}#disclaimer .guide-bubble::before{background:#fffdf5}
-.mood-welcome .mascot-image{animation:hedgehog-hello 2.4s ease-in-out 2}.mood-think .mascot-image{animation:hedgehog-think 2.8s ease-in-out 1}.mood-explain .mascot-image{animation:hedgehog-nod 1.6s ease-in-out 1}.mood-happy .mascot-image{animation:hedgehog-joy .7s ease-in-out 2}.is-greeting .mascot-image{animation:hedgehog-hello .8s ease-in-out 2!important}
-@keyframes hedgehog-hello{0%,100%{transform:rotate(0) translateY(0)}25%{transform:rotate(-3deg) translateY(-3px)}70%{transform:rotate(3deg) translateY(-2px)}}
-@keyframes hedgehog-think{0%,100%{transform:rotate(0)}45%,65%{transform:rotate(-4deg)}}
-@keyframes hedgehog-nod{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(3px) rotate(2deg)}}
-@keyframes hedgehog-joy{0%,100%{transform:translateY(0)}45%{transform:translateY(-6px) rotate(-2deg)}}
 @media(max-width:600px){.brand-mascot{width:44px;height:48px}.learning-step,.learning-step:last-child,.knowledge-item{padding:18px}.guide-message,.lesson-dialogue{gap:14px}button.guide-figure,.lesson-dialogue button.guide-figure{width:84px;flex-basis:84px}.guide-bubble{padding:18px}.guide-bubble h2{font-size:19px}#welcome-guide{width:116px}#disclaimer button.guide-figure{width:116px}}
 @media(prefers-reduced-motion:reduce){.mascot-image,.is-greeting .mascot-image{animation:none!important}#content .navigation-action,button.primary,#accept,details,.lesson-choice,.profile-answers label{transition:none}#content .navigation-action:hover:not(:disabled),button.primary:hover:not(:disabled),#accept:hover:not(:disabled){transform:none}}
+
+/* Freundliche Analyseoberfläche für Erwachsene: ruhiger, nicht spielerischer. */
+img.guide-figure.mascot-image{display:block;flex:0 0 140px;width:140px;height:auto;aspect-ratio:1;object-fit:contain;animation:none!important;transform:none;cursor:default;pointer-events:none}
+.lesson-dialogue img.guide-figure.mascot-image{width:116px;flex-basis:116px}
+#disclaimer img.guide-figure.mascot-image{width:156px}
+@media(max-width:600px){img.guide-figure.mascot-image,.lesson-dialogue img.guide-figure.mascot-image{width:76px;flex-basis:76px}#disclaimer img.guide-figure.mascot-image{width:100px}}
+.guide-figure .mascot-image,.is-greeting .mascot-image{animation:none!important}
+:root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#faf8f1}
+h1{font-weight:680}h2{font-weight:650}.card,.report-section,.chart{border-radius:18px;box-shadow:0 2px 0 #e7e1ce55,0 8px 22px #55452b05}
+.learning-step .number{background:#eef1e6;border-color:#cdd5bf;color:#486040;box-shadow:0 2px 0 #d7dec8}
+.learning-step,.knowledge-item{border-radius:16px;box-shadow:0 2px 0 #e8e0cd44}
+.guide-bubble{border-radius:20px;box-shadow:0 2px 0 #e5ddc466,0 8px 20px #6c513308}
+button.guide-figure{width:140px;flex-basis:140px}.lesson-dialogue button.guide-figure{width:116px;flex-basis:116px}
+#welcome-guide{flex-basis:156px}#disclaimer button.guide-figure{width:156px}
+#content .navigation-action,button.primary,#accept{border-radius:11px;box-shadow:0 2px 0 #1c412d,0 5px 12px #2a4b300d}
+#content .navigation-action:hover:not(:disabled),button.primary:hover:not(:disabled),#accept:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 3px 0 #1c412d,0 6px 12px #2a4b3012}
+#content .navigation-action:active:not(:disabled),button.primary:active:not(:disabled),#accept:active:not(:disabled){transform:translateY(1px);box-shadow:0 1px 0 #1c412d}
+@media(max-width:600px){button.guide-figure,.lesson-dialogue button.guide-figure{width:76px;flex-basis:76px}#welcome-guide{width:100px}#disclaimer button.guide-figure{width:100px}}
+@media(prefers-reduced-motion:reduce){#content .navigation-action:hover:not(:disabled),button.primary:hover:not(:disabled),#accept:hover:not(:disabled){transform:none}}
