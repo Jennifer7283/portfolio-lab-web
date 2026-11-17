@@ -141,6 +141,13 @@ export function calculateLossExample(amount,percent){
  const loss=amount*percent/100;return {loss,remaining:amount-loss};
 }
 
+// Lernfälle, keine empirische Wahrscheinlichkeitsverteilung. Keine direkte Wiederholung.
+export function drawLossScenario(previous=null,random=Math.random){
+ const cases=Array.from({length:12},(_,i)=>(i+1)*5).filter(value=>value!==previous),sample=random();
+ if(!finite(sample)||sample<0||sample>=1)throw Error('Ungültiger Zufallswert.');
+ return cases[Math.floor(sample*cases.length)];
+}
+
 export function profileReflection(profile,depth='Grundlagen'){
  const p=profilePolicy(profile);if(!p)return null;
  const f=profile.context??{},outlook=[],finances=[];
