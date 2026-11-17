@@ -133,7 +133,7 @@ export function profileComparisonGuide(profile,depth='Grundlagen'){
  const extra=[];
  if(depth!=='Grundlagen')extra.push('Ein langer Anlagezeitraum verhindert keine Verluste und garantiert keine Erholung bis zum Auszahlungstermin. Ein ETF kann verkäuflich sein und beim Verkauf trotzdem im Minus stehen: Verfügbarkeit ist nicht dasselbe wie Werterhalt.');
  if(depth==='Vertiefung')extra.push('Die Hinweise folgen deinen Selbstauskünften und redaktionellen Lernregeln, nicht einer validierten Eignungsprüfung. Historische Rückgänge sind Beobachtungen und keine Grenze zukünftiger Verluste. Die Beispielrechnung unterstellt lediglich den eingegebenen prozentualen Rückgang.');
- return {lead,reason,questions,example,trial:'Im Tool kannst du ausprobieren, was ein Verlust für einen frei gewählten Anlagebetrag bedeuten würde. Bei 5.000 Euro wären beispielsweise 20 Prozent Verlust gleich 1.000 Euro. Das ist ein Rechenbeispiel, keine Prognose oder Verlustgrenze.',extra,next,limit:'Aus diesen Angaben bestimmen wir keine passende Aktienquote und wählen kein Portfolio für dich aus.'};
+ return {lead,reason,questions,example,trial:'Spiele anschließend mit deinem gewünschten Anlagebetrag durch, was ein angenommener Kursrückgang für dich bedeuten würde. Überlege dabei, ob dir das verlorene Geld für wichtige Ausgaben fehlen würde.',extra,next,limit:'Aus diesen Angaben bestimmen wir keine passende Aktienquote und wählen kein Portfolio für dich aus.'};
 }
 
 export function calculateLossExample(amount,percent){
