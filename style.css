@@ -277,3 +277,10 @@ button.guide-figure{width:140px;flex-basis:140px}.lesson-dialogue button.guide-f
 .guide-message .guide-dismiss{display:inline-block;margin-top:14px;line-height:1.5;cursor:pointer}
 .guide-dismiss:focus-visible,.guide-restore:focus-visible{outline:3px solid #647f58;outline-offset:4px}
 @media(max-width:600px){.guide-message{gap:12px;margin:18px 0 24px}.guide-message img.guide-figure.mascot-image{width:64px;flex-basis:64px}.guide-message .guide-bubble{padding:16px}.guide-message .guide-bubble h2{font-size:18px}.guide-message .guide-bubble p{font-size:15px}}
+
+/* Die verfügbare Inhaltsbreite nutzen, auch auf großen Bildschirmen. */
+main{max-width:none;min-width:0}
+#content,.learning-path,.knowledge-list,.empty-analysis{width:100%;max-width:none;min-width:0}
+.learning-step,.knowledge-item{width:100%;max-width:none;min-width:0}
+.learning-step p,.knowledge-item p,.lead{max-width:none}
+.guide-message .guide-bubble p+p{margin-top:12px}

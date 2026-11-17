@@ -10,6 +10,8 @@ Der Igel begleitet auch die weiteren Hauptbereiche: Grundlagen, Kurzfassung, Sim
 
 Die ruhige Typografie und warme Creme-/Grün-Gestaltung ändern keine Finanzberechnung, Fragen oder Navigationsstruktur. Die Begleittexte sind redaktionelle Lernhilfen, keine dynamischen Anlageempfehlungen oder KI-Auswertungen. Keine zusätzlichen KI-Aufrufe, Tracking- oder Nutzerdatenspeicher.
 
+Allgemeine Einleitungen werden nicht zusätzlich zur Sprechblase angezeigt. In der Profilerstellung stehen Freiwilligkeit, spätere Ergänzungen und Sitzungsspeicherung beim Begleiter statt als wiederholte Absätze bei den Fragen. Methodische Erläuterungen, Quellen, Ergebnisgrenzen und notwendige Eingabehinweise bleiben erhalten. Die Sprechblasen sind freundlich und alltagssprachlich formuliert, ohne persönliche Eignung oder künftigen Erfolg zu behaupten. Lernschritte, Kurzfassung und Hauptinhalt nutzen die gesamte verfügbare Inhaltsbreite; die bisherigen festen Breitenbegrenzungen entfallen.
+
 ## Lernlektionen (17.11.2026)
 
 Unter „Überblick & Lernen“ führt „Zu den Lernlektionen“ zu fünf kurzen Grundlagenfragen mit jeweils drei Antwortmöglichkeiten. Eine Antwort wird erst mit „Antwort prüfen“ ausgewertet. Jede Auswahl hat eine eigene kurze Begründung; eine falsche Antwort wird erklärt, statt andere Bereiche zu sperren. Am Ende folgen ein Rückblick und die Möglichkeit zur Wiederholung.
