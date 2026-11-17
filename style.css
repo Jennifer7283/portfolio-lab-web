@@ -176,8 +176,8 @@ nav .subnav label{gap:7px}
 #content :is(a,button).navigation-action:focus-visible{outline:3px solid #9b803e;outline-offset:3px}
 #content button.navigation-action:disabled{opacity:.45;cursor:not-allowed}
 #content .navigation-action[aria-current=step]{outline:2px solid #87ac9c;outline-offset:2px}
-.navigation-action-group{display:flex;align-items:stretch;flex-wrap:wrap;gap:12px}.navigation-action-group>.navigation-action{flex:1 1 180px}
-@media(max-width:600px){.profile-learning-actions.is-complete{grid-template-columns:minmax(0,1fr)}.navigation-action-group{flex-direction:column}.navigation-action-group>.navigation-action{flex:none;width:100%}}
+.navigation-action-group{display:flex;align-items:stretch;flex-wrap:wrap;gap:12px}#content .navigation-action-group>.navigation-action{flex:1 1 0;margin:0;align-self:stretch}
+@media(max-width:600px){.profile-learning-actions.is-complete{grid-template-columns:minmax(0,1fr)}.navigation-action-group{flex-direction:column}#content .navigation-action-group>.navigation-action{flex:none;width:100%}}
 .learning-lab p{line-height:1.6;margin:10px 0 16px}
 .learning-lab .card .card{padding:0;border:0;box-shadow:none}
 .learning-lab h3{margin-top:28px}.learning-lab .grid{align-items:end}
