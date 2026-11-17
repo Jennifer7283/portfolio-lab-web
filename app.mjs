@@ -201,7 +201,7 @@ function profileFieldView(key){
  return `<label class="field"><span>${esc(label)}</span><select data-profile-field="${key}"><option value="">Offen – bitte auswählen</option>${values.map(([v,t])=>`<option value="${v}" ${state.profileDraft.context[key]===v?'selected':''}>${esc(t)}</option>`).join('')}</select></label>`;
 }
 function profileWizardNavigation(back,next,label){
- return `<nav class="profile-wizard-actions" aria-label="Schrittweise Profilnavigation">${back?`<button class="secondary" data-profile-step="${back}">Zurück</button>`:'<a class="secondary" href="#lernen">Zurück</a>'}<button class="secondary" data-profile-step="${next}" data-profile-skip>Überspringen</button><button class="primary" data-profile-step="${next}">${esc(label)}</button></nav>`;
+ return `<nav class="profile-wizard-actions${back?'':' is-first-step'}" aria-label="Schrittweise Profilnavigation">${back?`<button class="secondary" data-profile-step="${back}">Zurück</button>`:''}<button class="secondary" data-profile-step="${next}" data-profile-skip>Überspringen</button><button class="primary" data-profile-step="${next}">${esc(label)}</button></nav>`;
 }
 function profileView(){
  const draft=state.profileDraft,score=scoreRiskAnswers(draft.answers),count=draft.answers.filter(Number.isInteger).length;
