@@ -1,5 +1,9 @@
 # Portfolio Lab – GitHub Pages
 
+## Lernbegleiter (17.11.2026)
+
+Eine eigenständig gezeichnete SVG-Roboterfigur begrüßt Nutzer nach jedem Neuladen zusammen mit dem unveränderten Nutzungshinweis. Erst eine aktive Bestätigung öffnet die Anwendung. Die Figur erklärt „Mein Profil“ und „Überblick & Lernen“ mit ausblendbaren, festen Hinweisen und begleitet die fünf Lernfragen als Dialog. Es handelt sich nicht um einen KI-Chat oder eine Anlageberatung. Keine zusätzlichen Anfragen, externen Bilddateien oder Datenspeicher; ausgeblendete Hinweise werden beim Neuladen zurückgesetzt.
+
 ## Lernlektionen (17.11.2026)
 
 Unter „Überblick & Lernen“ führt „Zu den Lernlektionen“ zu fünf kurzen Grundlagenfragen mit jeweils drei Antwortmöglichkeiten. Eine Antwort wird erst mit „Antwort prüfen“ ausgewertet. Jede Auswahl hat eine eigene kurze Begründung; eine falsche Antwort wird erklärt, statt andere Bereiche zu sperren. Am Ende folgen ein Rückblick und die Möglichkeit zur Wiederholung.
