@@ -1,5 +1,13 @@
 # Portfolio Lab – GitHub Pages
 
+## Lernlektionen (17.11.2026)
+
+Unter „Überblick & Lernen“ führt „Zu den Lernlektionen“ zu fünf kurzen Grundlagenfragen mit jeweils drei Antwortmöglichkeiten. Eine Antwort wird erst mit „Antwort prüfen“ ausgewertet. Jede Auswahl hat eine eigene kurze Begründung; eine falsche Antwort wird erklärt, statt andere Bereiche zu sperren. Am Ende folgen ein Rückblick und die Möglichkeit zur Wiederholung.
+
+Die Fragen betreffen ETF/Aktie, Portfolio, Diversifikation, World/Emerging Markets und Verlustrisiken. Etwa zwei Minuten sind ein Gestaltungsziel ohne Zeitlimit, keine gemessene Bearbeitungszeit. Die redaktionellen Fragen sind kein validierter Wissenstest, keine Eignungsprüfung und kein Teil des Risikoprofils. Antworten beeinflussen keine Finanzberechnung oder Portfolioauswahl, gelangen nicht in KI-Prompts und bleiben nur im Arbeitsspeicher der geöffneten Sitzung.
+
+Die Gestaltung orientiert sich an eigenem Antwortversuch mit anschließender Begründung bei [Khan Academy](https://blog.khanacademy.org/how-should-people-practice-on-khan-academy/) und fehlerbezogenem Erklärfeedback bei [Duolingo](https://blog.duolingo.com/explain-my-answer-now-free/). Es werden allgemeine Prinzipien übernommen, keine Wirksamkeitsnachweise für diese eigene Übung behauptet.
+
 ## Neue Lern- und Vergleichsansicht (08.11.2026)
 
 Portfolios sind in drei aufklappbare Gruppen mit Mehrfachauswahl eingeordnet.

@@ -148,6 +148,47 @@ export function drawLossScenario(previous=null,random=Math.random){
  return cases[Math.floor(sample*cases.length)];
 }
 
+// Redaktionelle Verständnisfragen zu Überblick & Lernen, keine diagnostische Skala.
+export const learningLessonQuestions=[
+ {id:'etf',topic:'ETF und Aktie',question:'Was kaufst du mit einem breit gestreuten Aktien-ETF?',correct:1,
+  options:[
+   {text:'Eine einzelne Aktie eines Unternehmens.',explanation:'Eine einzelne Aktie steht für ein Unternehmen. Ein breit gestreuter Aktien-ETF bündelt dagegen Aktien vieler Unternehmen.'},
+   {text:'Anteile an einem Fonds mit Aktien mehrerer Unternehmen.',explanation:'Genau: Der ETF bündelt verschiedene Aktien in einem Fonds. Seine Kurse können trotzdem fallen.'},
+   {text:'Ein Sparkonto mit einem festen Zins.',explanation:'Ein ETF ist kein Sparkonto. Sein Wert hängt von den enthaltenen Anlagen ab und kann sinken.'}],
+  takeaway:'Eine Aktie gehört zu einem Unternehmen; ein breit gestreuter Aktien-ETF bündelt viele Unternehmen.'},
+ {id:'portfolio',topic:'Portfolio',question:'Was ist ein Portfolio?',correct:0,
+  options:[
+   {text:'Die Gesamtheit deiner Geldanlagen.',explanation:'Genau: Dein Portfolio umfasst deine Anlagen. Es kann auch nur aus einem einzigen ETF bestehen.'},
+   {text:'Die Liste aller Unternehmen in einem Aktienindex.',explanation:'Ein Index beschreibt eine festgelegte Auswahl. Dein Portfolio ist dagegen die Gesamtheit deiner eigenen Anlagen.'},
+   {text:'Ein Handelsplatz, an dem ETFs gekauft werden.',explanation:'Ein Handelsplatz ist eine Börse. Ein Portfolio ist deine Zusammenstellung von Anlagen.'}],
+  takeaway:'Dein Portfolio ist deine Zusammenstellung von Anlagen – auch ein einzelner ETF kann ein Portfolio sein.'},
+ {id:'streuung',topic:'Diversifikation',question:'Drei ETFs enthalten fast dieselben Unternehmen. Ist das automatisch breit gestreut?',correct:2,
+  options:[
+   {text:'Ja, die Zahl der ETFs reicht dafür aus.',explanation:'Entscheidend sind die enthaltenen Anlagen, nicht die Anzahl der ETFs. Ähnliche Inhalte können gleichzeitig an Wert verlieren.'},
+   {text:'Ja, mehrere ETFs verhindern gemeinsame Verluste.',explanation:'Auch mehrere ETFs können gleichzeitig fallen. Streuung verteilt Risiken, beseitigt sie aber nicht.'},
+   {text:'Nein, ihre Inhalte können sich stark überschneiden.',explanation:'Genau: Achte darauf, welche Unternehmen und Branchen enthalten sind. Mehr ETFs bedeuten nicht automatisch mehr Streuung.'}],
+  takeaway:'Diversifikation bedeutet unterschiedliche Anlagen, nicht einfach möglichst viele ETFs.'},
+ {id:'world',topic:'World und Emerging Markets',question:'Enthält ein MSCI-World-ETF automatisch auch Schwellenländer?',correct:1,
+  options:[
+   {text:'Ja, „World“ bedeutet alle Länder der Welt.',explanation:'Der Name kann täuschen: Der MSCI World enthält Industrieländer, aber keine Schwellenländer.'},
+   {text:'Nein, der MSCI World enthält nur Industrieländer.',explanation:'Genau: Schwellenländer werden beispielsweise durch Emerging-Markets-Indizes abgebildet. Ein World-ETF ist kein vollständiger Weltmarkt.'},
+   {text:'Nein, er enthält ausschließlich US-Unternehmen.',explanation:'Der MSCI World enthält Unternehmen aus verschiedenen Industrieländern, nicht nur aus den USA.'}],
+  takeaway:'MSCI World umfasst Industrieländer. Emerging Markets meint Schwellenländer, etwa Indien oder Brasilien.'},
+ {id:'risiko',topic:'Risiko und Anlagezeit',question:'Was gilt auch dann, wenn du dein Geld lange anlegst?',correct:0,
+  options:[
+   {text:'Verluste sind möglich; eine Erholung ist nicht garantiert.',explanation:'Genau: Eine lange Anlagezeit beseitigt das Verlustrisiko nicht. Kurzfristig benötigtes Geld solltest du deshalb getrennt betrachten.'},
+   {text:'Nach fünf Jahren ist ein Verlust ausgeschlossen.',explanation:'Es gibt keine feste Haltedauer, nach der Verluste ausgeschlossen sind. Auch nach fünf Jahren kann eine Anlage im Minus liegen.'},
+   {text:'Ein hoher vergangener Gewinn garantiert weitere Gewinne.',explanation:'Vergangene Gewinne sind keine Zusage für die Zukunft. Auch zuvor erfolgreiche Anlagen können fallen.'}],
+  takeaway:'Lange anlegen heißt nicht risikofrei anlegen. Historische Gewinne und eine Erholung sind keine Garantie.'}
+];
+
+export function createLearningLessonProgress(){return {index:0,choices:Array(learningLessonQuestions.length).fill(null),checked:Array(learningLessonQuestions.length).fill(false),complete:false};}
+export function checkLearningLessonAnswer(index,choice){
+ const question=learningLessonQuestions[index];
+ if(!Number.isInteger(index)||!question||!Number.isInteger(choice)||!question.options[choice])throw Error('Bitte eine der angebotenen Antworten auswählen.');
+ return {correct:choice===question.correct,explanation:question.options[choice].explanation,answer:question.options[question.correct].text,takeaway:question.takeaway};
+}
+
 export function profileReflection(profile,depth='Grundlagen'){
  const p=profilePolicy(profile);if(!p)return null;
  const f=profile.context??{},outlook=[],finances=[];
