@@ -267,3 +267,13 @@ button.guide-figure{width:140px;flex-basis:140px}.lesson-dialogue button.guide-f
 #content .navigation-action:active:not(:disabled),button.primary:active:not(:disabled),#accept:active:not(:disabled){transform:translateY(1px);box-shadow:0 1px 0 #1c412d}
 @media(max-width:600px){button.guide-figure,.lesson-dialogue button.guide-figure{width:76px;flex-basis:76px}#welcome-guide{width:100px}#disclaimer button.guide-figure{width:100px}}
 @media(prefers-reduced-motion:reduce){#content .navigation-action:hover:not(:disabled),button.primary:hover:not(:disabled),#accept:hover:not(:disabled){transform:none}}
+
+/* Eine kurze, freiwillige Orientierung je Ansicht; kein schwebendes Maskottchen. */
+.guide-message{gap:22px;margin:22px 0 30px;align-items:flex-start}
+.guide-message img.guide-figure.mascot-image{width:104px;flex-basis:104px}
+.guide-message .guide-bubble{padding:20px 24px}
+.guide-message .guide-bubble h2{font-size:21px;margin-bottom:8px}
+.guide-message .guide-bubble p{font-size:16px;line-height:1.6;margin:0}
+.guide-message .guide-dismiss{display:inline-block;margin-top:14px;line-height:1.5;cursor:pointer}
+.guide-dismiss:focus-visible,.guide-restore:focus-visible{outline:3px solid #647f58;outline-offset:4px}
+@media(max-width:600px){.guide-message{gap:12px;margin:18px 0 24px}.guide-message img.guide-figure.mascot-image{width:64px;flex-basis:64px}.guide-message .guide-bubble{padding:16px}.guide-message .guide-bubble h2{font-size:18px}.guide-message .guide-bubble p{font-size:15px}}

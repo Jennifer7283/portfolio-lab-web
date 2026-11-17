@@ -31,8 +31,30 @@ function guideMessage(title,text,mood='explain',dismiss=null){
 }
 function guideIntro(page){
  if(state.guideHidden[page])return `<button class="guide-restore" data-guide-show="${esc(page)}">Einführung wieder anzeigen</button>`;
- if(page==='profil')return guideMessage('Was erwartet dich hier?','Dein Profil ist freiwillig. Du kannst deinen Einstieg wählen, deine finanziellen Rahmenbedingungen beschreiben und deine Risikobereitschaft einschätzen. Daraus entsteht eine Orientierung zum Lernen, keine Anlageempfehlung. Du kannst Fragen überspringen und später zurückkehren.','explain',page);
- return guideMessage('Die Grundlagen im Überblick.','Hier lernst du, was Aktien, ETFs und Portfolios sind und wie Streuung und Risiko zusammenhängen. Lies in deinem Tempo. Mit fünf kurzen Fragen kannst du anschließend dein Verständnis überprüfen.','welcome',page);
+ // Eine Orientierung pro Hauptansicht, keine neuen Pflichtschritte oder Anlagevorschläge.
+ const profileSteps={
+  entry:['Dein Einstieg, in deinem Tempo.','Hier geht es zuerst darum, was du kennenlernen möchtest und wie viel Erfahrung du mitbringst. Du musst noch keine Anlageentscheidung treffen. Alle Angaben sind freiwillig; übersprungene Fragen kannst du später ergänzen.'],
+  context:['Was muss dein Geld für dich leisten?','Denke bei diesen Fragen an deinen Alltag: Welche Ausgaben müssen gesichert sein, und wann könntest du das Geld brauchen? Das ist etwas anderes als die Bereitschaft, Risiken einzugehen. Du kannst Angaben offenlassen.'],
+  quiz:['Wie würdest du tatsächlich entscheiden?','Hier gibt es keine richtigen oder falschen Antworten. Überlege, wie du mit unsicheren Ergebnissen und möglichen Verlusten umgehen würdest. Deine Risikobereitschaft sagt nicht automatisch, welche Verluste du dir leisten kannst.'],
+  result:['Deine Antworten einordnen.','Lies deine Risikobereitschaft und deine finanziellen Rahmenbedingungen zusammen: Beides kann in unterschiedliche Richtungen weisen. Die Auswertung hilft dir beim Lernen und Vergleichen; sie bestimmt kein für dich geeignetes Portfolio.']
+ };
+ if(page==='profil'){const [title,text]=profileSteps[state.profileStep]||profileSteps.entry;return guideMessage(title,text,'explain',page);}
+ const guides={
+  lernen:['Die Grundlagen im Überblick.','Beginne mit den Begriffen, die dir noch nicht vertraut sind. Du musst nicht alles auf einmal lesen. Mit fünf kurzen Fragen kannst du anschließend prüfen, was du mitgenommen hast.','welcome'],
+  kurz:['Die wichtigsten Gedanken mitnehmen.','Diese Kurzfassung gibt dir einen ersten Überblick. Du musst dir nicht alle Begriffe sofort merken. Achte besonders darauf, was du kaufst, wie dein Geld verteilt ist und welche Verluste möglich sind.','explain'],
+  simulation:['Vom Wissen zum Ausprobieren.','Vergleiche zunächst die Vermögenskurven bei gleichem Startkapital und gleichen Einzahlungen. Verschiebe dann den Anlagebeginn: Bleibt dein Eindruck derselbe? Ein hoher Endwert allein zeigt noch nicht, wie groß die zwischenzeitlichen Verluste waren.','think'],
+  eigen:['Deine Mischung als Lernexperiment.','Wähle einen ETF und lies direkt darunter nach, was er enthält. Ergänze bei Bedarf weitere Anlagen und verteile insgesamt hundert Prozent. Vergleiche danach nicht nur den Endwert, sondern auch die Schwankungen und Verluste. Die selbst gewählte Mischung ist keine Empfehlung.','think'],
+  sparen:['Unter gleichen Bedingungen vergleichen.','Behalte für alle Sparformen denselben Betrag und Zeitraum bei. Ändere zum Beispiel nur den Tagesgeldzins und beobachte den Unterschied. Der eingegebene Zins ist ein Szenario; beim Bausparvertrag wird hier nur die Sparphase betrachtet.','explain'],
+  inflation:['Kontostand und Kaufkraft unterscheiden.','Der Kontostand zeigt, wie viel Geld vorhanden ist. Die Kaufkraft zeigt, was du damit kaufen könntest. Sieh dir zuerst unverzinstes Geld an und vergleiche dann die anderen Verläufe. Ein Kaufkraftverlust ist keine Abbuchung vom Konto.','explain'],
+  radar:['Beliebt heißt nicht automatisch passend.','Nutze die Rangliste, um ETFs kennenzulernen, nicht als Einkaufsliste. Prüfe zuerst, welche Anlagen und Regionen ein ETF abdeckt. Die Plätze beschreiben Käufe einer Kundengruppe, nicht den gesamten Markt oder künftige Gewinne.','think'],
+  analysen:['Einen Schritt genauer hinsehen.','Im Walk-Forward-Test folgen auf frühere Schätzdaten spätere Testmonate. Achte darauf, welche Informationen damals schon bekannt waren. Die zusätzlichen Ansichten kannst du links auswählen; du musst sie nicht alle gleichzeitig öffnen.','think'],
+  methodik:['Hinter die Ergebnisse schauen.','Wenn dich ein Ergebnis überrascht, beginne mit „Daten & Annahmen“. Prüfe dann bei Bedarf die Modellparameter. So kannst du unterscheiden, was aus den historischen Daten stammt und was auf einer vereinfachenden Modellannahme beruht.','explain']
+ };
+ let guide=guides[page];
+ if(!guide)return '';
+ if(!state.data&&['simulation','eigen','sparen','inflation','analysen'].includes(page))guide=['Die Analyse vorbereiten.','Für diesen Bereich brauchst du eine lokal exportierte Analysedatei. Wähle sie im Importfeld aus; sie wird nur in deinem Browser verarbeitet. Bis dahin kannst du die Grundlagen und Lernlektionen ohne Kursdaten nutzen.','explain'];
+ if(page==='simulation'&&state.data&&state.learningOpen)guide=['Was verändert der Aktienanteil?','Vergleiche die Vermögensentwicklung und die zwischenzeitlichen Verluste zusammen. Verändere dann den Aktienanteil oder den Anlagebeginn und beobachte, was sich ändert. Die Beispiele sollen Unterschiede sichtbar machen, nicht deine persönliche Aktienquote festlegen.','think'];
+ return guideMessage(...guide,page);
 }
 const config=()=>({em:state.em,cashEquity:state.cashEquity,bondEquity:state.bondEquity,rate:state.rate,nextRate:state.nextRate,rateMonths:state.rateMonths});
 function fingerprint(){return JSON.stringify({revision:state.dataRevision,page:state.page,selected:[...state.selected].sort(),own:state.own,start:state.start,capital:state.capital,payment:state.payment,config:config(),depth:state.depth});}
@@ -312,7 +334,7 @@ function learningView(short=false){
  const template=document.createElement('template');template.innerHTML=learning(short);
  const list=template.content.querySelector('.grid');
  if(list){list.className=short?'knowledge-list':'learning-path';for(const [i,item] of [...list.children].entries()){item.className=short?'knowledge-item':'learning-step';const number=item.querySelector('.number');if(number)number.textContent=String(i+1).padStart(2,'0');}}
- return (short?'':guideIntro('lernen'))+template.innerHTML+(short?'':learningLessonsEntry())+learningJourney(short);
+ return template.innerHTML+(short?'':learningLessonsEntry())+learningJourney(short);
 }
 function learningLessonsEntry(){return '<section class="section lesson-entry"><h2>Die Grundlagen kurz überprüfen</h2><p>Was unterscheidet Aktie, ETF und Portfolio? Prüfe die wichtigsten Begriffe mit fünf kurzen Fragen und einer Erklärung zu jeder Antwort.</p><a class="secondary" href="#lektionen">Zu den Lernlektionen</a></section>';}
 function learningLessonsView(){
@@ -333,6 +355,12 @@ function methodologyView(){
  return explanation('Wie entstehen die Ergebnisse?','method')+template.innerHTML+(option('methodik','annahmen')?profileMethodology():'');
 }
 let lastResults=[];
+function renderLearningCompanion(){
+ // Profil und Lektionen haben ihren zustandsabhängigen Dialog bereits selbst.
+ if(['profil','lektionen'].includes(state.page))return;
+ const lead=$('content').querySelector('.lead');
+ if(lead)lead.insertAdjacentHTML('afterend',guideIntro(state.page));
+}
 let renderTimer,pointerBusy=false,deferredRender=false;
 function formatExplanationParagraphs(){
  if(['lernen','kurz','profil','radar'].includes(state.page))return;
@@ -358,7 +386,7 @@ function formatScatterPlots(){for(const svg of document.querySelectorAll('svg[ar
 function queueRender(){clearTimeout(renderTimer);renderTimer=setTimeout(()=>{if(pointerBusy||document.activeElement?.matches('input[type="number"]')){deferredRender=true;return;}render();},160);}
 function render(){clearTimeout(renderTimer);deferredRender=false;const focused=document.activeElement,focusId=focused?.id,ownIndex=focused?.dataset?.ownWeight,mixKey=focused?.dataset?.mixKey,selectedPortfolio=focused?.dataset?.portfolio,exampleKey=focused?.dataset?.mixExample;infoMap=new Map();infoSeq=0;chartPayload=new Map();lastResults=[];if(state.page==='minimum'){state.page='simulation';state.options['simulation:schaetzverfahren']=true;}if(!pages.some(([id])=>id===state.page))state.page='lernen';$('depth-bar').innerHTML=state.page==='lektionen'?'':depthHeader();nav();const d=state.data;$('data-status').innerHTML=d&&!['lernen','lektionen','kurz','profil','radar'].includes(state.page)?`<div class="data-strip"><span>IMPORTIERTER ANALYSESTICHTAG<b>${esc(d.asOf)}</b></span><span>VERFÜGBARE MONATE<b>${month(d.dates[0])} – ${month(d.dates.at(-1))}</b></span></div>`:'';
  try{$('content').innerHTML=state.page==='profil'?profileView():state.page==='lernen'?learningView():state.page==='lektionen'?learningLessonsView():state.page==='kurz'?learningView(true):state.page==='simulation'?simulationPage():state.page==='eigen'?simulationPage(true):state.page==='minimum'?simulationPage(false,true):state.page==='sparen'?savingsPage():state.page==='inflation'?savingsPage(true):state.page==='radar'?radarView():state.page==='analysen'?analyses():methodologyView();}catch(e){$('content').innerHTML=`<h1>Die Ansicht konnte nicht berechnet werden.</h1><p class="error">${esc(e.message)}</p><p>Bitte prüfe deine Eingaben oder importiere eine vollständige Analysedatei.</p>`;}
- formatExplanationParagraphs();formatNavigationActions();formatScatterPlots();chartEvents();bind();
+ renderLearningCompanion();formatExplanationParagraphs();formatNavigationActions();formatScatterPlots();chartEvents();bind();
  if(focused?.tagName==='INPUT'||focusId==='explanation-depth'||exampleKey){const replacement=mixKey?document.querySelector(`[data-mix-key="${mixKey}"][type="${focused.type}"]`):selectedPortfolio?document.querySelector(`[data-portfolio="${CSS.escape(selectedPortfolio)}"]`):exampleKey?document.querySelector(`[data-mix-example="${exampleKey}"]`):ownIndex!==undefined?document.querySelector(`[data-own-weight="${ownIndex}"]`):focusId?$(focusId):null;replacement?.focus({preventScroll:true});}
 }
 function bind(){
