@@ -2,7 +2,7 @@
 
 ## Lernbegleiter (17.11.2026)
 
-Eine eigenständig gezeichnete SVG-Roboterfigur begrüßt Nutzer nach jedem Neuladen zusammen mit dem unveränderten Nutzungshinweis. Erst eine aktive Bestätigung öffnet die Anwendung. Die Figur erklärt „Mein Profil“ und „Überblick & Lernen“ mit ausblendbaren, festen Hinweisen und begleitet die fünf Lernfragen als Dialog. Es handelt sich nicht um einen KI-Chat oder eine Anlageberatung. Keine zusätzlichen Anfragen, externen Bilddateien oder Datenspeicher; ausgeblendete Hinweise werden beim Neuladen zurückgesetzt.
+Lumi, ein eigenständig gezeichneter Gartenschläfer im Laborkittel, begrüßt Nutzer nach jedem Neuladen. Der unveränderte Nutzungshinweis und seine Bestätigung stehen vollständig in einer Sprechblase mit Spitze zur Figur. Erst eine aktive Bestätigung öffnet die Anwendung. Lumi erklärt „Mein Profil“ und „Überblick & Lernen“ mit ausblendbaren, festen Hinweisen und begleitet die fünf Lernfragen als Dialog. Die ganze Figur besitzt unterschiedliche Mimik und Gesten für Begrüßung, Nachdenken, Erklären und Zustimmung. Kurze CSS-Animationen beachten „Bewegung reduzieren“. Es handelt sich nicht um einen KI-Chat oder eine Anlageberatung. Keine zusätzlichen Anfragen, externen Bilddateien oder Datenspeicher; ausgeblendete Hinweise werden beim Neuladen zurückgesetzt.
 
 ## Lernlektionen (17.11.2026)
 
