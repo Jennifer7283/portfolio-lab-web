@@ -2,7 +2,9 @@
 
 ## Lernbegleiter (17.11.2026)
 
-Lumi, ein eigenständig gezeichneter Gartenschläfer im Laborkittel, begrüßt Nutzer nach jedem Neuladen. Der unveränderte Nutzungshinweis und seine Bestätigung stehen vollständig in einer Sprechblase mit Spitze zur Figur. Erst eine aktive Bestätigung öffnet die Anwendung. Lumi erklärt „Mein Profil“ und „Überblick & Lernen“ mit ausblendbaren, festen Hinweisen und begleitet die fünf Lernfragen als Dialog. Die ganze Figur besitzt unterschiedliche Mimik und Gesten für Begrüßung, Nachdenken, Erklären und Zustimmung. Kurze CSS-Animationen beachten „Bewegung reduzieren“. Es handelt sich nicht um einen KI-Chat oder eine Anlageberatung. Keine zusätzlichen Anfragen, externen Bilddateien oder Datenspeicher; ausgeblendete Hinweise werden beim Neuladen zurückgesetzt.
+Der Portfolio-Lab-Igel basiert auf der vom Nutzer bereitgestellten 3D-Vorlage: Brille, grüner Hoodie und Doktorhut. Vier lokal bereitgestellte, freigestellte PNG-Varianten begleiten Begrüßung, Fragen, Erklärungen und Rückmeldungen. Die Bilder wurden mit der integrierten Bildgenerierung erstellt. Kurze CSS-Bewegungen und eine Reaktion beim Anklicken des Igels ergänzen die Mimik; es handelt sich um animierte 2D-Bilder mit 3D-Optik, nicht um ein Echtzeit-3D-Modell. „Bewegung reduzieren“ wird berücksichtigt.
+
+Der Nutzungshinweis und seine Bestätigung stehen vollständig in einer Sprechblase. Er erscheint nach jedem Neuladen. Erst eine aktive Bestätigung öffnet die Anwendung. Einführungen in „Mein Profil“ und „Überblick & Lernen“ sind ausblendbar. Die warme Creme-/Grün-Gestaltung, plastischeren Buttons und Reaktionen ändern keine Inhalte, Navigation, Reihenfolge oder Finanzberechnungen. Keine zusätzlichen KI-Aufrufe, Tracking- oder Nutzerdatenspeicher.
 
 ## Lernlektionen (17.11.2026)
 

@@ -23,37 +23,17 @@ state.lessons=createLearningLessonProgress();
 state.guideHidden={};
 // Eigene SVG-Figur, ohne externe Bilder oder KI-Anfragen.
 function guideFigure(mood='explain'){
- const happy=mood==='happy',thinking=mood==='think';
- const arm=mood==='welcome'?'M120 130Q143 114 151 84':thinking?'M120 130Q141 116 116 100':happy?'M120 130Q142 120 151 103':'M120 130Q142 140 151 120';
- return `<svg class="guide-figure mood-${esc(mood)}" viewBox="0 0 190 230" aria-hidden="true" focusable="false">
- <ellipse cx="91" cy="216" rx="52" ry="7" fill="#184c40" opacity=".09"/>
- <g class="lumi-body">
- <path d="M132 177C174 180 181 148 166 137C156 129 147 139 155 146" fill="none" stroke="#b77e56" stroke-width="13" stroke-linecap="round"/>
- <path d="M132 177C174 180 181 148 166 137C156 129 147 139 155 146" fill="none" stroke="#d8ac7e" stroke-width="8" stroke-linecap="round"/>
- <ellipse cx="68" cy="207" rx="18" ry="10" fill="#9a664b"/><ellipse cx="111" cy="207" rx="18" ry="10" fill="#9a664b"/>
- <path d="M56 120Q90 103 125 122L132 183Q119 208 90 208Q58 208 48 184Z" fill="#f5eddb" stroke="#87634b" stroke-width="2.5"/>
- <path d="M90 134V203M69 123L80 143L90 134L101 144L113 122" fill="none" stroke="#c5bca8" stroke-width="2.5" stroke-linecap="round"/>
- <path d="M104 161H123V178Q113 187 104 178Z" fill="#c8dace" stroke="#809c87" stroke-width="1.5"/>
- <path d="M112 175V164M112 169Q103 167 106 160Q115 159 112 169M113 169Q121 167 120 161Q112 161 113 169" fill="#53795e" stroke="#53795e" stroke-width="1.2"/>
- <circle cx="90" cy="161" r="2.2" fill="#a3977e"/><circle cx="90" cy="184" r="2.2" fill="#a3977e"/>
- <path d="M54 131Q33 146 41 162" fill="none" stroke="#f5eddb" stroke-width="18" stroke-linecap="round"/><ellipse cx="41" cy="166" rx="9" ry="11" fill="#d6a077" stroke="#87634b" stroke-width="2"/>
- <g class="lumi-arm"><path d="${arm}" fill="none" stroke="#87634b" stroke-width="19" stroke-linecap="round"/><path d="${arm}" fill="none" stroke="#f5eddb" stroke-width="15" stroke-linecap="round"/>
- <g transform="${mood==='welcome'?'translate(151 80)':thinking?'translate(116 98)':happy?'translate(151 100)':'translate(151 117)'}"><ellipse ry="12" rx="10" fill="#d6a077" stroke="#87634b" stroke-width="2"/><path d="M-4-6V0M2-7V-1" stroke="#b57c58" stroke-width="1.5" stroke-linecap="round"/></g></g>
- <circle cx="49" cy="53" r="25" fill="#c9976b" stroke="#87634b" stroke-width="2.5"/><circle cx="49" cy="53" r="15" fill="#eac5b6"/>
- <circle cx="123" cy="53" r="25" fill="#c9976b" stroke="#87634b" stroke-width="2.5"/><circle cx="123" cy="53" r="15" fill="#eac5b6"/>
- <path d="M40 79Q37 40 84 38Q135 36 139 80Q143 122 91 132Q36 128 40 79Z" fill="#d9ae80" stroke="#87634b" stroke-width="2.5"/>
- <path d="M65 42Q69 30 81 28L79 39Q89 29 98 33L94 42" fill="#d9ae80" stroke="#87634b" stroke-width="2" stroke-linejoin="round"/>
- <path d="M47 77Q57 58 76 67L78 89Q58 103 47 89ZM127 77Q117 58 98 67L96 89Q116 103 127 89Z" fill="#94674f"/>
- <g class="lumi-eyes">${happy?'<path d="M57 80Q63 71 69 80M105 80Q111 71 117 80" fill="none" stroke="#302f29" stroke-width="4" stroke-linecap="round"/>':'<ellipse cx="64" cy="79" rx="6" ry="8" fill="#302f29"/><ellipse cx="110" cy="79" rx="6" ry="8" fill="#302f29"/><circle cx="66" cy="76" r="2" fill="#fff"/><circle cx="112" cy="76" r="2" fill="#fff"/>'}</g>
- <ellipse cx="87" cy="104" rx="28" ry="19" fill="#f4dfc0"/><ellipse cx="87" cy="96" rx="7" ry="5" fill="#674b3c"/>
- <path d="${thinking?'M83 111Q89 106 95 110':'M75 108Q87 122 100 108'}" fill="${thinking?'none':'#744f40'}" stroke="#674b3c" stroke-width="2" stroke-linecap="round"/>
- ${thinking?'':'<path d="M81 114Q88 109 95 114" stroke="#e6a5a0" stroke-width="3" stroke-linecap="round"/>'}
- <ellipse cx="53" cy="100" rx="9" ry="5" fill="#d99281" opacity=".65"/><ellipse cx="122" cy="100" rx="9" ry="5" fill="#d99281" opacity=".65"/>
- <path d="M51 105L31 100M51 111L30 114M123 105L145 100M123 111L146 114" stroke="#87634b" stroke-width="1.5" stroke-linecap="round"/>
- </g></svg>`;
+ const pose=['welcome','think','explain','happy'].includes(mood)?mood:'explain';
+ return `<button type="button" class="guide-figure mood-${pose}" data-mascot="${pose}" aria-label="Den Igel begrüßen" title="Sag dem Igel Hallo"><img class="mascot-image" src="./hedgehog-${pose}.png" alt="" width="1024" height="1024" decoding="async" draggable="false"></button>`;
 }
 function guideMessage(title,text,mood='explain',dismiss=null){
  return `<div class="guide-message" role="note" aria-label="Lernbegleiter">${guideFigure(mood)}<div class="guide-bubble"><p class="guide-label">Dein Lernbegleiter</p><h2>${esc(title)}</h2><p>${esc(text)}</p>${dismiss?`<button class="guide-dismiss" data-guide-dismiss="${esc(dismiss)}">Hinweis ausblenden</button>`:''}</div></div>`;
+}
+function greetMascot(mascot){
+ if(mascot.classList.contains('is-greeting'))return;
+ const image=mascot.querySelector('img'),original=image.getAttribute('src');
+ mascot.classList.add('is-greeting');image.src='./hedgehog-welcome.png';
+ setTimeout(()=>{image.src=original;mascot.classList.remove('is-greeting');},1800);
 }
 function guideIntro(page){
  if(state.guideHidden[page])return '';
@@ -349,7 +329,7 @@ function learningLessonsView(){
   return heading+`<section class="card lesson-card" aria-labelledby="lesson-summary-title">${guideMessage('Geschafft – lass uns kurz zurückblicken.','Hier findest du die wichtigsten Gedanken noch einmal. Du kannst die Fragen jederzeit wiederholen.','welcome')}<h2 id="lesson-summary-title" tabindex="-1">Dein kurzer Rückblick</h2><p>${allCorrect?'Du hast alle fünf Fragen richtig eingeordnet.':'Einige Antworten waren noch nicht ganz richtig. Hier kannst du die Kernideen in Ruhe nachlesen.'}</p><ul class="lesson-review">${questions.map((q,i)=>`<li><h3>${esc(q.topic)}</h3><p class="small">${l.choices[i]===q.correct?'Richtig eingeordnet':'Zum Wiederholen'}</p><p>${esc(q.takeaway)}</p></li>`).join('')}</ul><p class="small">Das ist eine Lernübung, kein Nachweis deiner Anlagekenntnisse oder persönlichen Eignung. Die Antworten verändern weder dein Profil noch die Portfolioauswahl.</p><div class="prompt-actions"><button class="secondary" id="lesson-restart">Noch einmal üben</button><a class="secondary" href="#lernen">Zurück zu Überblick &amp; Lernen</a></div></section>`;
  }
  const i=l.index,q=questions[i],checked=l.checked[i],feedback=checked?checkLearningLessonAnswer(i,l.choices[i]):null;
- return heading+`<section class="card lesson-card" aria-labelledby="lesson-question"><p class="eyebrow">Frage ${i+1} von ${questions.length} · ${esc(q.topic)}</p><progress class="lesson-progress" value="${l.checked.filter(Boolean).length}" max="${questions.length}" aria-label="Beantwortete Lernfragen"></progress><div class="lesson-dialogue">${guideFigure(checked?(feedback.correct?'happy':'explain'):'think')}<div class="guide-bubble"><p class="guide-label">Lumi fragt</p><h2 id="lesson-question" tabindex="-1">${esc(q.question)}</h2><p class="small">Was meinst du? Wähle eine Antwort und prüfe deine Überlegung.</p></div></div><fieldset class="lesson-answers"><legend class="sr-only">Eine Antwort auswählen</legend>${q.options.map((option,j)=>`<label class="lesson-choice${checked&&j===q.correct?' is-answer':''}${checked&&j===l.choices[i]&&j!==q.correct?' is-mistake':''}"><input type="radio" name="lesson-answer" data-lesson-choice="${j}" ${l.choices[i]===j?'checked':''} ${checked?'disabled':''}><span>${esc(option.text)}${checked&&j===q.correct?'<small>Richtige Antwort</small>':''}</span></label>`).join('')}</fieldset>${feedback?`<div class="lesson-dialogue feedback-conversation" id="lesson-feedback" tabindex="-1" role="status">${guideFigure(feedback.correct?'happy':'explain')}<div class="guide-bubble lesson-feedback ${feedback.correct?'is-correct':'is-review'}"><p class="guide-label">Lumi erklärt</p><h3>${feedback.correct?'Richtig eingeordnet':'Noch nicht ganz'}</h3><p>${esc(feedback.explanation)}</p>${feedback.correct?'':`<p><strong>Richtig ist:</strong> ${esc(feedback.answer)}</p>`}</div></div>`:''}<div class="prompt-actions">${i?'<button class="secondary" id="lesson-back">Vorherige Frage</button>':'<a class="secondary" href="#lernen">Zurück zu Überblick &amp; Lernen</a>'}<button class="primary" id="lesson-next" ${Number.isInteger(l.choices[i])?'':'disabled'}>${checked?(i===questions.length-1?'Rückblick ansehen':'Nächste Frage'):'Antwort prüfen'}</button></div></section><p class="small">Du kannst jederzeit pausieren oder über die Navigation einen anderen Bereich öffnen. Dein Fortschritt bleibt in dieser Sitzung erhalten; beim Neuladen geht er verloren.</p>`;
+ return heading+`<section class="card lesson-card" aria-labelledby="lesson-question"><p class="eyebrow">Frage ${i+1} von ${questions.length} · ${esc(q.topic)}</p><progress class="lesson-progress" value="${l.checked.filter(Boolean).length}" max="${questions.length}" aria-label="Beantwortete Lernfragen"></progress><div class="lesson-dialogue">${guideFigure(checked?(feedback.correct?'happy':'explain'):'think')}<div class="guide-bubble"><p class="guide-label">Dein Igel fragt</p><h2 id="lesson-question" tabindex="-1">${esc(q.question)}</h2><p class="small">Was meinst du? Wähle eine Antwort und prüfe deine Überlegung.</p></div></div><fieldset class="lesson-answers"><legend class="sr-only">Eine Antwort auswählen</legend>${q.options.map((option,j)=>`<label class="lesson-choice${checked&&j===q.correct?' is-answer':''}${checked&&j===l.choices[i]&&j!==q.correct?' is-mistake':''}"><input type="radio" name="lesson-answer" data-lesson-choice="${j}" ${l.choices[i]===j?'checked':''} ${checked?'disabled':''}><span>${esc(option.text)}${checked&&j===q.correct?'<small>Richtige Antwort</small>':''}</span></label>`).join('')}</fieldset>${feedback?`<div class="lesson-dialogue feedback-conversation" id="lesson-feedback" tabindex="-1" role="status">${guideFigure(feedback.correct?'happy':'explain')}<div class="guide-bubble lesson-feedback ${feedback.correct?'is-correct':'is-review'}"><p class="guide-label">Dein Igel erklärt</p><h3>${feedback.correct?'Richtig eingeordnet':'Noch nicht ganz'}</h3><p>${esc(feedback.explanation)}</p>${feedback.correct?'':`<p><strong>Richtig ist:</strong> ${esc(feedback.answer)}</p>`}</div></div>`:''}<div class="prompt-actions">${i?'<button class="secondary" id="lesson-back">Vorherige Frage</button>':'<a class="secondary" href="#lernen">Zurück zu Überblick &amp; Lernen</a>'}<button class="primary" id="lesson-next" ${Number.isInteger(l.choices[i])?'':'disabled'}>${checked?(i===questions.length-1?'Rückblick ansehen':'Nächste Frage'):'Antwort prüfen'}</button></div></section><p class="small">Du kannst jederzeit pausieren oder über die Navigation einen anderen Bereich öffnen. Dein Fortschritt bleibt in dieser Sitzung erhalten; beim Neuladen geht er verloren.</p>`;
 }
 function methodologyView(){
  const template=document.createElement('template');template.innerHTML=methodology();
@@ -388,6 +368,7 @@ function render(){clearTimeout(renderTimer);deferredRender=false;const focused=d
  if(focused?.tagName==='INPUT'||focusId==='explanation-depth'||exampleKey){const replacement=mixKey?document.querySelector(`[data-mix-key="${mixKey}"][type="${focused.type}"]`):selectedPortfolio?document.querySelector(`[data-portfolio="${CSS.escape(selectedPortfolio)}"]`):exampleKey?document.querySelector(`[data-mix-example="${exampleKey}"]`):ownIndex!==undefined?document.querySelector(`[data-own-weight="${ownIndex}"]`):focusId?$(focusId):null;replacement?.focus({preventScroll:true});}
 }
 function bind(){
+ for(const mascot of document.querySelectorAll('#content [data-mascot]'))mascot.addEventListener('click',()=>greetMascot(mascot));
  for(const button of document.querySelectorAll('[data-guide-dismiss]'))button.addEventListener('click',()=>{state.guideHidden[button.dataset.guideDismiss]=true;render();$('content').querySelector('h1')?.focus({preventScroll:true});});
  for(const answer of document.querySelectorAll('[data-lesson-choice]'))answer.addEventListener('change',()=>{const l=state.lessons;if(l.checked[l.index])return;l.choices[l.index]=Number(answer.dataset.lessonChoice);render();document.querySelector(`[data-lesson-choice="${l.choices[l.index]}"]`)?.focus({preventScroll:true});});
  $('lesson-next')?.addEventListener('click',()=>{const l=state.lessons;if(!Number.isInteger(l.choices[l.index]))return;if(!l.checked[l.index]){checkLearningLessonAnswer(l.index,l.choices[l.index]);l.checked[l.index]=true;render();$('lesson-feedback')?.focus({preventScroll:true});return;}if(l.index<learningLessonQuestions.length-1)l.index++;else if(l.checked.every(Boolean))l.complete=true;else l.index=l.checked.indexOf(false);render();$('lesson-question')?.focus({preventScroll:true});$('lesson-summary-title')?.focus({preventScroll:true});});
@@ -450,4 +431,4 @@ $('accept-check').addEventListener('change',e=>$('accept').disabled=!e.target.ch
 $('accept').addEventListener('click',()=>{if(!$('accept-check').checked)return;$('disclaimer').close();location.hash='profil';render();});
 $('disclaimer').addEventListener('cancel',e=>e.preventDefault());
 if(innerWidth<760){document.body.classList.add('nav-closed');$('nav-toggle').setAttribute('aria-expanded','false');}
-render();$('welcome-guide').innerHTML=guideFigure('welcome');$('disclaimer').showModal();
+render();$('welcome-guide').innerHTML=guideFigure('welcome');$('welcome-guide').querySelector('[data-mascot]').addEventListener('click',e=>greetMascot(e.currentTarget));$('disclaimer').showModal();$('disclaimer').scrollTop=0;
