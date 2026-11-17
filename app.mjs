@@ -36,7 +36,7 @@ function greetMascot(mascot){
  setTimeout(()=>{image.src=original;mascot.classList.remove('is-greeting');},1800);
 }
 function guideIntro(page){
- if(state.guideHidden[page])return '';
+ if(state.guideHidden[page])return `<button class="guide-restore" data-guide-show="${esc(page)}">Einführung wieder anzeigen</button>`;
  if(page==='profil')return guideMessage('Was erwartet dich hier?','Dein Profil ist freiwillig. Du kannst deinen Einstieg wählen, deine finanziellen Rahmenbedingungen beschreiben und deine Risikobereitschaft einschätzen. Daraus entsteht eine Orientierung zum Lernen, keine Anlageempfehlung. Du kannst Fragen überspringen und später zurückkehren.','explain',page);
  return guideMessage('Lass uns die Grundlagen entdecken.','Hier lernst du, was Aktien, ETFs und Portfolios sind und wie Streuung und Risiko zusammenhängen. Lies in deinem Tempo. Anschließend können wir die wichtigsten Begriffe gemeinsam mit fünf kurzen Fragen ausprobieren.','welcome',page);
 }
@@ -369,7 +369,8 @@ function render(){clearTimeout(renderTimer);deferredRender=false;const focused=d
 }
 function bind(){
  for(const mascot of document.querySelectorAll('#content [data-mascot]'))mascot.addEventListener('click',()=>greetMascot(mascot));
- for(const button of document.querySelectorAll('[data-guide-dismiss]'))button.addEventListener('click',()=>{state.guideHidden[button.dataset.guideDismiss]=true;render();$('content').querySelector('h1')?.focus({preventScroll:true});});
+ for(const button of document.querySelectorAll('[data-guide-dismiss]'))button.addEventListener('click',()=>{const page=button.dataset.guideDismiss;state.guideHidden[page]=true;render();document.querySelector(`[data-guide-show="${page}"]`)?.focus({preventScroll:true});});
+ for(const button of document.querySelectorAll('[data-guide-show]'))button.addEventListener('click',()=>{state.guideHidden[button.dataset.guideShow]=false;render();$('content').querySelector('.guide-message [data-guide-dismiss]')?.focus({preventScroll:true});});
  for(const answer of document.querySelectorAll('[data-lesson-choice]'))answer.addEventListener('change',()=>{const l=state.lessons;if(l.checked[l.index])return;l.choices[l.index]=Number(answer.dataset.lessonChoice);render();document.querySelector(`[data-lesson-choice="${l.choices[l.index]}"]`)?.focus({preventScroll:true});});
  $('lesson-next')?.addEventListener('click',()=>{const l=state.lessons;if(!Number.isInteger(l.choices[l.index]))return;if(!l.checked[l.index]){checkLearningLessonAnswer(l.index,l.choices[l.index]);l.checked[l.index]=true;render();$('lesson-feedback')?.focus({preventScroll:true});return;}if(l.index<learningLessonQuestions.length-1)l.index++;else if(l.checked.every(Boolean))l.complete=true;else l.index=l.checked.indexOf(false);render();$('lesson-question')?.focus({preventScroll:true});$('lesson-summary-title')?.focus({preventScroll:true});});
  $('lesson-back')?.addEventListener('click',()=>{state.lessons.index=Math.max(0,state.lessons.index-1);render();$('lesson-question')?.focus({preventScroll:true});});
