@@ -1,5 +1,15 @@
 # Portfolio Lab – GitHub Pages
 
+## Freiwilliger eigener KI-Zugang (18.11.2026)
+
+Beim ersten Aufruf erscheint vor dem übrigen Einstieg die Frage nach einer eigenen API-Verbindung. „Ohne API fortfahren“ bleibt gleichwertig möglich. Nur die beantwortete Einstiegsfrage wird lokal gespeichert; Schlüssel und Modellverbindung bleiben ausschließlich im Arbeitsspeicher der geöffneten Seite. Nach einem Neuladen lässt sich der Zugang über „Eigene KI verbinden“ erneut einrichten. Wer den Browser-Speicher löscht oder einen anderen Browser verwendet, sieht die Einstiegsfrage erneut.
+
+Unterstützt wird zunächst ausschließlich `https://gpustack.test.hs-itz.de/v1`. Die CSP erlaubt neben dem eigenen Ursprung nur dieses konkrete externe Ziel, keine beliebigen HTTPS-Server. Die API muss erreichbar sein und eine passende CORS-Freigabe besitzen; eine fehlende Freigabe oder ein fehlendes Hochschul-VPN kann diese statische Website nicht umgehen. Die Erweiterung enthält weder einen gemeinsamen API-Schlüssel noch einen öffentlichen Proxy. Ein vorhandener Schlüssel wird nicht aus anderen Dateien oder dem Schlüsselbund ausgelesen.
+
+Erst nach Bestätigung der angezeigten Datenübertragung und einem Klick wird die Modellliste mit dem Schlüssel abgefragt. Erst ein gesondert angeforderter Bericht überträgt den Berichtsprompt mit Portfoliofakten. Profilantworten sind darin weiterhin nicht enthalten. Modellaufrufe erfolgen nacheinander mit Fortschrittsstatus, maximal drei Minuten pro Berichtsteil, ohne automatische Wiederholungen. Fertige Entwürfe bleiben bei einem späteren Fehler erhalten. Die API kann keine Nachrichtenlinks öffnen; recherchierte Nachrichten erfordern zusätzlich einen tatsächlichen Quellenabruf. Ohne API bleiben kopierbare Prompts verfügbar.
+
+Die lokale Browser-Version wird über ihren eigenen Server erkannt. Dort entfällt diese Einstiegsfrage; sie nutzt weiterhin den serverseitigen Schlüsselbundzugang und bietet nur direkte Berichterstellung, keinen sichtbaren Promptexport.
+
 ## Lernbegleiter (17.11.2026)
 
 Der Portfolio-Lab-Igel basiert auf der vom Nutzer bereitgestellten 3D-Vorlage: Brille, grüner Hoodie und Doktorhut. Vier lokal bereitgestellte, freigestellte PNG-Varianten begleiten Begrüßung, Fragen, Erklärungen und Rückmeldungen. Die Bilder wurden mit der integrierten Bildgenerierung erstellt. Auf ausdrücklichen Wunsch bleibt der Igel statisch und ist nicht anklickbar. In einer Lernfrage gibt es genau einen Igel und eine Sprechblase; nach der Prüfung wechseln Haltung und Rückmeldung an derselben Stelle. Sprecheretiketten wie „Dein Igel fragt“ entfallen. Animationsentwürfe gehören nicht zu den öffentlichen Website-Dateien.
@@ -58,7 +68,7 @@ Alle drei Portfolio-Prompttypen enthalten aktuelle Zielgewichte, Zinsszenario,
 Zeitraum, Einzahlungen, Kosten/Bänder, Datenstand und Erklärungstiefe. Ein alter
 Prompt bleibt nach Eingabeänderungen sichtbar, ist aber als veraltet markiert.
 Ein externer KI-Bericht kann hier nicht automatisch überprüft oder aktualisiert
-werden. Es werden weiterhin keine Daten an einen KI-Dienst gesendet.
+werden. Bei der reinen Prompterzeugung werden keine Daten an einen KI-Dienst gesendet; eine ausdrücklich angeforderte direkte Generierung nutzt den freiwillig eingerichteten API-Zugang.
 
 ## ETF-Monatsradar: getrennte Datenversorgung
 
@@ -168,14 +178,14 @@ Profil und Antworten existieren nur im Arbeitsspeicher, nicht in Browser-Speiche
 Analyseexporten oder KI-Prompts. Neuladen verwirft sie.
 
 Statische öffentliche Testversion, unabhängig von der lokalen Streamlit-App.
-Keine Installation, kein Backend, keine API-Schlüssel und kein KI-Verbindungsaufbau.
+Keine Installation und kein eigener Backendserver. API-Schlüssel können freiwillig für die geöffnete Sitzung eingegeben werden; es wird kein gemeinsamer Zugang bereitgestellt.
 GitHub Pages: Branch `main`, Ordner `/ (root)`.
 
 ## Daten
 
 Dieses Repository enthält bewusst keine historischen Yahoo-Kursdaten. Importdateien
 werden nur im Arbeitsspeicher des Browsers verarbeitet. Beim Neuladen sind sie weg.
-Es gibt keinen Daten-Upload zu einem Server. Die private Datenexportdatei und die
+Der Dateiimport lädt die Datei nicht zu einem Server hoch. Eine direkte KI-Anfrage überträgt die dafür aufbereiteten Berichtsfakten. Die private Datenexportdatei und die
 DuckDB-Datenbank dürfen nicht in dieses Repository übernommen werden.
 
 Historische Optimierungsgewichte werden aus einer lokal berechneten Analyse

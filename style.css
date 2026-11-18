@@ -284,3 +284,14 @@ main{max-width:none;min-width:0}
 .learning-step,.knowledge-item{width:100%;max-width:none;min-width:0}
 .learning-step p,.knowledge-item p,.lead{max-width:none}
 .guide-message .guide-bubble p+p{margin-top:12px}
+/* Freiwilliger API-Einstieg: gleiche Karten und Bedienelemente wie im übrigen Tool. */
+.online-api-intro{display:flex;align-items:center;gap:24px}
+.online-api-intro>img{flex:0 0 112px;object-fit:contain}
+.online-api-settings{margin:16px 0 24px}
+.online-report{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.online-report-output p{line-height:1.65;margin:12px 0 18px}
+#online-api-dialog{max-width:820px;width:calc(100% - 40px);max-height:90vh;overflow-y:auto}
+#online-api-dialog [hidden],.online-report[hidden]{display:none!important}
+#online-api-dialog .check{align-items:flex-start}
+#online-api-dialog .check input{flex-shrink:0;margin-top:6px}
+@media(max-width:600px){.online-api-intro{align-items:flex-start;gap:14px}.online-api-intro>img{width:72px;height:72px;flex-basis:72px}}
