@@ -454,5 +454,5 @@ $('accept').addEventListener('click',()=>{if(!$('accept-check').checked)return;$
 $('disclaimer').addEventListener('cancel',e=>e.preventDefault());
 if(innerWidth<760){document.body.classList.add('nav-closed');$('nav-toggle').setAttribute('aria-expanded','false');}
 render();$('welcome-guide').innerHTML=guideFigure('welcome');$('disclaimer').showModal();$('disclaimer').scrollTop=0;
-import {startOnlineAI} from './online-ai.mjs?v=20261118-optionale-api';
+import {startOnlineAI} from './online-ai.mjs?v=20261118-optionale-api-2';
 startOnlineAI();

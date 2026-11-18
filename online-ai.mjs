@@ -3,7 +3,7 @@ export const API_BASE='https://gpustack.test.hs-itz.de/v1';
 const CHOICE='portfolio-lab-api-choice-v1';
 const $=id=>document.getElementById(id);
 const esc=text=>String(text).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let key='',model='',busy=false,controller=null,dialog,settings,started=false;
+let key='',model='',busy=false,controller=null,dialog,settings,started=false,welcomePending=false;
 const reports=new Map();
 
 export function reportJobs(prompt){
@@ -115,6 +115,7 @@ export function startOnlineAI(){
  dialog=document.createElement('dialog');dialog.id='online-api-dialog';dialog.setAttribute('aria-labelledby','online-api-title');
  dialog.innerHTML=`<div class="online-api-intro"><img src="./hedgehog-welcome.png" alt="" width="112" height="112"><div><h2 id="online-api-title">Möchtest du deine eigene KI verbinden?</h2><p>Mit einem eigenen GPUStack-API-Schlüssel kannst du Berichte direkt erstellen lassen. Ohne Schlüssel kannst du alle Lern- und Analysefunktionen nutzen und Berichtsprompts kopieren.</p><p>Unterstützt wird zunächst die bekannte Hochschulinstanz. Sie muss aus deinem Browser erreichbar sein und Zugriffe von dieser Website erlauben. Ein Schlüssel allein reicht dafür nicht.</p></div></div><div class="prompt-actions"><button class="primary" id="online-api-yes">API-Schlüssel einbinden</button><button class="secondary" id="online-api-skip">Ohne API fortfahren</button></div><div id="online-api-form" hidden><p><strong>Zielserver:</strong> ${esc(API_BASE)}</p><label class="field"><span>Dein API-Schlüssel</span><input id="online-api-key" type="password" autocomplete="off" spellcheck="false"></label><label class="field"><span>Modellname</span><input id="online-api-model" value="qwen3.6-27b" maxlength="200"></label><label class="check"><input id="online-api-consent" type="checkbox"><span>Ich möchte meinen Schlüssel zur Verbindungsprüfung an die oben genannte GPUStack-Instanz senden. Erst eine von mir angeforderte Berichterstellung überträgt zusätzlich den jeweiligen Berichtsprompt mit Portfolio- und Berechnungsdaten. Profilantworten sind nicht enthalten. Je nach Anbieter können Kosten entstehen.</span></label><p class="small">Der Schlüssel bleibt nur im Arbeitsspeicher dieser geöffneten Seite, nicht im Browser-Speicher. Nach dem Neuladen musst du ihn bei Bedarf erneut über „Eigene KI verbinden“ eingeben. Gespeichert wird nur, dass diese Einstiegsfrage bereits beantwortet wurde.</p><button class="primary" id="online-api-check">Verbindung prüfen und nutzen</button></div><p id="online-api-status" role="status"></p>`;
  document.body.append(dialog);
+ dialog.addEventListener('close',()=>{if(welcomePending){welcomePending=false;$('disclaimer').showModal();}});
  settings=document.createElement('details');settings.className='online-api-settings';
  settings.innerHTML='<summary>Eigene KI verbinden (optional)</summary><div class="detail-body"><p>Die Nutzung ohne API bleibt möglich. Profilantworten werden nicht an die KI übertragen.</p><div class="prompt-actions"><button class="secondary" id="online-api-open">KI-Verbindung einrichten</button><button class="secondary" id="online-api-disconnect">Verbindung trennen</button></div></div>';
  $('content').before(settings);
@@ -143,5 +144,9 @@ export function startOnlineAI(){
  $('content').addEventListener('click',event=>{if(event.target.closest('[data-remove-portfolio],[data-mix-example],#add-asset,#remove-asset,#clear-data'))stale();});
  document.addEventListener('change',event=>{if(event.target.closest('#navigation'))stale();});
  window.addEventListener('pagehide',disconnect);window.addEventListener('hashchange',mount);
- mount();if(!remembered())dialog.showModal();
+ mount();if(!remembered()){
+  const welcome=$('disclaimer');welcomePending=welcome.open;
+  if(welcomePending)welcome.close();
+  dialog.showModal();
+ }
 }
