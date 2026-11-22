@@ -1,0 +1,95 @@
+html[data-portfolio-learning] #depth-bar { display:none; }
+/* Gemeinsame Skalierung statt Umordnen oder einzelner verkleinerter Diagramme. */
+html[data-portfolio-learning] { zoom:.9; }
+/* Rückmeldung nicht nur über Farbe: ergänzende Beschriftung steht in der Antwort. */
+#content .lesson-choice.is-answer { background:#edf7ef;border:2px solid #397549;box-shadow:none; }
+#content .lesson-choice.is-answer input { accent-color:#397549; }
+#content .lesson-choice.is-mistake { background:#fff0f0;border:2px solid #b33232;box-shadow:none; }
+#content .lesson-choice.is-mistake input { accent-color:#b33232; }
+.local-speaker { display:block;font-size:.9rem;font-weight:650;color:var(--muted);margin-bottom:8px; }
+.local-notice-first { grid-template-columns:1fr; }
+.local-tour-dialog { width:min(960px,calc(100vw - 32px));max-width:960px; }
+.local-tour-dialog::backdrop { background:rgba(15,27,22,.65);backdrop-filter:blur(5px); }
+.local-tour-conversation { display:grid;grid-template-columns:200px minmax(0,1fr);align-items:center;gap:24px; }
+.local-tour-conversation img.guide-figure.mascot-image { width:200px;height:200px;flex:none; }
+.local-tour-conversation .guide-bubble p { font-size:1.05rem;line-height:1.6;margin-bottom:22px; }
+.local-tour-conversation .guide-bubble > button { width:100%;min-height:56px; }
+.local-tour-conversation .local-step-actions { margin-top:20px; }
+body.local-guided.local-tutorial-active #main { padding-right:420px;padding-bottom:80px; }
+#local-tour-root { position:fixed;inset:0;z-index:1000;pointer-events:none; }
+.local-tour-mask { position:absolute;z-index:1000;background:rgba(17,30,25,.58);pointer-events:auto; }
+.local-tour-panel { position:absolute;pointer-events:auto;z-index:1002;right:20px;top:24px;width:360px;max-height:calc(100svh - 48px);overflow:auto;padding:0 2px 12px; }
+.local-tour-panel .guide-bubble { padding:22px; }
+.local-tour-panel .guide-bubble::before { top:-10px;left:calc(50% - 9px);transform:rotate(135deg); }
+.local-tour-panel .guide-bubble h2 { font-size:1.25rem;line-height:1.4; }
+.local-tour-panel .guide-bubble p { font-size:1rem;line-height:1.55; }
+.local-tour-avatar { display:flex;justify-content:center; }
+.local-tour-avatar img.guide-figure.mascot-image { width:120px;height:120px;flex:none; }
+.local-tour-panel .local-tour-hint { font-size:.9rem;color:#53664f;border-top:1px solid var(--border);padding-top:12px; }
+.local-tour-panel .local-step-actions { margin-top:16px;gap:10px; }
+.local-tour-panel .local-step-actions button { padding:12px 10px;font-size:.9rem;min-height:64px; }
+.local-tutorial-target { outline:3px solid #64856b;outline-offset:6px;scroll-margin-top:24px; }
+body.local-tutorial-active #content [inert] { filter:blur(2px);opacity:.5; }
+body.local-tutorial-active #igel-chat-root { visibility:hidden; }
+@media(max-width:800px){
+ body.local-guided.local-tutorial-active #main { padding-right:20px;padding-bottom:60svh; }
+ .local-tour-panel { top:auto;bottom:12px;right:12px;width:calc(100vw - 24px);max-height:46svh; }
+ .local-tour-panel .guide-bubble { padding:16px 20px; }
+ .local-tour-avatar { display:none; }
+ .local-tour-panel .guide-bubble::before { display:none; }
+ .local-tour-panel .local-step-actions { margin-top:10px; }
+ .local-tour-conversation { grid-template-columns:1fr;gap:8px; }
+ .local-tour-conversation img.guide-figure.mascot-image { width:120px;height:120px;justify-self:center; }
+ .local-tour-dialog { max-height:calc(100svh - 24px);overflow:auto;padding:18px; }
+}
+#local-entry { width:min(950px,calc(100vw - 36px)); max-width:950px; }
+.local-entry-conversation { display:grid;grid-template-columns:minmax(130px,230px) minmax(0,1fr);align-items:center;gap:28px; }
+.local-entry-conversation .guide-figure { width:100%;height:auto; }
+.local-entry-choices { display:grid;gap:14px;margin-top:24px; }
+.local-entry-choices button { min-height:58px;width:100%;font-size:1rem; }
+.local-entry-back { width:100%;margin-top:16px;min-height:48px; }
+body.local-touring #sidebar, body.local-touring #nav-toggle, #local-ai-settings { display:none!important; }
+body.local-touring #main { margin-left:0;max-width:none;width:100%;padding:32px clamp(20px,5vw,80px); }
+.local-journey-header { display:flex;align-items:center;justify-content:space-between;gap:20px;color:var(--muted);margin-bottom:24px; }
+.local-entry-change { background:transparent;border:1px solid var(--border);color:var(--green);padding:8px 14px;font-size:.9rem; }
+.local-step-actions { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:36px 0 12px; }
+.local-step-actions button { width:100%;height:100%;min-height:64px;margin:0;padding:14px 20px;line-height:1.4;text-wrap:balance; }
+body.local-guided .guide-message { margin-bottom:28px; }
+body.local-guided .local-basics p { margin:14px 0;line-height:1.6; }
+body.local-guided .guide-bubble p,body.local-guided .local-result { line-height:1.6; }
+body.local-guided p,body.local-guided button { overflow-wrap:normal;word-break:normal;hyphens:none; }
+body.local-basics-mode #main > footer { display:none; }
+.local-basics-dialog { min-height:calc(100svh - 134px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 0 20px; }
+.local-basics-speech { flex:none;width:min(100%,740px);padding:26px 32px;text-align:left; }
+.local-basics-speech h1 { font-size:1.65rem;line-height:1.3;margin:0 0 14px;letter-spacing:normal; }
+.local-basics-speech p { margin:0;font-size:1.1rem;line-height:1.65; }
+.local-basics-speech::before { left:calc(50% - 9px);top:auto;bottom:-10px;transform:rotate(-45deg);border-color:#ded8c2; }
+.local-basics-character { display:flex;justify-content:center;width:100%;margin:8px 0 0; }
+.local-basics-character img.guide-figure.mascot-image { width:260px;height:260px;flex:none; }
+.local-dialog-actions { width:min(100%,740px);margin:4px 0 0; }
+.local-dialog-actions.is-first { grid-template-columns:minmax(0,360px);justify-content:center; }
+body.local-basics-mode #igel-chat-launch img { display:none; }
+@media(max-width:650px){
+ .local-entry-conversation { grid-template-columns:1fr;gap:8px; }
+ .local-entry-conversation .guide-figure { width:120px;justify-self:center; }
+ .local-entry-conversation .guide-bubble { padding:18px; }
+ .local-step-actions { gap:10px; }
+ .local-step-actions button { padding:12px;font-size:.9rem; }
+ .local-journey-header { align-items:flex-start; }
+ .local-basics-dialog { min-height:calc(100svh - 150px);padding:4px 0 12px; }
+ .local-basics-speech { padding:22px; }
+ .local-basics-speech h1 { font-size:1.4rem; }
+ .local-basics-speech p { font-size:1rem; }
+ .local-basics-character img.guide-figure.mascot-image { width:210px;height:210px; }
+}
+
+/* Natürlicher Seitenfluss: Eingaben und Diagramme bleiben untereinander. */
+body.local-guided { overflow-anchor:none; }
+.local-summary-intro { display:flex;align-items:center;gap:24px;margin-bottom:28px; }
+.local-summary-intro img.guide-figure.mascot-image { width:120px;height:120px;flex:none; }
+.local-summary-intro .guide-bubble { flex:1; }
+.local-summary-grid { display:block; }
+@media(max-width:650px){
+ .local-summary-intro { gap:16px;align-items:flex-start; }
+ .local-summary-intro img.guide-figure.mascot-image { width:80px;height:80px; }
+}

@@ -1,5 +1,15 @@
 # Portfolio Lab – GitHub Pages
 
+## Gemeinsame Lernoberfläche (22.11.2026)
+
+Die lokale Browser-Version und GitHub Pages verwenden denselben geführten Einstieg, die drei Erfahrungsstufen, Profilfragen, Lerninhalte, Quiz und die reduzierte Anfängeransicht. `python -m Web.sync_public` erzeugt die öffentlichen Lernmodule aus den redaktionellen Quelldateien. Der lokale Server entfernt diesen erzeugten Abschnitt, bevor er seine lokalen Daten- und KI-Anbindungen ergänzt; dadurch läuft der Einstieg genau einmal.
+
+Die öffentliche Version behält den freiwilligen eigenen API-Zugang und die kopierbaren Prompts. Lotti kann mit einem ausdrücklich verbundenen Zugang antworten. Das Profil wird nur nach gesonderter Zustimmung für den Chat übertragen; Berichtsprompts enthalten es nicht. Ohne Verbindung bleibt der Chat offline. API-Erreichbarkeit, VPN und CORS bleiben Voraussetzungen des jeweiligen Zugangs.
+
+Historische Analysedaten bleiben ein lokaler Dateiimport im Browser. Der Abgleich veröffentlicht weder Kursreihen noch die Datenbank oder einen gemeinsamen Schlüssel. Ohne Import sind die Lerninhalte zugänglich; ein Tutorial verdeckt die Dateiauswahl nicht.
+
+Diagramme bündeln Mausbewegungen pro Bildschirmaktualisierung und speichern Monatsinformationen zwischen. Infofenster fangen die Maus über der Kurve nicht mehr ab. Tutorial-Ausschnitte werden aus den gemessenen Bildschirmpositionen berechnet, auch bei der festen Seitenskalierung und nach Größenänderungen.
+
 ## Freiwilliger eigener KI-Zugang (18.11.2026)
 
 Beim ersten Aufruf erscheint vor dem übrigen Einstieg die Frage nach einer eigenen API-Verbindung. „Ohne API fortfahren“ bleibt gleichwertig möglich. Nur die beantwortete Einstiegsfrage wird lokal gespeichert; Schlüssel und Modellverbindung bleiben ausschließlich im Arbeitsspeicher der geöffneten Seite. Nach einem Neuladen lässt sich der Zugang über „Eigene KI verbinden“ erneut einrichten. Wer den Browser-Speicher löscht oder einen anderen Browser verwendet, sieht die Einstiegsfrage erneut.

@@ -1,10 +1,11 @@
-import {validateData,simulate,customPortfolio,stats,savings,buildingSavings,realValue,volatilityClass,compare,sum,mean,finite,pretty,endOfPreviousMonth,setViewOption,explanationParagraphs,profileQuestions,profileFields,scoreRiskAnswers,profilePolicy,profileOrder,profileReflection,calculateLossExample,drawLossScenario,learningLessonQuestions,createLearningLessonProgress,checkLearningLessonAnswer,ownPortfolioWeights,NASDAQ_SHORT,SP500_DESCRIPTION,assetDescription} from './core.mjs?v=20261117-lernlektionen';
-import {depths,depthRule,knowledge,knowledgeKey,mixIds,mixSpec,mixSimulation,findAsset,learningExamples} from './experience.mjs?v=20261115-lernprofil';
-import {lastCompleteMonth,validateRadar,radarRankings,radarPrompt,builtInRadar} from './radar.mjs?v=20261113-kurzbericht';
+import {validateData,simulate,customPortfolio,stats,savings,buildingSavings,realValue,volatilityClass,compare,sum,mean,finite,pretty,endOfPreviousMonth,setViewOption,explanationParagraphs,profileQuestions,profileFields,scoreRiskAnswers,profilePolicy,profileOrder,profileReflection,calculateLossExample,drawLossScenario,learningLessonQuestions,createLearningLessonProgress,checkLearningLessonAnswer,ownPortfolioWeights,NASDAQ_SHORT,SP500_DESCRIPTION,assetDescription} from './core.mjs?v=20261122-sync';
+import {depths,depthRule,knowledge,knowledgeKey,mixIds,mixSpec,mixSimulation,findAsset,learningExamples} from './experience.mjs?v=20261122-sync';
+import {lastCompleteMonth,validateRadar,radarRankings,radarPrompt,builtInRadar} from './radar.mjs?v=20261122-sync';
 
 const $=id=>document.getElementById(id),esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const money=x=>finite(x)?new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',maximumFractionDigits:2}).format(x):'–';
-const pct=x=>finite(x)?new Intl.NumberFormat('de-DE',{style:'percent',maximumFractionDigits:2}).format(x):'–';
+const moneyFormat=new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',maximumFractionDigits:2}),percentFormat=new Intl.NumberFormat('de-DE',{style:'percent',maximumFractionDigits:2});
+const money=x=>finite(x)?moneyFormat.format(x):'–';
+const pct=x=>finite(x)?percentFormat.format(x):'–';
 const dec=x=>finite(x)?x.toLocaleString('de-DE',{maximumFractionDigits:2}):'–';
 const month=d=>d?new Date(d+'T00:00:00Z').toLocaleDateString('de-DE',{month:'2-digit',year:'numeric',timeZone:'UTC'}):'–';
 const months=d=>new Date(d+'T00:00:00Z').toLocaleDateString('de-DE',{month:'long',year:'numeric',timeZone:'UTC'});
@@ -153,21 +154,33 @@ function lineChart(series,yLabel='Vermögen in Euro'){
 let chartPayload=new Map();
 // Dieselben lesbaren Infofenster für Linien, Punkte und Säulen. Die Skalen
 // bleiben fest: Mausrad und Ziehen verändern das Diagramm nicht.
-function placeTooltip(wrap,tip,x,y){const r=wrap.getBoundingClientRect();tip.hidden=false;tip.style.left=Math.max(8,Math.min(x-r.left+14,wrap.clientWidth-tip.offsetWidth-10))+'px';tip.style.top=Math.max(8,Math.min(y-r.top+12,wrap.clientHeight-tip.offsetHeight-10))+'px';}
+function placeTooltip(wrap,tip,x,y){
+ const r=wrap.getBoundingClientRect(),scale=r.width/wrap.offsetWidth||1;tip.hidden=false;
+ const size=tip._size||(tip._size={width:tip.offsetWidth,height:tip.offsetHeight});
+ const left=Math.max(8,Math.min((x-r.left)/scale+14,wrap.clientWidth-size.width-10)),top=Math.max(8,Math.min((y-r.top)/scale+12,wrap.clientHeight-size.height-10));
+ tip.style.transform=`translate3d(${left}px,${top}px,0)`;
+}
 function chartEvents(){for(const [id,p] of chartPayload){const wrap=$(id),svg=wrap?.querySelector('svg'),tip=wrap?.querySelector('.tooltip'),cross=svg?.querySelector('[data-crosshair]');if(!svg)continue;
- let current=0;
- const hide=()=>{tip.hidden=true;cross?.setAttribute('visibility','hidden');};
- const show=(i,x,y)=>{current=i;tip.innerHTML=`<strong>${months(p.series[0].values[i].date)}</strong>`+p.series.map((s,k)=>{const v=s.values[i];return v?`<section class="tooltip-series"><h4><i class="swatch" style="background:${colors[k%colors.length]}"></i>${esc(s.name)}</h4><p>${s.percent?'Verlust':s.name==='Eingezahltes Kapital'?'Eingezahlt':'Vermögenswert'}: <b>${s.percent?pct(v.y/100):money(v.y)}</b></p>${finite(v.return)?`<p>Monatsrendite: <b>${pct(v.return)}</b></p>`:''}</section>`:'';}).join('');placeTooltip(wrap,tip,x,y);cross?.setAttribute('x1',p.x(i));cross?.setAttribute('x2',p.x(i));cross?.setAttribute('visibility','visible');};
+ let current=0,pendingFrame=0,pendingPoint=null;const htmlCache=new Map();
+ tip.tabIndex=0;tip.setAttribute('aria-label','Monatswerte. Mit den Pfeiltasten im Diagramm navigieren oder hier scrollen.');
+ const hide=()=>{cancelAnimationFrame(pendingFrame);pendingFrame=0;tip.hidden=true;cross?.setAttribute('visibility','hidden');};
+ const show=(i,x,y)=>{cancelAnimationFrame(pendingFrame);pendingFrame=0;current=i;
+  if(tip.dataset.localMonth!==String(i)){
+   if(!htmlCache.has(i))htmlCache.set(i,`<strong>${months(p.series[0].values[i].date)}</strong>`+p.series.map((s,k)=>{const v=s.values[i];return v?`<section class="tooltip-series"><h4><i class="swatch" style="background:${colors[k%colors.length]}"></i>${esc(s.name)}</h4><p>${s.percent?'Verlust':s.name==='Eingezahltes Kapital'?'Eingezahlt':'Vermögenswert'}: <b>${s.percent?pct(v.y/100):money(v.y)}</b></p>${finite(v.return)?`<p>Monatsrendite: <b>${pct(v.return)}</b></p>`:''}</section>`:'';}).join(''));
+   tip.innerHTML=htmlCache.get(i);tip.dataset.localMonth=String(i);tip._size=null;
+  }
+  placeTooltip(wrap,tip,x,y);cross?.setAttribute('x1',p.x(i));cross?.setAttribute('x2',p.x(i));cross?.setAttribute('visibility','visible');};
  const point=e=>{const r=svg.getBoundingClientRect(),vx=(e.clientX-r.left)/r.width*p.W,vy=(e.clientY-r.top)/r.height*p.H;if(vx<p.L||vx>p.W-p.R||vy<p.T||vy>p.H-p.B){hide();return;}show(Math.max(0,Math.min(p.series[0].values.length-1,Math.round((vx-p.L)/(p.W-p.L-p.R)*(p.series[0].values.length-1)))),e.clientX,e.clientY);};
  svg.setAttribute('tabindex','0');svg.setAttribute('aria-label',svg.getAttribute('aria-label')+'. Monatswerte mit den Pfeiltasten ansehen.');
- svg.addEventListener('pointermove',point);svg.addEventListener('click',point);svg.addEventListener('pointerleave',e=>{if(!tip.contains(e.relatedTarget))hide();});wrap.addEventListener('pointerleave',hide);svg.addEventListener('blur',hide);
+ svg.addEventListener('pointermove',event=>{pendingPoint={clientX:event.clientX,clientY:event.clientY};if(!pendingFrame)pendingFrame=requestAnimationFrame(()=>{pendingFrame=0;if(svg.isConnected)point(pendingPoint);});});svg.addEventListener('click',point);svg.addEventListener('pointerleave',e=>{if(!tip.contains(e.relatedTarget))hide();});wrap.addEventListener('pointerleave',hide);svg.addEventListener('blur',e=>{if(!tip.contains(e.relatedTarget))hide();});tip.addEventListener('keydown',e=>{if(e.key==='Escape'){hide();svg.focus({preventScroll:true});}});
  svg.addEventListener('keydown',e=>{if(e.key==='Escape'){hide();return;}if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const max=p.series[0].values.length-1,i=e.key==='Home'?0:e.key==='End'?max:Math.max(0,Math.min(max,current+(e.key==='ArrowLeft'?-1:1))),r=svg.getBoundingClientRect();show(i,r.left+p.x(i)/p.W*r.width,r.top+r.height*.25);});
  }
  for(const wrap of document.querySelectorAll('.chart:has([data-chart-mark])')){let tip=wrap.querySelector('.tooltip');if(!tip){tip=document.createElement('div');tip.className='tooltip mark-tooltip';tip.hidden=true;wrap.append(tip);}
   wrap.addEventListener('pointerleave',()=>{tip.hidden=true;});
-  for(const mark of wrap.querySelectorAll('[data-chart-mark]')){const show=e=>{const r=mark.getBoundingClientRect();tip.innerHTML=`<strong>${esc(mark.dataset.name)}</strong>`+mark.dataset.detail.split(' · ').map(metric=>`<p>${esc(metric)}</p>`).join('');placeTooltip(wrap,tip,e.clientX??r.right,e.clientY??r.top);};const hide=()=>{tip.hidden=true;};mark.addEventListener('pointermove',show);mark.addEventListener('click',show);mark.addEventListener('focus',show);mark.addEventListener('pointerleave',e=>{if(!tip.contains(e.relatedTarget))hide();});mark.addEventListener('blur',hide);mark.addEventListener('keydown',e=>{if(e.key==='Escape')hide();if(e.key==='Enter'||e.key===' '){e.preventDefault();show(e);}});}
+  for(const mark of wrap.querySelectorAll('[data-chart-mark]')){const show=e=>{const r=mark.getBoundingClientRect();if(tip._mark!==mark){tip.innerHTML=`<strong>${esc(mark.dataset.name)}</strong>`+mark.dataset.detail.split(' · ').map(metric=>`<p>${esc(metric)}</p>`).join('');tip._mark=mark;tip._size=null;}placeTooltip(wrap,tip,e.clientX??r.right,e.clientY??r.top);};const hide=()=>{tip.hidden=true;};mark.addEventListener('pointermove',show);mark.addEventListener('click',show);mark.addEventListener('focus',show);mark.addEventListener('pointerleave',e=>{if(!tip.contains(e.relatedTarget))hide();});mark.addEventListener('blur',hide);mark.addEventListener('keydown',e=>{if(e.key==='Escape')hide();if(e.key==='Enter'||e.key===' '){e.preventDefault();show(e);}});}
  }
 }
+window.addEventListener('resize',()=>{for(const tip of document.querySelectorAll('.tooltip'))tip._size=null;});
 function resultTable(out){return table([{label:'Portfolio',help:'portfolio'},{label:'Insgesamt<br>eingezahlt',help:'paid'},{label:'Brutto-Endwert',help:'gross'},{label:'Netto-Endwert',help:'net'},{label:'Brutto-Differenz',help:'diff'},{label:'Netto-Differenz',help:'diff'},{label:'Handelskosten',help:'cost'}],[...out].sort((a,b)=>(a.rows.at(-1).value-a.rows.at(-1).paid)-(b.rows.at(-1).value-b.rows.at(-1).paid)).map(a=>{const r=a.rows.at(-1),gross=simulate(state.data,a.name,state.start,state.capital,state.payment,{returns:a.returns,attr:a.attr,trades:a.events,initial:a.attr.filter(x=>x.datum===state.data.dates[state.start]).map(x=>x.startgewicht)},false).rows.at(-1);return [esc(a.name),money(r.paid),money(gross.value),money(r.value),money(gross.value-r.paid),money(r.value-r.paid),money(r.totalCost)];}));}
 function statTable(out){const rf=state.data.dates.slice(state.start).map(d=>state.data.riskFree[d]);return table([{label:'Portfolio',help:'portfolio'},{label:'Rendite p.a.',help:'annual'},{label:'Schwankungen<br>p.a.',help:'vol'},{label:'Sharpe Ratio',help:'sharpe'},{label:'Größter Einbruch',help:'drawdown'}],out.map(a=>({a,s:stats(a.returns,rf)})).sort((a,b)=>a.s.annual-b.s.annual).map(({a,s})=>[esc(a.name),pct(s.annual),pct(s.vol),dec(s.sharpe),pct(s.maxDD)]));}
 function summary(out){
@@ -384,7 +397,7 @@ function formatNavigationActions(){
 }
 function formatScatterPlots(){for(const svg of document.querySelectorAll('svg[aria-label="Rendite und Schwankungen"]')){const chart=svg.parentElement,legend=chart.querySelector('.legend'),body=document.createElement('div'),plot=document.createElement('div');chart.classList.add('scatter-chart');body.className='chart-body';plot.className='chart-plot';plot.append(svg);body.append(plot);if(legend){const title=document.createElement('h3');title.textContent='Portfolios';legend.prepend(title);body.append(legend);}chart.append(body);}}
 function queueRender(){clearTimeout(renderTimer);renderTimer=setTimeout(()=>{if(pointerBusy||document.activeElement?.matches('input[type="number"]')){deferredRender=true;return;}render();},160);}
-function render(){clearTimeout(renderTimer);deferredRender=false;const focused=document.activeElement,focusId=focused?.id,ownIndex=focused?.dataset?.ownWeight,mixKey=focused?.dataset?.mixKey,selectedPortfolio=focused?.dataset?.portfolio,exampleKey=focused?.dataset?.mixExample;infoMap=new Map();infoSeq=0;chartPayload=new Map();lastResults=[];if(state.page==='minimum'){state.page='simulation';state.options['simulation:schaetzverfahren']=true;}if(!pages.some(([id])=>id===state.page))state.page='lernen';$('depth-bar').innerHTML=state.page==='lektionen'?'':depthHeader();nav();const d=state.data;$('data-status').innerHTML=d&&!['lernen','lektionen','kurz','profil','radar'].includes(state.page)?`<div class="data-strip"><span>IMPORTIERTER ANALYSESTICHTAG<b>${esc(d.asOf)}</b></span><span>VERFÜGBARE MONATE<b>${month(d.dates[0])} – ${month(d.dates.at(-1))}</b></span></div>`:'';
+function render(){clearTimeout(renderTimer);deferredRender=false;const focused=document.activeElement,focusId=focused?.id,ownIndex=focused?.dataset?.ownWeight,mixKey=focused?.dataset?.mixKey,selectedPortfolio=focused?.dataset?.portfolio,exampleKey=focused?.dataset?.mixExample;infoMap=new Map();infoSeq=0;chartPayload=new Map();lastResults=[];if(state.page==='minimum'){state.page='simulation';state.options['simulation:schaetzverfahren']=true;}if(!pages.some(([id])=>id===state.page))state.page='lernen';$('depth-bar').innerHTML=state.page==='lektionen'?'':depthHeader();nav();const d=state.data;$('data-status').innerHTML=d&&!['lernen','lektionen','kurz','profil','radar'].includes(state.page)?`<div class="data-strip"><span>ANALYSESTICHTAG<b>${esc(d.asOf)}</b></span><span>VERFÜGBARE MONATE<b>${month(d.dates[0])} – ${month(d.dates.at(-1))}</b></span></div>`:'';
  try{$('content').innerHTML=state.page==='profil'?profileView():state.page==='lernen'?learningView():state.page==='lektionen'?learningLessonsView():state.page==='kurz'?learningView(true):state.page==='simulation'?simulationPage():state.page==='eigen'?simulationPage(true):state.page==='minimum'?simulationPage(false,true):state.page==='sparen'?savingsPage():state.page==='inflation'?savingsPage(true):state.page==='radar'?radarView():state.page==='analysen'?analyses():methodologyView();}catch(e){$('content').innerHTML=`<h1>Die Ansicht konnte nicht berechnet werden.</h1><p class="error">${esc(e.message)}</p><p>Bitte prüfe deine Eingaben oder importiere eine vollständige Analysedatei.</p>`;}
  renderLearningCompanion();formatExplanationParagraphs();formatNavigationActions();formatScatterPlots();chartEvents();bind();
  if(focused?.tagName==='INPUT'||focusId==='explanation-depth'||exampleKey){const replacement=mixKey?document.querySelector(`[data-mix-key="${mixKey}"][type="${focused.type}"]`):selectedPortfolio?document.querySelector(`[data-portfolio="${CSS.escape(selectedPortfolio)}"]`):exampleKey?document.querySelector(`[data-mix-example="${exampleKey}"]`):ownIndex!==undefined?document.querySelector(`[data-own-weight="${ownIndex}"]`):focusId?$(focusId):null;replacement?.focus({preventScroll:true});}
@@ -450,9 +463,475 @@ window.addEventListener('hashchange',()=>{state.page=location.hash.slice(1);stat
 $('nav-toggle').addEventListener('click',()=>{document.body.classList.toggle('nav-closed');$('nav-toggle').setAttribute('aria-expanded',String(!document.body.classList.contains('nav-closed')));});
 $('close-info').addEventListener('click',()=>$('info-dialog').close());
 $('accept-check').addEventListener('change',e=>$('accept').disabled=!e.target.checked);
-$('accept').addEventListener('click',()=>{if(!$('accept-check').checked)return;$('disclaimer').close();location.hash='profil';render();});
+$('accept').addEventListener('click',()=>{if(!$('accept-check').checked)return;$('disclaimer').close();window.dispatchEvent(new Event('portfolio-local-entry'));});
 $('disclaimer').addEventListener('cancel',e=>e.preventDefault());
 if(innerWidth<760){document.body.classList.add('nav-closed');$('nav-toggle').setAttribute('aria-expanded','false');}
 render();$('welcome-guide').innerHTML=guideFigure('welcome');$('disclaimer').showModal();$('disclaimer').scrollTop=0;
-import {startOnlineAI} from './online-ai.mjs?v=20261118-optionale-api-2';
+import {startOnlineAI} from './online-ai.mjs?v=20261122-sync';
 startOnlineAI();
+
+// BEGIN SHARED LEARNING RUNTIME (generated by Web.sync_public)
+
+// Wird nur an das lokal ausgelieferte app.mjs angehängt. Öffentliche Dateien
+// werden nicht geändert. Berechnungen und Diagramminteraktionen bleiben gleich.
+import {localLearningSteps,localLearningSymbols,localLearningPortfolios,localLearningRoute,localLearningSelection,localBasicsDialogue,localBasicsMove,localNoticeSlides,localStockQuestion,localNutshellCards,localBeginnerPages,localActivePortfolio,localBeginnerComparisons,localShuffledQuiz,localEntryRoute,localOnboardingProfile} from './learning-core.mjs?v=20261122-sync';
+const localScale=.9;
+const localJourney={mode:null,data:null,selectionInitialized:false,freeSelection:null,basicsIndex:0,noticeIndex:0,quizPassed:false,tourFinished:false};
+const localOriginal={render,nav,selection,radarView,profileView,learningView,learningLessonsView,simulationPage,savingsPage,renderLearningCompanion,names,results,formatExplanationParagraphs};
+let localQuizQuestions=learningLessonQuestions.map(q=>q.id==='world'?localStockQuestion:q);
+const localEntry=document.createElement('dialog');
+localEntry.id='local-entry';localEntry.setAttribute('aria-labelledby','local-entry-title');
+localEntry.addEventListener('cancel',e=>e.preventDefault());document.body.append(localEntry);
+let localEntryStep=0,localEntryReturnToProfile=false;
+function localRenderEntry(){
+ const key=['goal','horizon'][localEntryStep],field=profileFields.find(f=>f[0]===key);
+ const title=localEntryStep===0?'Wofür möchtest du Geld anlegen?':localEntryStep===1?'Wann könntest du das Geld benötigen?':'Wie vertraut bist du mit ETFs?';
+ const choices=field?field[2].map(([value,label])=>`<button class="primary" data-local-answer="${esc(value)}" aria-pressed="${state.profileDraft.context[key]===value}">${esc(label)}</button>`).join(''):'<button class="primary" data-local-mode="beginner">Ich fange gerade erst an</button><button class="primary" data-local-mode="beginner-free">Ich kenne die Grundlagen</button><button class="primary" data-local-mode="experienced">Ich bin Finanzexperte</button>';
+ localEntry.innerHTML=`<div class="local-entry-conversation">${guideFigure('welcome')}<div class="guide-bubble"><span class="local-speaker">Lotti</span><h2 id="local-entry-title" tabindex="-1">${esc(title)}</h2><div class="local-entry-choices">${choices}</div>${localEntryStep?'<button class="secondary local-entry-back" data-local-entry-back>Zurück</button>':''}</div></div>`;
+ for(const button of localEntry.querySelectorAll('[data-local-answer]'))button.addEventListener('click',()=>{
+  state.profileDraft.context[key]=button.dataset.localAnswer;
+  localEntryStep++;localRenderEntry();
+ });
+ for(const button of localEntry.querySelectorAll('[data-local-mode]'))button.addEventListener('click',()=>localApplyEntry(button.dataset.localMode));
+ localEntry.querySelector('[data-local-entry-back]')?.addEventListener('click',()=>{localEntryStep--;localRenderEntry();});
+ if(localEntry.open)$('local-entry-title').focus({preventScroll:true});
+}
+function localChooseEntry(returnToProfile=false){
+ localEntryStep=0;localEntryReturnToProfile=returnToProfile===true;localRenderEntry();
+ if(!localEntry.open)localEntry.showModal();
+}
+const localFreeEntry=document.createElement('button');localFreeEntry.className='local-entry-change';
+localFreeEntry.textContent='Einstieg wechseln';localFreeEntry.addEventListener('click',localChooseEntry);
+$('navigation').before(localFreeEntry);
+window.addEventListener('portfolio-local-entry',localChooseEntry);
+function localApplyEntry(choice){
+ const entry=localEntryRoute(choice),mode=entry.mode;
+ state.profileDraft=localOnboardingProfile(state.profileDraft,choice);
+ state.profile=structuredClone(state.profileDraft);state.profileStep='context';
+ if(mode==='beginner'){
+  if(localJourney.mode!=='beginner')localJourney.freeSelection=[...state.selected];
+  localJourney.selectionInitialized=false;
+  localJourney.basicsIndex=0;
+  if(state.own.some(r=>r.name&&!localLearningSymbols.includes(state.data?.assets[r.name]?.symbol)))state.own=[{name:'',weight:0}];
+ }else if(localJourney.mode==='beginner'&&localJourney.freeSelection){const restored=localJourney.freeSelection.filter(n=>state.data?.portfolios[n]);if(restored.length)state.selected=restored;else state.selected=state.selected.filter(n=>state.data?.portfolios[n]);}
+ localJourney.mode=mode;state.depth=mode==='experienced'?'Verstehen':'Grundlagen';state.depthChosen=true;state.learningOpen=false;
+ window.dispatchEvent(new Event('portfolio-local-audience'));
+ localJourney.tourFinished=entry.tourFinished;
+ if(entry.page==='lernen'){
+  localJourney.quizPassed=false;state.lessons=createLearningLessonProgress();
+  window.dispatchEvent(new Event('portfolio-local-restart'));
+ }
+ state.page=localEntryReturnToProfile&&mode==='experienced'?'profil':entry.page;localEntry.close();
+ history.replaceState(null,'','#'+state.page);render();window.scrollTo({top:0});
+}
+function localGuided(){return localJourney.mode==='beginner';}
+function localTourRunning(){return localGuided()&&!localJourney.tourFinished;}
+nav=function(){
+ if(!localGuided()){
+  localOriginal.nav();
+  for(const row of $('navigation').querySelectorAll('.nav-row'))if(row.querySelector('a[href="#lernen"],a[href="#lektionen"]'))row.remove();
+  return;
+ }
+ $('navigation').innerHTML=localBeginnerPages.map(id=>`<div class="nav-row ${state.page===id?'active':''}"><a href="#${id}" ${state.page===id?'aria-current="page"':''}>${esc(pages.find(p=>p[0]===id)[1])}</a></div>`).join('');
+};
+selection=function(minimum=false){
+ const template=document.createElement('template');template.innerHTML=localOriginal.selection(minimum);
+ if(!minimum)for(const group of template.content.querySelectorAll('.portfolio-group')){
+  const summary=group.querySelector('summary'),count=summary.querySelector('.selection-count');
+  summary.replaceChildren(document.createTextNode(group.dataset.group==='models'?'Aktive und regelbasierte Verfahren':group.dataset.group==='simple'?'Passive Vergleichsportfolios · feste Mischungen':'Passive Marktvergleiche · einzelne ETFs'),...(count?[count]:[]));
+  if(localGuided()&&group.dataset.group==='models')group.remove();
+ }
+ for(const label of template.content.querySelectorAll('.portfolio-choice span,.selection-chip'))if(label.textContent.trim()==='local-gold')label.textContent='Gold (GLD)';
+ return template.innerHTML;
+};
+radarView=function(){
+ const template=document.createElement('template');template.innerHTML=localOriginal.radarView();
+ for(const section of template.content.querySelectorAll('details'))if(section.querySelector('#radar-file'))section.remove();
+ return template.innerHTML;
+};
+profileView=function(){
+ if(state.profileStep==='entry')state.profileStep='context';
+ const template=document.createElement('template');template.innerHTML=localOriginal.profileView();
+ if(state.profileStep==='context'){
+  const back=template.content.querySelector('[data-profile-step="entry"]');
+  if(back){back.removeAttribute('data-profile-step');back.setAttribute('data-local-profile-edit','');back.textContent='Einstiegsangaben ändern';}
+  const actions=template.content.querySelector('.profile-wizard-actions');
+  if(actions)actions.insertAdjacentHTML('beforebegin',profileFieldView('effort'));
+ }
+ return template.innerHTML;
+};
+function localNavigate(page){state.page=page;history.pushState(null,'','#'+page);render();window.scrollTo({top:0});$('content').querySelector('h1')?.focus({preventScroll:true});}
+function localGoldAsset(){return Object.entries(state.data?.assets||{}).find(([,a])=>a.symbol==='GLD')?.[0];}
+function localAvailableComparisons(){return localJourney.tourFinished?names():localLearningPortfolios.filter(n=>n==='local-gold'?!!localGoldAsset():!!state.data?.portfolios[n]);}
+function localNoticeRender(){
+ const slide=localNoticeSlides[localJourney.noticeIndex],last=localJourney.noticeIndex===localNoticeSlides.length-1;
+ $('welcome-speech').innerHTML=`<span class="local-speaker">Lotti</span><h2 id="welcome-title">${esc(slide.title)}</h2><p>${esc(slide.text)}</p><div class="local-step-actions ${localJourney.noticeIndex?'':'local-notice-first'}">${localJourney.noticeIndex?'<button class="secondary" data-local-notice="back">Zurück zum Vorherigen</button>':''}<button class="primary" data-local-notice="next">Ich habe verstanden</button></div>`;
+ for(const button of $('welcome-speech').querySelectorAll('[data-local-notice]'))button.addEventListener('click',()=>{
+  if(button.dataset.localNotice==='back'){localJourney.noticeIndex--;localNoticeRender();}
+  else if(!last){localJourney.noticeIndex++;localNoticeRender();}
+  else{$('disclaimer').close();localChooseEntry();}
+  $('welcome-title')?.setAttribute('tabindex','-1');$('welcome-title')?.focus({preventScroll:true});
+ });
+}
+function localStepNavigation(){
+ if(localJourney.tourFinished)return '';
+ const i=localLearningSteps.findIndex(s=>s.page===state.page),previous=state.page==='simulation'?localLearningSteps.find(s=>s.page==='kurz'):localLearningSteps[i-1],next=localLearningSteps[i+1];
+ return `<nav class="local-step-actions" aria-label="Lernweg"><button class="secondary" ${previous?`data-local-page="${previous.page}"`:'data-local-change'}>${previous?'Zurück '+esc(previous.destination):'Zurück zur Einstiegsauswahl'}</button><button class="primary" ${next?`data-local-page="${next.page}"`:'data-local-finish'}>${next?'Weiter '+esc(next.destination):'Lernweg abschließen'}</button></nav>`;
+}
+function localLessonHeader(title,text,mood='explain'){
+ const speechTitle={lernen:'Ein Schritt nach dem anderen',inflation:'Ein anderer Blick auf dein Geld',simulation:'Wie hätte sich dein Kapital entwickelt?',eigen:'Du bestimmst die Mischung',sparen:'Gleicher Betrag, andere Sparform'}[state.page]||title;
+ return `<div class="local-journey-header"><span>Portfolio Lab · ${localTourRunning()?'Geführter Einstieg':'Anfängeransicht'}</span><button class="local-entry-change" data-local-change>Einstieg wechseln</button></div><h1 tabindex="-1">${esc(title)}</h1>${guideMessage(speechTitle,text,mood)}`;
+}
+function localBasics(){
+ const i=localJourney.basicsIndex,slide=localBasicsDialogue[i];
+ return `<div class="local-journey-header"><span>Portfolio Lab · Gemeinsam die Grundlagen entdecken</span><button class="local-entry-change" data-local-change>Einstieg wechseln</button></div>
+ <section class="local-basics-dialog" aria-label="Grundlagen im Dialog">
+  <div class="guide-bubble local-basics-speech" aria-live="polite" aria-atomic="true"><span class="local-speaker">Lotti</span><h1 id="local-basics-title" tabindex="-1">${esc(slide.title)}</h1><p>${esc(slide.sentences.join(' '))}</p></div>
+  <div class="local-basics-character">${guideFigure(slide.mood)}</div>
+  <nav class="local-step-actions local-dialog-actions ${i===0?'is-first':''}" aria-label="Im Gespräch weitergehen">
+   ${i>0?'<button class="secondary" data-local-basics="back">Zurück zum Vorherigen</button>':''}
+   <button class="primary" data-local-basics="next">${i===localBasicsDialogue.length-1?'Weiter zu Investieren in a nutshell':'Ja, habe ich verstanden'}</button>
+  </nav>
+ </section>`;
+}
+function localBeginnerInputs(showPayment=true){
+ return `<section class="card"><div class="grid">${field('Beispielbetrag (€)','capital',state.capital,'number','min="0" max="1000000000" step="100"')}${showPayment?field('Monatlich dazu (€)','payment',state.payment,'number','min="0" max="10000000" step="25"'):''}</div><label class="field"><span>Investitionsbeginn: <strong>${month(state.data.dates[state.start])}</strong></span><input id="start" type="range" min="0" max="${state.data.dates.length-1}" step="1" value="${state.start}"></label></section>`;
+}
+function localMissingData(){return document.documentElement.hasAttribute('data-local-ai')?'<p role="status">Die lokalen Analysedaten werden geladen. Du kannst zunächst die Grundlagen lesen.</p>':importBox();}
+function localBeginnerSelection(){
+ if(localJourney.tourFinished)return selection().replace('<section class="section">','<section class="card" data-local-target="choice">');
+ const allowed=localAvailableComparisons(),labels={'Welt-ETF':'MSCI World · Aktien aus Industrieländern','S&P 500 (SPY)':'S&P 500 · große US-Unternehmen','local-gold':'Gold (GLD) · börsengehandelte Goldanlage'};
+ return `<section class="card" data-local-target="choice"><h2>Welche Verläufe möchtest du sehen?</h2>${allowed.map(n=>`<label class="portfolio-choice"><input type="checkbox" data-portfolio="${esc(n)}" ${state.selected.includes(n)?'checked':''}><span>${labels[n]}</span></label>`).join('')}<p class="small">MSCI World und S&P 500 enthalten teilweise dieselben Unternehmen. Gold ist eine andere Anlageart.</p></section>`;
+}
+function localBeginnerOwn(){
+ // Die bestehende Eingabelogik, Prozentprüfung und Erklärungen bleiben erhalten.
+ const template=document.createElement('template');template.innerHTML=ownEditor();
+ template.content.querySelector('section').dataset.localTarget='own';
+ // Alle vorhandenen ETF-Bausteine bleiben auswählbar; Vergleichsverfahren sind getrennt gefiltert.
+ return template.innerHTML;
+}
+function localCurves(out,label='Vermögen in Euro'){
+ return lineChart(out.map(a=>({name:a.name,values:a.rows.map((r,i)=>({date:r.date,y:r.value,return:i?a.returns?.[i-1]:null}))})),label);
+}
+function localResultSentence(out){
+ if(!out.length)return '';
+ return `<p class="local-result"><strong>Am Ende des gewählten Zeitraums:</strong> ${out.map(a=>`${esc(a.name)}: ${money(a.rows.at(-1).value)}`).join(' · ')}.</p>`;
+}
+function localBeginnerSimulation(own=false){
+ const title=own?'Dein eigenes ETF-Portfolio':'Was wäre aus deinem Geld geworden?';
+ let html=localLessonHeader(title,own?'Hier kannst du deine Mischung verändern und ihren Verlauf vergleichen. Probiere aus, was andere Anteile oder ein anderer Anlagebeginn verändern.':'Hier siehst du, wie sich dein Beispielbetrag in verschiedenen ETFs und Portfolios entwickelt hätte. Wähle aus, was dich interessiert, und probiere andere Beträge, Startmonate oder regelmäßige Einzahlungen aus. So kannst du die Verläufe vergleichen – sie zeigen die Vergangenheit, nicht die Zukunft.','think');
+ if(!state.data)return html+localMissingData()+localStepNavigation();
+ html+=(own?localBeginnerOwn()+localBeginnerSelection():localBeginnerSelection())+localBeginnerInputs();
+ try{
+  const out=results(own);lastResults=out;
+  if(out.length){html+=`<section class="section" data-local-target="chart"><h2>Historische Vermögensentwicklung</h2>${localCurves(out)}${localResultSentence(out)}<p class="small">Nach modellierten Handelskosten, ohne Steuern und Inflation. Vergangene Ergebnisse sagen die Zukunft nicht voraus.</p></section>`;if(!localTourRunning())html+=reports(out);}
+  else html+='<p>Wähle einen ETF aus, um seinen Verlauf zu sehen.</p>';
+ }catch(error){html+=`<p class="error" role="status">${esc(error.message)}</p>`;}
+ return html+localStepNavigation();
+}
+function localBeginnerInflation(){
+ let html=localLessonHeader('Was passiert, wenn dein Geld liegen bleibt?','Dein Kontostand kann gleich bleiben, während Preise steigen. Dann reicht derselbe Betrag für weniger Einkäufe. Investieren kann helfen, Kaufkraft zu erhalten – garantiert ist das nicht.');
+ if(!state.data)return html+localMissingData()+localStepNavigation();
+ const d=state.data;html+=localBeginnerInputs(false);
+ const cash=savings(d.dates.slice(state.start),state.capital,state.payment,0,0,0),real=realValue(cash.rows,d.cpi);
+ if(real.length){
+  const dates=new Set(real.map(r=>r.date));
+  html+=`<section class="section" data-local-target="chart"><h2>Kontostand und Kaufkraft</h2>${localCurves([{name:'Geld auf dem Konto · ohne Zinsen',rows:cash.rows.filter(r=>dates.has(r.date))},{name:'Was du dafür kaufen konntest',rows:real}])}<p>Die Kaufkraftkurve zeigt den Wert bei den Preisen vor dem ersten gewählten Anlagemonat. Es wird kein Geld vom Konto abgezogen.</p></section>`;
+ }else html+='<p>Für diesen Beginn fehlen passende Inflationsdaten. Wähle einen anderen Monat.</p>';
+ return html+localStepNavigation();
+}
+function localBeginnerSavings(){
+ let html=localLessonHeader('ETF und Tagesgeld vergleichen','Tagesgeld wird verzinst und schwankt nicht wie ein Aktien-ETF. Ein ETF bietet langfristige Ertragsmöglichkeiten, kann aber deutlich fallen. Schau auf den gesamten Verlauf – nicht nur auf den Endwert.');
+ if(!state.data)return html+localMissingData()+localStepNavigation();
+ html+=localBeginnerSelection()+localBeginnerInputs()+`<section class="card"><h2>Dein Tagesgeld-Beispiel</h2><div class="grid">${field('Zins pro Jahr (%)','rate',state.rate,'number','min="0" max="50" step="0.1"')}</div><p class="small">Vereinfachtes Szenario mit gleichbleibendem Zins, kein historisches Bankangebot. Tatsächliche Zinsen können sich ändern.</p></section>`;
+ try{
+  const out=results();
+  const cash=savings(state.data.dates.slice(state.start),state.capital,state.payment,state.rate/100,0,state.rate/100);cash.name='Tagesgeld · dein Zinsbeispiel';
+  html+=`<section class="section" data-local-target="chart"><h2>So hätten sich die Beträge entwickelt</h2>${localCurves([...out,cash])}${localResultSentence([...out,cash])}<p class="small">Ohne Steuern und Inflation; bei Anlagen mit modellierten Handelskosten. Tagesgeld und Aktien-ETF erfüllen unterschiedliche Zwecke.</p></section>`;
+ }catch(error){html+=`<p class="error">${esc(error.message)}</p>`;}
+ return html+localStepNavigation();
+}
+learningComparisonEntry=()=>'';
+names=function(minimum=false){const all=localOriginal.names(minimum).filter(n=>n!=='mix-cash');return [...(localGuided()?localBeginnerComparisons(all):all),...(!minimum&&localGuided()&&localGoldAsset()?['local-gold']:[])];};
+results=function(own=false,minimum=false){
+ const selected=state.selected,includeGold=localGuided()&&selected.includes('local-gold')&&!minimum;
+ try{state.selected=selected.filter(n=>n!=='local-gold');const out=localOriginal.results(own,minimum);if(includeGold)out.push(simulate(state.data,'Gold (GLD)',state.start,state.capital,state.payment,customPortfolio(state.data,{[localGoldAsset()]:1},state.start)));return out;}
+ finally{state.selected=selected;}
+};
+function localNutshell(){
+ return pageHeading('Investieren in a nutshell','')+`<div class="local-summary-intro">${guideFigure('explain')}<div class="guide-bubble"><span class="local-speaker">Lotti</span><p>Hier findest du die wichtigsten Begriffe noch einmal kurz zusammengefasst.</p></div></div><div class="local-summary-grid">${localNutshellCards.map(card=>`<article class="card"><h2>${esc(card.title)}</h2><p>${esc(card.text)}</p></article>`).join('')}</div><nav class="local-step-actions" aria-label="Lernweg">${localJourney.tourFinished?'<button class="primary" data-local-page="simulation">Weiter zur Vermögenssimulation</button>':'<button class="secondary" data-local-page="lernen">Zurück zu den Grundlagen</button><button class="primary" data-local-quiz>Weiter zum Grundlagen-Quiz</button>'}</nav>`;
+}
+function localQuiz(){
+ if(state.lessons.complete){
+  const score=localQuizQuestions.filter((q,i)=>state.lessons.choices[i]===q.correct).length,success=score===localQuizQuestions.length;
+  localJourney.quizPassed=true;
+  return pageHeading('Grundlagen-Quiz','')+guideMessage('Wie möchtest du weitermachen?',`Du hast ${score} von ${localQuizQuestions.length} Fragen richtig beantwortet. ${success?'Die Grundlagen hast du richtig eingeordnet.':'Nicht alles war richtig – das gehört zum Lernen dazu.'} Du kannst das ganze Quiz mit neu gemischten Fragen und Antworten wiederholen oder direkt mit der Vermögenssimulation weitermachen.`,'happy')+`<nav class="local-step-actions"><button class="secondary" data-local-quiz-retry>Quiz wiederholen</button><button class="primary" data-local-page="simulation">Weiter zur Vermögenssimulation</button></nav>`;
+ }
+ const l=state.lessons,i=l.index,q=localQuizQuestions[i],checked=l.checked[i],answer=q.options[l.choices[i]],correct=l.choices[i]===q.correct;
+ return pageHeading('Grundlagen-Quiz','')+`<section class="card lesson-card"><p class="eyebrow">Frage ${i+1} von ${localQuizQuestions.length} · ${esc(q.topic)}</p><div class="lesson-dialogue">${guideFigure(checked?(correct?'happy':'explain'):'think')}<div class="guide-bubble"><h2 id="lesson-question" tabindex="-1">${esc(q.question)}</h2>${checked?`<div id="lesson-feedback" class="lesson-feedback-content" tabindex="-1" role="status"><h3>${correct?'Richtig eingeordnet':'Noch nicht ganz'}</h3><p>${esc(answer.explanation)}</p>${correct?'':`<p><strong>Richtig ist:</strong> ${esc(q.options[q.correct].text)}</p>`}</div>`:'<p>Wähle eine Antwort.</p>'}</div></div><fieldset class="lesson-answers"><legend class="sr-only">Eine Antwort auswählen</legend>${q.options.map((option,j)=>`<label class="lesson-choice${checked&&j===q.correct?' is-answer':''}${checked&&j===l.choices[i]&&j!==q.correct?' is-mistake':''}"><input type="radio" name="lesson-answer" data-lesson-choice="${j}" ${l.choices[i]===j?'checked':''} ${checked?'disabled':''}><span>${esc(option.text)}${checked&&j===q.correct?'<small>Richtige Antwort</small>':checked&&j===l.choices[i]?'<small>Deine Antwort – noch nicht richtig</small>':''}</span></label>`).join('')}</fieldset><nav class="local-step-actions">${i?'<button class="secondary" id="lesson-back">Vorherige Frage</button>':'<button class="secondary" data-local-page="kurz">Zurück zu Investieren in a nutshell</button>'}<button class="primary" id="local-quiz-next" data-local-quiz-next ${Number.isInteger(l.choices[i])?'':'disabled'}>${checked?(l.checked.every(Boolean)?'Rückblick ansehen':'Nächste Frage'):'Antwort prüfen'}</button></nav></section>`;
+}
+learningView=function(short=false){return localGuided()?(short?localNutshell():localBasics()):localOriginal.learningView(short);};
+learningLessonsView=function(){return localQuiz();};
+simulationPage=function(own=false,minimum=false){return localGuided()?localBeginnerSimulation(own):localOriginal.simulationPage(own,minimum);};
+savingsPage=function(inflation=false){return localGuided()?(inflation?localBeginnerInflation():localBeginnerSavings()):localOriginal.savingsPage(inflation);};
+renderLearningCompanion=function(){if(!localGuided())localOriginal.renderLearningCompanion();};
+formatExplanationParagraphs=function(){if(!localGuided())localOriginal.formatExplanationParagraphs();};
+render=function(){
+ const focus=document.activeElement,scroll={x:scrollX,y:scrollY},preserve=localJourney.renderedPage===state.page&&(focus?.id==='start'||focus?.dataset?.ownWeight!==undefined);
+ if(localJourney.mode==='experienced'&&['lernen','lektionen'].includes(state.page)){state.page='kurz';history.replaceState(null,'','#kurz');}
+ if(localGuided()){
+  state.page=localLearningRoute(state.page,'beginner',localJourney.tourFinished);
+  if(localTourRunning()&&['simulation','eigen','sparen','inflation'].includes(state.page)&&!localJourney.quizPassed)state.page='kurz';
+  if(state.page==='inflation')state.payment=0;
+  if(location.hash!=='#'+state.page)history.replaceState(null,'','#'+state.page);
+  if(state.data){
+   if(localJourney.data!==state.data||!localJourney.selectionInitialized){
+    state.selected=state.data.portfolios['Welt-ETF']?['Welt-ETF']:[];
+    localJourney.data=state.data;localJourney.selectionInitialized=true;
+   }else state.selected=localJourney.tourFinished?state.selected.filter(n=>localAvailableComparisons().includes(n)):localLearningSelection(state.selected,localAvailableComparisons());
+  }
+ }
+ document.body.classList.toggle('local-guided',localGuided());
+ document.body.classList.toggle('local-touring',localTourRunning());
+ document.body.classList.toggle('local-basics-mode',localGuided()&&state.page==='lernen');
+ const practice=localGuided()&&['simulation','eigen','sparen','inflation'].includes(state.page);
+ document.body.classList.toggle('local-practice-mode',practice);
+ document.body.classList.toggle('local-summary-mode',localGuided()&&state.page==='kurz');
+ localOriginal.render();
+ document.querySelector('#sidebar .brand')?.setAttribute('href',localGuided()?(localTourRunning()?'#lernen':'#kurz'):'#simulation');
+ if(practice&&focus?.tagName==='INPUT'){
+  const replacement=focus.id?$(focus.id):focus.dataset.ownWeight!==undefined?document.querySelector(`[data-own-weight="${focus.dataset.ownWeight}"]`):null;
+  replacement?.focus({preventScroll:true});
+ }
+ if(localGuided())for(const bubble of $('content').querySelectorAll('.guide-bubble'))if(!bubble.querySelector('.local-speaker'))bubble.insertAdjacentHTML('afterbegin','<span class="local-speaker">Lotti</span>');
+ $('depth-bar').replaceChildren();
+ for(const section of $('content').querySelectorAll('details'))if(section.querySelector(':scope > summary')?.textContent.trim()==='Diagramme und Kennzahlen verstehen')section.remove();
+ // Auch in der freien Ansicht entfällt der alte Aktienanteil-Lernvergleich.
+ for(const button of document.querySelectorAll('[data-learning-start]'))button.remove();
+ for(const button of document.querySelectorAll('[data-local-change]'))button.addEventListener('click',localChooseEntry);
+ for(const button of document.querySelectorAll('[data-local-profile-edit]'))button.addEventListener('click',()=>localChooseEntry(true));
+ for(const button of document.querySelectorAll('[data-local-basics]'))button.addEventListener('click',()=>{
+  const next=localBasicsMove(localJourney.basicsIndex,button.dataset.localBasics);
+  localJourney.basicsIndex=next.index;
+  if(next.complete){state.page='kurz';history.pushState(null,'','#kurz');}
+  render();window.scrollTo({top:0});$('content').querySelector('h1')?.focus({preventScroll:true});
+ });
+ for(const button of document.querySelectorAll('[data-local-page]'))button.addEventListener('click',()=>{
+  localNavigate(button.dataset.localPage);
+ });
+ for(const button of document.querySelectorAll('[data-local-quiz]'))button.addEventListener('click',()=>{state.lessons=createLearningLessonProgress();localNavigate('lektionen');});
+ for(const button of document.querySelectorAll('[data-local-quiz-retry]'))button.addEventListener('click',()=>{
+  localQuizQuestions=localShuffledQuiz(localQuizQuestions);
+  state.lessons=createLearningLessonProgress();render();window.scrollTo({top:0});$('lesson-question')?.focus({preventScroll:true});
+ });
+ for(const button of document.querySelectorAll('[data-local-quiz-next]'))button.addEventListener('click',()=>{
+  const l=state.lessons;if(!Number.isInteger(l.choices[l.index]))return;
+  if(!l.checked[l.index]){l.checked[l.index]=true;render();$('lesson-feedback')?.focus({preventScroll:true});return;}
+  const remaining=l.checked.indexOf(false);if(remaining<0)l.complete=true;else l.index=remaining;
+  render();$('lesson-question')?.focus({preventScroll:true});
+ });
+ window.dispatchEvent(new Event('portfolio-local-render'));
+ if(preserve)window.scrollTo({left:scroll.x,top:scroll.y,behavior:'instant'});
+ localJourney.renderedPage=state.page;
+};
+// Der Hinweis wird zuerst bestätigt; die anschließende Auswahl ist verpflichtend.
+localNoticeRender();
+render();
+
+
+// Lokale, deterministische Bedienhilfe. Keine KI-Anfragen und kein Training.
+import {localTutorialSpecs,localTutorialReady,localInflationFacts,localInflationNarrative,tutorialMaskRects} from './learning-core.mjs?v=20261122-sync';
+const localTour={records:{},key:'',inert:[],target:null,preview:null,frame:0,observer:null};
+const localTourRoot=document.createElement('div');localTourRoot.id='local-tour-root';document.body.append(localTourRoot);
+const localTourDialog=document.createElement('dialog');localTourDialog.id='local-tour-dialog';localTourDialog.className='local-tour-dialog';
+localTourDialog.setAttribute('aria-labelledby','local-tour-intro-title');localTourDialog.addEventListener('cancel',e=>e.preventDefault());document.body.append(localTourDialog);
+const localFinishDialog=document.createElement('dialog');localFinishDialog.id='local-finish-dialog';localFinishDialog.className='local-tour-dialog';
+localFinishDialog.setAttribute('aria-labelledby','local-finish-title');localFinishDialog.addEventListener('cancel',e=>e.preventDefault());document.body.append(localFinishDialog);
+function localTourRecord(){return localTour.records[state.page]||(localTour.records[state.page]={index:0,touched:new Set(),done:false});}
+function localTourSnapshot(){
+ let ownValid=false;try{ownPortfolioWeights(state.data,state.own);ownValid=[...document.querySelectorAll('[data-own-weight]')].every(el=>el.validity.valid&&el.valueAsNumber===state.own[+el.dataset.ownWeight].weight);}catch{}
+ const inputValue=id=>{const input=$(id);return input?(input.validity.valid?input.valueAsNumber:NaN):state[id];};
+ return {required:localAvailableComparisons(),selected:state.selected,own:state.own,ownValid,
+  capital:inputValue('capital'),payment:inputValue('payment'),rate:inputValue('rate'),dateCount:state.data?.dates.length||0};
+}
+function localTourRestore(){
+ localTour.observer?.disconnect();localTour.observer=null;cancelAnimationFrame(localTour.frame);localTour.frame=0;
+ for(const [element,wasInert] of localTour.inert)element.inert=wasInert;
+ localTour.inert=[];localTour.target?.classList.remove('local-tutorial-target');localTour.target=null;localTour.preview=null;
+}
+function localTourClear(){
+ localTourRestore();localTourRoot.replaceChildren();document.body.classList.remove('local-tutorial-active');localTour.key='';
+ if(localTourDialog.open)localTourDialog.close();
+}
+function localTourTarget(spec){
+ const element=document.querySelector(spec.target);return element?.matches('input')?element.closest('label')||element:element;
+}
+function localTourPosition(){
+ const target=localTour.target;if(!target)return;
+ const origin=localTourRoot.getBoundingClientRect(),sx=localTourRoot.offsetWidth/origin.width||1,sy=localTourRoot.offsetHeight/origin.height||1;
+ const bounds=[target,...(localTour.preview?[localTour.preview]:[])].map(el=>el.getBoundingClientRect()).map(r=>({left:r.left-origin.left,right:r.right-origin.left,top:r.top-origin.top,bottom:r.bottom-origin.top}));
+ const rects=tutorialMaskRects(bounds,origin.width,origin.height);
+ let masks=[...localTourRoot.querySelectorAll('.local-tour-mask')];
+ while(masks.length<rects.length){const mask=document.createElement('div');mask.className='local-tour-mask';localTourRoot.prepend(mask);masks.push(mask);}
+ masks.forEach((el,i)=>{if(!rects[i]){el.remove();return;}const [x,y,width,height]=rects[i];Object.assign(el.style,{left:x*sx+'px',top:y*sy+'px',width:width*sx+'px',height:height*sy+'px'});});
+}
+function localTourSchedulePosition(){if(!localTour.frame)localTour.frame=requestAnimationFrame(()=>{localTour.frame=0;localTourPosition();});}
+function localTourRefresh(){
+ const spec=localTutorialSpecs[state.page]?.[localTourRecord().index],button=localTourRoot.querySelector('[data-tour-next]');
+ if(!spec||!button)return;
+ const ready=!!state.data&&localTutorialReady(spec.kind,localTourSnapshot(),[...localTourRecord().touched]);
+ button.disabled=!ready;
+ const hint=localTourRoot.querySelector('[data-tour-hint]');if(hint)hint.textContent=ready?(['capital','start','payment','rate'].includes(spec.kind)?'Du kannst den Beispielwert übernehmen oder ihn verändern.':'Du kannst zum nächsten Schritt gehen.'):spec.kind==='weights'?`Deine Anteile ergeben derzeit ${dec(sum(state.own.map(r=>r.weight)))} %. Zusammen müssen es 100 % sein.`:spec.kind==='choice'?'Wähle mindestens eine Vergleichsanlage aus.':spec.kind==='own-choice'?'Wähle in jeder hinzugefügten Zeile eine Anlage aus.':'Bitte verwende einen gültigen Beispielwert.';
+}
+function localTourText(spec){
+ if(spec.kind!=='history'||!state.data)return spec.text;
+ return localInflationNarrative(localInflationFacts(state.data.dates,state.data.cpi,state.start),months);
+}
+function localTourNext(){
+ const specs=localTutorialSpecs[state.page],record=localTourRecord(),spec=specs[record.index];
+ if(spec.kind!=='intro'&&(!state.data||!localTutorialReady(spec.kind,localTourSnapshot(),[...record.touched])))return;
+ if(localTourDialog.open)localTourDialog.close();
+ record.index++;
+ if(record.index>=specs.length){record.done=true;render();if(state.page==='inflation')localShowFinish();return;}
+ render();
+}
+function localShowFinish(){
+ localTourClear();
+ localFinishDialog.innerHTML=`<div class="local-tour-conversation">${guideFigure('happy')}<div class="guide-bubble"><span class="local-speaker">Lotti</span><h2 id="local-finish-title">Jetzt bist du dran.</h2><p>Du hast die Grundlagen und die wichtigsten Ansichten kennengelernt. Jetzt kannst du die ganze Anfängeransicht frei erkunden. Die Auswahl bleibt übersichtlich: ETFs, einfache Mischungen, Sparformen und Inflation. Über „Einstieg wechseln“ erreichst du bei Bedarf später die Fortgeschrittenenansicht.</p><div class="local-step-actions"><button class="secondary" data-finish-back>Zurück zur Inflation</button><button class="primary" data-finish-explore>Zur Vermögenssimulation</button></div></div></div>`;
+ localFinishDialog.querySelector('[data-finish-back]').addEventListener('click',()=>localFinishDialog.close());
+ localFinishDialog.querySelector('[data-finish-explore]').addEventListener('click',()=>{
+  localFinishDialog.close();localJourney.tourFinished=true;
+  state.selected=state.selected.filter(n=>!!state.data?.portfolios[n]);if(!state.selected.length&&state.data?.portfolios['Welt-ETF'])state.selected=['Welt-ETF'];
+  localNavigate('simulation');
+ });
+ localFinishDialog.showModal();
+}
+function localTourSync(){
+ const specs=localTourRunning()?localTutorialSpecs[state.page]:null;
+ if(!specs){localTourClear();return;}
+ if(!state.data){localTourClear();return;}
+ const record=localTourRecord();
+ if(record.done){localTourClear();return;}
+ const spec=specs[record.index],key=state.page+':'+record.index;
+ if(['intro','history'].includes(spec.kind)){
+  localTourRestore();localTourRoot.replaceChildren();document.body.classList.remove('local-tutorial-active');
+  if(localTour.key!==key||!localTourDialog.open){
+   localTourDialog.innerHTML=`<div class="local-tour-conversation">${guideFigure('explain')}<div class="guide-bubble"><span class="local-speaker">Lotti</span><h2 id="local-tour-intro-title">${esc(spec.title)}</h2><p>${esc(localTourText(spec))}</p><button class="primary" data-tour-intro-next>Ja, habe ich verstanden</button></div></div>`;
+   localTourDialog.querySelector('[data-tour-intro-next]').addEventListener('click',localTourNext);
+   if(!localTourDialog.open)localTourDialog.showModal();
+  }
+  localTour.key=key;return;
+ }
+ if(localTourDialog.open)localTourDialog.close();
+ const moved=localTour.key!==key;localTourRestore();document.body.classList.add('local-tutorial-active');
+ localTourRoot.innerHTML=`<div class="local-tour-mask"></div><div class="local-tour-mask"></div><div class="local-tour-mask"></div><div class="local-tour-mask"></div><section class="local-tour-panel" role="dialog" aria-labelledby="local-tour-step-title" aria-describedby="local-tour-step-text"><div class="local-tour-avatar">${guideFigure('think')}</div><div class="guide-bubble"><span class="local-speaker">Lotti</span><h2 id="local-tour-step-title">${esc(spec.title)}</h2><p id="local-tour-step-text">${esc(spec.text)}</p><p class="local-tour-hint" data-tour-hint role="status"></p><nav class="local-step-actions"><button class="secondary" data-tour-back>Zurück zum Vorherigen</button><button class="primary" data-tour-next>${record.index===specs.length-1?'Jetzt selbst ausprobieren':'Weiter zum nächsten Schritt'}</button></nav></div></section>`;
+ localTour.target=localTourTarget(spec);
+ if(['capital','start','payment','rate'].includes(spec.kind))localTour.preview=document.querySelector('[data-local-target="chart"]');
+ if(localTour.target){
+  localTour.target.classList.add('local-tutorial-target');if(moved)localTour.target.scrollIntoView({block:'start',behavior:'instant'});
+ }
+ const isolate=element=>{
+  if(element===localTourRoot||element===localTour.target||element===localTour.preview)return;
+  if(element.contains(localTourRoot)||localTour.target&&element.contains(localTour.target)||localTour.preview&&element.contains(localTour.preview)){for(const child of element.children)isolate(child);return;}
+  localTour.inert.push([element,element.inert]);element.inert=true;
+ };
+ for(const element of document.body.children)isolate(element);
+ localTourRoot.querySelector('[data-tour-back]').addEventListener('click',()=>{record.index=Math.max(0,record.index-1);render();});
+ localTourRoot.querySelector('[data-tour-next]').addEventListener('click',localTourNext);
+ localTour.key=key;localTourRefresh();localTourPosition();localTourSchedulePosition();
+ localTour.observer=new ResizeObserver(localTourSchedulePosition);localTour.observer.observe(localTour.target||localTourRoot);if(localTour.preview)localTour.observer.observe(localTour.preview);
+ if(moved){const first=localTour.target?.querySelector('input,select,button,svg[tabindex]');first?.focus({preventScroll:true});}
+}
+function localTourInput(event){
+ if(!localGuided()||!localTutorialSpecs[state.page]||localTourRecord().done)return;
+ const el=event.target,record=localTourRecord();
+ if(['capital','payment','start','rate'].includes(el.id))record.touched.add(el.id);
+ localTourRefresh();
+}
+document.addEventListener('input',localTourInput);document.addEventListener('change',localTourInput);
+document.addEventListener('keydown',event=>{
+ if(event.key!=='Tab'||!localTour.target||!localTourRoot.childElementCount||document.querySelector('#info-dialog[open]'))return;
+ const focusable=[...localTour.target.querySelectorAll('input,select,button,summary,svg[tabindex]'),...(localTour.preview?[...localTour.preview.querySelectorAll('svg[tabindex]')]:[]),...localTourRoot.querySelectorAll('button')].filter(el=>!el.disabled&&!el.inert&&el.getClientRects().length);
+ if(!focusable.length)return;const index=focusable.indexOf(document.activeElement),next=event.shiftKey?(index<=0?focusable.length-1:index-1):(index+1)%focusable.length;
+ event.preventDefault();focusable[next].focus({preventScroll:true});
+});
+window.addEventListener('resize',localTourSchedulePosition);window.addEventListener('scroll',localTourSchedulePosition,{passive:true});
+window.addEventListener('portfolio-local-restart',()=>{localTourClear();localTour.records={};});
+window.addEventListener('portfolio-local-render',()=>{
+ localTourSync();for(const button of document.querySelectorAll('[data-local-finish]'))button.addEventListener('click',localShowFinish);
+});
+localTourSync();
+
+// Wird nur dem lokal ausgelieferten app.mjs angefügt, nicht veröffentlicht.
+window.addEventListener('portfolio-local-chat-context',event=>{
+ try{
+  const d=state.data,includeProfile=event.detail.includeProfile===true;
+  const guided=typeof localGuided==='function'&&localGuided();
+  const context={page:state.page,area:pages.find(([id])=>id===state.page)?.[1]||state.page,
+   depth:state.depth,dataRevision:state.dataRevision,
+   visibleSections:guided?[]:(extras[state.page]||[]).filter(([key])=>option(state.page,key)).map(([,label])=>label),
+   knowledge:Object.fromEntries(Object.entries(knowledge).map(([key,entry])=>[key,{Erklaerung:entry[state.depth],Grenze:entry.Grenze}])),terms:help};
+  if(d&&!['profil','lernen','lektionen','kurz','radar'].includes(state.page)){
+   // Auch unmittelbar nach einer Eingabe neue Werte nutzen, nicht den letzten
+   // eventuell noch vor dem verzögerten Diagramm-Rendering berechneten Cache.
+   let out=[],inputError=null;
+   if(['simulation','eigen','sparen','inflation','analysen'].includes(state.page)){
+    try{out=guided&&state.page==='inflation'?[]:results(state.page==='eigen');}catch{inputError='Die aktuelle Portfolioeingabe ist noch nicht vollständig oder gültig; es liegen dafür keine berechneten Ergebnisse vor.';}
+   }
+   context.asOf=d.asOf;context.period={from:d.dates[state.start],to:d.dates.at(-1)};
+   context.portfolios=out.slice(0,10).map(a=>{
+    const f=facts(a);f.Anlagenzahl=f.Anlagen.length;f.NichtEinzelnDargestellteAnlagen=Math.max(0,f.Anlagen.length-4);
+    f.Anlagen=f.Anlagen.slice(0,4).map(x=>({...x,Beschreibung:(x.Beschreibung||'').slice(0,500)}));
+    return f;
+   });
+   context.omittedPortfolios=Math.max(0,out.length-10);
+   context.scenario={Startkapital:state.capital,MonatlicheEinzahlung:state.payment,
+    TagesgeldZinsProzent:state.rate,ZinsDanachProzent:guided?state.rate:state.nextRate,ZinsDauerMonate:guided?0:state.rateMonths,
+    Kosten:d.assumptions,SteuernBeruecksichtigt:false,
+    InflationImVermoegensvergleich:state.page==='inflation'};
+   if(inputError)context.scenario.Eingabehinweis=inputError;
+   if(state.page==='eigen')context.ownWeights=state.own.filter(x=>x.name&&x.weight>0).map(x=>({Anlage:x.name,Prozent:x.weight}));
+   if(state.page==='eigen'&&out[0]?.name==='Eigenes Portfolio')context.comparison=out.slice(1,6).map(b=>({Vergleich:b.name,...compare(out[0],b)}));
+   if(['sparen','inflation'].includes(state.page)){
+    const dates=d.dates.slice(state.start),all=[...out,
+     ...(!guided||state.page==='sparen'?[savings(dates,state.capital,state.payment,state.rate/100,guided?0:state.rateMonths,(guided?state.rate:state.nextRate)/100)]:[]),
+     ...(!guided||state.page==='inflation'?[{...savings(dates,state.capital,state.payment,0,0,0),name:'Unverzinstes Geld'}]:[]),
+     ...(!guided&&state.buildingEnabled?[buildingSavings(dates,state.capital,state.payment,state.contractSum,state.buildingRate/100,state.closingFee/100,state.annualFee)]:[])];
+    context.scenario.Sparformen=all.slice(0,15).map(a=>{
+     const last=a.rows.at(-1),real=state.page==='inflation'?realValue(a.rows,d.cpi).at(-1):null;
+     return {Name:a.name,Endwert: last.value,Eingezahlt:last.paid,Kosten:last.totalCost,
+      ...(state.page==='inflation'?{KaufkraftEnde:real?.value??null,KaufkraftBis:real?.date??null}: {})};
+    });
+   }
+  }
+  if(state.page==='radar')context.scenario={RadarMonat:state.radar.month,Datenstand:state.radar.asOf,Ranglisten:radarRankings(state.radar).filter(c=>c.complete).map(c=>({Kategorie:c.label,ETFs:c.items.slice(0,3).map(x=>({Name:x.name,ISIN:x.isin}))})),Hinweis:'Consorsbank-Kundenfavoriten, nicht repräsentativ für den gesamten Markt. Gespeicherter Stand, keine Live-Nachrichten.'};
+  if(state.page==='lektionen')context.scenario={Lernfrage:localQuizQuestions[state.lessons.index]?.question,Hinweis:'Bei einer Verständnisfrage zunächst einen Denkanstoß geben, nicht ungefragt die Lösung vorwegnehmen.'};
+  if(state.page==='profil')context.scenario={Profilabschnitt:state.profileStep,
+   AktuelleFrage:['quiz','intro'].includes(state.profileStep)?profileQuestions[state.question]?.[0]:null,
+   Hinweis:'Freiwillige Selbstauskunft. Die Frage erklären, aber keine persönliche Antwort für den Nutzer auswählen. Ohne Freigabe werden keine Antworten übertragen.'};
+  if(guided)context.scenario={...context.scenario,Lernansicht:'Geführter Einstieg mit wenigen ETF-Beispielen. Kurz und ohne unnötige Kennzahlen erklären; keine Optimierungsverfahren in dieser Ansicht.'};
+  if(guided&&state.page==='lernen'){
+   const slide=localBasicsDialogue[localJourney.basicsIndex];
+   context.scenario.AktuellerLernabschnitt=slide.title;
+   context.scenario.SichtbareErklaerung=slide.sentences.join(' ');
+  }
+  if(guided&&typeof localTour!=='undefined'&&localTutorialSpecs[state.page]){
+   const record=localTour.records[state.page];
+   if(record&&!record.done){const step=localTutorialSpecs[state.page][record.index];context.scenario={...context.scenario,Tutorialschritt:step.title,Erklaerung:step.text};}
+  }
+  if(includeProfile){
+   const p=state.profileDraft||state.profile;
+   const fields=profileFields.flatMap(([key,label,values])=>{
+    const answer=values.find(([value])=>value===p?.context?.[key]);
+    return answer?[{Frage:label,Antwort:answer[1]}]:[];
+   });
+   const score=scoreRiskAnswers(p?.answers||[]);
+   context.profile={Selbstauskunft:true,Angaben:fields,Risikobereitschaft:score?.label||'Fragebogen nicht vollständig – keine Einstufung'};
+  }
+  event.detail.resolve(context);
+ }catch(error){event.detail.reject(Error('Der aktuelle Seitenkontext konnte nicht gelesen werden. Bitte Eingaben und Portfolioauswahl prüfen.'));}
+});
+
+import {beginnerReportPrompt} from './learning-utils.mjs?v=20261122-sync';
+const publicOriginalPrompt=promptText;
+promptText=function(kind,out){const text=publicOriginalPrompt(kind,out);return localGuided()?beginnerReportPrompt(text,kind):text;};

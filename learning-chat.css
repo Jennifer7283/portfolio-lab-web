@@ -1,0 +1,33 @@
+#igel-chat-root{--chat-border:#c7d7ce;color:#203e35;font-size:16px;line-height:1.5}
+#igel-chat-root [hidden]{display:none!important}
+#igel-chat-launch{position:fixed;right:24px;bottom:22px;z-index:80;display:flex;align-items:center;gap:8px;padding:6px 20px 6px 8px;background:#fffdf5;color:#194d3f;border:1px solid var(--chat-border);border-radius:40px;box-shadow:0 6px 24px #143e3326;font-weight:700}
+#igel-chat-launch img{object-fit:contain;flex-shrink:0}
+#igel-chat-panel{position:fixed;right:24px;bottom:22px;z-index:90;width:min(480px,calc(100vw - 32px));height:min(800px,calc(100dvh - 44px));background:#fffdf7;border:1px solid var(--chat-border);border-radius:20px;box-shadow:0 12px 50px #143e3338;display:flex;flex-direction:column;overflow:hidden;text-align:left}
+.igel-chat-header{display:flex;align-items:center;gap:12px;padding:10px 16px;background:#edf3eb;border-bottom:1px solid var(--chat-border);flex-shrink:0}
+.igel-chat-header img{object-fit:contain;flex-shrink:0}
+#igel-chat-panel h2{font-size:20px;margin:0;letter-spacing:normal}
+#igel-chat-area{font-size:14px;line-height:1.4;margin:4px 0 0}
+#igel-chat-close{margin-left:auto;align-self:flex-start;background:transparent;color:#23483c;border:0;padding:0 8px;font-size:28px;box-shadow:none}
+.igel-chat-settings{padding:10px 16px;max-height:32%;overflow-y:auto;border-bottom:1px solid var(--chat-border);flex-shrink:0}
+.igel-chat-settings > summary{font-size:14px;padding:4px 0;line-height:1.4}
+#igel-chat-root .igel-chat-small{font-size:14px;line-height:1.4;margin:0 0 8px;color:#52635a}
+#igel-chat-context{margin:0 0 8px;background:transparent;border:0;border-radius:0;box-shadow:none}
+#igel-chat-context summary{font-size:14px;padding:4px 0;min-height:0;line-height:1.4}
+.igel-chat-context-body p,.igel-chat-context-body dl{font-size:14px;line-height:1.5;margin:8px 0}
+.igel-chat-context-body dt{font-weight:700;margin-top:6px}.igel-chat-context-body dd{margin:0}
+#igel-chat-context-data{font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:200px;overflow:auto}
+.igel-chat-profile-choice{display:flex;align-items:flex-start;gap:8px;font-size:14px;line-height:1.4;margin:8px 0}
+.igel-chat-profile-choice input{margin-top:3px;flex-shrink:0}
+#igel-chat-messages{flex:1;min-height:90px;overflow-y:auto;overscroll-behavior:contain;padding:16px;display:flex;flex-direction:column;gap:14px}
+.igel-chat-message{max-width:96%;padding:12px 16px;border:1px solid #d7e3da;border-radius:15px;background:#fff;align-self:flex-start;overflow-wrap:break-word}
+.igel-chat-message.user{background:#e9f1e8;align-self:flex-end}
+.igel-chat-prose p{font-size:16px;line-height:1.55;margin:0 0 10px}.igel-chat-prose p:last-child{margin-bottom:0}
+.igel-chat-prose h3{font-size:17px;margin:8px 0}
+#igel-chat-root .igel-chat-meta{font-size:13px;line-height:1.4;color:#617468;margin:10px 0 0}
+#igel-chat-form{padding:12px 16px 16px;border-top:1px solid var(--chat-border);flex-shrink:0}
+#igel-chat-question{width:100%;min-height:70px;max-height:150px;resize:vertical;box-sizing:border-box;font:inherit;border:1px solid var(--chat-border);border-radius:10px;padding:10px;background:#fff;color:#203e35}
+#igel-chat-status{font-size:14px;line-height:1.4;margin:6px 0;max-height:90px;overflow:auto}
+.igel-chat-actions{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.igel-chat-actions button{font-size:14px;line-height:1.4;min-height:42px;padding:8px 12px;flex:1}
+#igel-chat-launch:focus-visible,#igel-chat-root button:focus-visible,#igel-chat-root textarea:focus-visible{outline:3px solid #b78939;outline-offset:3px}
+@media(max-width:600px){#igel-chat-launch{right:12px;bottom:12px}#igel-chat-panel{right:8px;bottom:8px;width:calc(100vw - 16px);height:calc(100dvh - 16px)}.igel-chat-header{padding:8px 12px}.igel-chat-header img{width:52px;height:52px}.igel-chat-settings{padding:8px 12px;max-height:30%}}
