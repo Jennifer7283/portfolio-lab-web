@@ -122,7 +122,7 @@ export function localBasicsMove(index,direction){
     :{index:Math.min(last,current+1),complete:current===last};
 }
 export function localLearningRoute(page,mode,finished=false) {
-  const allowed=finished?localBeginnerPages:localLearningSteps.map(s=>s.page);
+  const allowed=finished?[...localBeginnerPages,'lektionen']:localLearningSteps.map(s=>s.page);
   return mode==='beginner'&&!allowed.includes(page)?(finished?'kurz':'lernen'):page;
 }
 export function localLearningSelection(selected,available) {
@@ -137,16 +137,20 @@ export const localTutorialSpecs={
   {kind:'capital',target:'#capital',title:'Mit welchem Betrag möchtest du rechnen?',text:'Gib einen frei gewählten Beispielbetrag ein. Du investierst hier kein echtes Geld. Für alle ausgewählten Anlagen rechnen wir mit demselben Betrag.'},
   {kind:'start',target:'#start',title:'Was wäre bei einem anderen Start passiert?',text:'Verschiebe den Investitionsbeginn auf einen anderen Monat. Schau auf die Kurven: Ein anderer Einstieg kann Gewinne und Rückgänge deutlich verändern. Vergleiche deshalb nicht nur einen einzigen Startzeitpunkt.'},
   {kind:'payment',target:'#payment',title:'Was verändern regelmäßige Einzahlungen?',text:'Ändere den monatlich zusätzlich eingezahlten Betrag. Die Kurve zeigt dann auch dein zusätzlich eingezahltes Geld. Ein höherer Endwert bedeutet deshalb nicht automatisch eine bessere Rendite.'},
-  {kind:'observe',target:'[data-local-target="chart"]',title:'Jetzt kannst du selbst vergleichen',text:'Bewege die Maus über die Kurven, um die Monatswerte zu sehen. Achte auf den Endwert und die Rückgänge dazwischen. Anschließend gebe ich dir diese Ansicht frei, damit du die Eingaben beliebig verändern kannst.'},
+  {kind:'observe',target:'[data-local-target="chart"]',title:'Schau auch auf den Weg dazwischen',text:'Bewege die Maus über die Kurven, um die Monatswerte zu sehen. Ein hoher Endwert kann leicht verdecken, dass es zwischendurch deutlich bergab ging. Solche Rückgänge schauen wir uns jetzt genauer an.'},
+  {kind:'risk-history',target:'[data-local-target="risk-history"]',title:'Auch gestreut sind Verluste möglich',text:'Schau auf die Rückgänge unter null. Auch ein ETF mit vielen Unternehmen kann deutlich verlieren. Im Infofenster siehst du den Rückgang auch als Eurobeispiel für deinen Startbetrag.'},
+  {kind:'risk-causes',target:'[data-local-target="risk-history"]',title:'Warum können viele Anlagen zugleich fallen?',text:'Schlechtere Geschäftsaussichten, höhere Zinsen oder Krisen können viele Unternehmen gleichzeitig treffen. Streuung verringert die Abhängigkeit von einzelnen Unternehmen, verhindert solche gemeinsamen Rückgänge aber nicht.'},
  ],
  eigen:[
   {kind:'intro',title:'Deine eigene Mischung',text:'Jetzt bestimmst du selbst, welche Anlagen zusammengehören und wie du dein Geld verteilst. Wir gehen die Auswahl und die Anteile gemeinsam durch. Anschließend kannst du beobachten, wie sich deine Mischung historisch entwickelt hätte.'},
-  {kind:'own-choice',target:'[data-local-target="own"]',title:'Was soll in dein Portfolio?',text:'Wähle mindestens eine Anlage aus. Mit „Anlage hinzufügen“ kannst du weitere ergänzen. Direkt bei der Auswahl kannst du nachlesen, was in der jeweiligen Anlage steckt.'},
-  {kind:'weights',target:'[data-local-target="own"]',title:'Verteile den gesamten Betrag',text:'Trage ein, welcher Anteil deines Geldes in welche Anlage fließen soll. Alle Anteile müssen zusammen hundert Prozent ergeben. Ein einzelner ETF ist ebenfalls möglich.'},
+  {kind:'own-choice',target:'[data-local-target="own"]',title:'Was soll in dein Portfolio?',text:'Wähle zuerst einen ETF aus der Liste aus. Trage anschließend im Feld „Anteil in Prozent“ daneben ein, wie viel von deinem Geld in diesen ETF fließen soll. Für einen einzigen ETF trägst du 100 ein; mit „Anlage hinzufügen“ kannst du das Geld auf weitere ETFs verteilen.'},
+  {kind:'weights',target:'[data-local-target="own"]',title:'Verteile den gesamten Betrag',text:'Die Prozentangaben teilen deinen gesamten Anlagebetrag auf: 50 % bedeutet die Hälfte deines Geldes. Trage zum Beispiel bei zwei ETFs jeweils 50 ein und prüfe darunter die Summe. Erst wenn sie 100 % ergibt, kann deine Mischung berechnet werden.'},
   {kind:'capital',target:'#capital',title:'Lege deinen Beispielbetrag fest',text:'Gib einen Beispielbetrag für deine Mischung ein. Die Prozentanteile teilen diesen Betrag auf die gewählten Anlagen auf. Der Vergleich verwendet denselben Betrag.'},
   {kind:'start',target:'#start',title:'Ändere den Einstieg',text:'Wähle einen anderen Startmonat. Hat deine Mischung in diesem Abschnitt anders abgeschnitten? Ein gutes Ergebnis in einem einzelnen Zeitraum ist noch keine Aussage über die Zukunft.'},
   {kind:'payment',target:'#payment',title:'Probiere monatliche Einzahlungen aus',text:'Ändere den zusätzlichen Monatsbetrag und schau auf den Verlauf. Denke daran: Ein Teil des Geldzuwachses stammt dann aus deinen Einzahlungen.'},
   {kind:'observe',target:'[data-local-target="chart"]',title:'Was fällt dir an deiner Mischung auf?',text:'Vergleiche den Verlauf deiner Mischung mit den einzelnen Anlagen. Achte darauf, ob Rückgänge ähnlich verlaufen oder sich teilweise ausgleichen. Danach kannst du deine Auswahl und Anteile frei verändern.'},
+  {kind:'diversify',target:'[data-local-target="own"]',title:'Probiere mehr Streuung aus',text:'Kombiniere unterschiedliche Branchen oder Anlagearten. Zusammen müssen die Anteile wieder hundert Prozent ergeben. Du kannst auch mit deiner bisherigen Mischung weitergehen.'},
+  {kind:'diversify-loss',target:'[data-local-target="risk-history"]',title:'Was verändert deine Mischung?',text:'Vergleiche deine Verlustkurve mit einer einzelnen Branche. Unterschiedliche Entwicklungen können Rückgänge abfedern. Fallen Anlagen gemeinsam, kann auch eine breite Mischung verlieren.'},
  ],
  sparen:[
   {kind:'intro',title:'ETF oder klassische Sparform?',text:'Jetzt stellen wir die ETF-Verläufe einem Tagesgeld-Beispiel gegenüber. Tagesgeld wird verzinst und schwankt nicht wie ein Aktien-ETF. Welche Kurve historisch höher endete, sagt allein noch nicht, welche Sparform für einen bestimmten Zweck passt.'},
@@ -156,17 +160,22 @@ export const localTutorialSpecs={
   {kind:'start',target:'#start',title:'Vergleiche einen anderen Zeitraum',text:'Verschiebe den Anlagebeginn. Schau darauf, wie sich der Abstand zwischen Tagesgeld und ETF verändert. Gerade bei kurzen Zeiträumen können Kursrückgänge stark ins Gewicht fallen.'},
   {kind:'payment',target:'#payment',title:'Und mit regelmäßigem Sparen?',text:'Ändere die monatliche Einzahlung. Alle angezeigten Sparformen erhalten denselben zusätzlichen Betrag. Vergleiche neben dem Endwert auch, wie ruhig oder unruhig die Wege dorthin waren.'},
   {kind:'observe',target:'[data-local-target="chart"]',title:'Unterschiedliche Wege zum Endwert',text:'Schau dir an, ob ein höherer Endwert auch mit stärkeren Rückgängen verbunden war. Ein ETF ist nicht grundsätzlich lohnender als Tagesgeld. Beide haben unterschiedliche Eigenschaften, die zu unterschiedlichen Zielen passen können.'},
+  {kind:'savings-use',target:'[data-local-target="chart"]',title:'Wann brauchst du das Geld?',text:'Für baldige Ausgaben oder eine Reserve kann Tagesgeld sinnvoller sein: Es schwankt nicht mit Börsenkursen und ist kurzfristig verfügbar. Einen ETF müsstest du bei einem ungünstigen Zeitpunkt vielleicht mit Verlust verkaufen.'},
+  {kind:'savings-safety',target:'[data-local-target="savings-purpose"]',title:'Was schützt dein Tagesgeld?',text:'Tagesgeld hat keine börsenbedingten Kursverluste. Die gesetzliche Einlagensicherung schützt in der EU in der Regel bis zu 100.000 € je Person und Bank. Sinkende Zinsen und steigende Preise können trotzdem deine Kaufkraft belasten.'},
+  {kind:'savings-mix',target:'[data-local-target="savings-purpose"]',title:'Du musst dich nicht für eines entscheiden',text:'Du kannst Geld für baldige Ausgaben auf Tagesgeld halten und längerfristiges Geld getrennt in ETFs anlegen. Überlege beim Vergleichen deshalb zuerst, wann du welchen Teil deines Geldes brauchen könntest.'},
  ],
  inflation:[
   {kind:'intro',title:'Was bedeutet Inflation?',text:'Inflation bedeutet, dass die Preise im Durchschnitt steigen. Das heißt nicht, dass jedes einzelne Produkt teurer wird. Für denselben Geldbetrag kannst du dir dann insgesamt weniger kaufen – seine Kaufkraft sinkt. Zum Schluss schauen wir deshalb auf Geld, das ohne Zinsen liegen bleibt.'},
+  {kind:'inflation-rate',target:'[data-local-inflation-explanation]',title:'Was sagt die Inflationsrate?',text:'Die Inflationsrate zeigt, wie stark sich die Preise verändern, meist gegenüber dem Vorjahresmonat. Sinkt die Rate, bleibt aber positiv, steigen die Preise weiter – nur langsamer. Bei einer negativen Rate sind die Preise im Durchschnitt niedriger als im Vergleichszeitraum.'},
   {kind:'history',title:'Wie haben sich die Preise entwickelt?',text:'Wir schauen auf die gespeicherten deutschen Inflationsdaten. Sie zeigen, wie sich das allgemeine Preisniveau im ausgewählten Zeitraum verändert hat.'},
   {kind:'capital',target:'#capital',title:'Welchen Betrag möchtest du betrachten?',text:'Gib einen Beispielbetrag ein. Wir vergleichen den Kontostand ohne Zinsen mit seiner Kaufkraft. Es wird dabei kein Geld vom Konto abgebucht.'},
   {kind:'start',target:'#start',title:'Wie verändert die Zeit die Kaufkraft?',text:'Verschiebe den Startmonat. Die Kaufkraftkurve verwendet die gespeicherten deutschen Inflationsdaten für diesen Zeitraum. Sie zeigt keine Vorhersage zukünftiger Preise.'},
-  {kind:'observe',target:'[data-local-target="chart"]',title:'Gleicher Kontostand, weniger Kaufkraft',text:'Vergleiche die beiden Kurven. Die eine zeigt den Geldbetrag, die andere, was du dir dafür bei den Ausgangspreisen kaufen konntest. Danach hast du den geführten Rundgang abgeschlossen und kannst selbst weiter erkunden.'},
+  {kind:'observe',target:'[data-local-target="chart"]',title:'Gleicher Kontostand, weniger Kaufkraft',text:'Vergleiche die beiden Kurven. Die eine zeigt den Geldbetrag, die andere, was du dir dafür bei den Ausgangspreisen kaufen konntest. Danach kannst du in einem kurzen Quiz prüfen, was du mitgenommen hast.'},
  ],
 };
 export function localTutorialReady(kind,snapshot,touched=[]){
- if(kind==='intro'||kind==='history'||kind==='observe')return true;
+ if(['intro','history','inflation-rate','observe','risk-history','risk-causes','diversify-loss','savings-use','savings-safety','savings-mix'].includes(kind))return true;
+ if(kind==='diversify')return snapshot.ownValid===true;
  if(kind==='choice')return snapshot.required.some(n=>snapshot.selected.includes(n));
  if(kind==='own-choice')return snapshot.own.length>0&&snapshot.own.every(r=>!!r.name);
  if(kind==='weights')return snapshot.ownValid===true;
@@ -201,3 +210,65 @@ export function localInflationFacts(dates,cpi,start=0){
  });
  return {base,last,total:cpi[last]/cpi[base]-1,loss:1-cpi[base]/cpi[last],peak:annual.reduce((a,b)=>!a||b.rate>a.rate?b:a,null),latest:annual.find(a=>a.date===last)||null};
 }
+
+// Anwendungsquiz nach der Vermögenssimulation, unabhängig vom Begriffsquiz.
+export const localSimulationQuiz=[
+ {id:'zeitraum',topic:'Zeiträume vergleichen',question:'Du verschiebst den Investitionsbeginn. Nun erzielt ein anderes Portfolio im ausgewählten Zeitraum die höchste Rendite. Was bedeutet das?',correct:0,options:[
+  {text:'Welches Portfolio die höchste Rendite erzielt, hängt auch vom betrachteten Zeitraum ab.'},
+  {text:'Das Tool hat beim ersten Vergleich falsch gerechnet.'},
+  {text:'Das nun führende Portfolio wird auch künftig die höchste Rendite erzielen.'}],feedback:'Mit einem anderen Startzeitpunkt betrachtest du andere Marktphasen. Deshalb kann sich auch die Rangfolge nach Rendite ändern.'},
+ {id:'verlust-tragen',topic:'Gewinn und Verluste einordnen',question:'Ein Portfolio erzielte im Vergleich den höchsten Gewinn, zeigte zwischenzeitlich aber auch starke Rückgänge. Was solltest du vor einer Anlageentscheidung zusätzlich bedenken?',correct:0,options:[
+  {text:'Ob du solche Rückgänge finanziell verkraften könntest und wann du das Geld wieder brauchst.'},
+  {text:'Nichts weiter, denn der höchste historische Gewinn macht es zur besten Wahl.'},
+  {text:'Ob du Verluste verhindern könntest, indem du mehr Geld investierst.'}],feedback:'Ein hoher Gewinn am Ende macht zwischenzeitliche Verluste nicht unwichtig. Wenn du dein Geld während eines Rückgangs brauchst, könntest du mit Verlust verkaufen müssen.'},
+ {id:'verlustkurve',topic:'Verlustkurven verstehen',question:'Ein ETF steigt über mehrere Jahre deutlich im Wert. Seine Verlustkurve zeigt zwischendurch trotzdem starke Rückgänge. Was zeigt dir das?',correct:0,options:[
+  {text:'Auch eine insgesamt erfolgreiche Anlage kann zwischenzeitlich deutlich an Wert verlieren.'},
+  {text:'Die beiden Diagramme widersprechen sich.'},
+  {text:'Bei einer insgesamt steigenden Anlage sind zwischenzeitliche Verluste ausgeschlossen.'}],feedback:'Eine langfristig steigende Kurve kann starke Rückgänge enthalten. Die Verlustkurve macht sichtbar, wie groß diese Rückschläge unterwegs waren.'}
+].map(q=>({...q,options:q.options.map(o=>({...o,explanation:q.feedback}))}));
+export function localQuizProgress(questions){return {index:0,choices:questions.map(()=>null),checked:questions.map(()=>false),complete:false};}
+
+export const localOwnPortfolioQuiz=[
+ {id:'zusatz-streuung',topic:'ETF-Inhalte vergleichen',question:'Du ergänzt dein Portfolio um einen zweiten ETF. Wann verbessert sich die Streuung besonders?',correct:1,options:[
+  {text:'Wenn der zweite ETF von einem anderen Anbieter stammt.'},
+  {text:'Wenn er zusätzliche Unternehmen, Branchen oder Regionen abdeckt.'},
+  {text:'Wenn sein Name anders lautet als der des ersten ETFs.'}],feedback:'Entscheidend ist, was in den ETFs steckt. Enthalten beide überwiegend dieselben Unternehmen, hängt dein Geld weiterhin stark von deren Entwicklung ab.'},
+ {id:'ausgleich',topic:'Unterschiedliche Kursverläufe',question:'Zwei Anlagen entwickeln sich unterschiedlich. Was kann ihre Kombination bewirken?',correct:0,options:[
+  {text:'Unterschiedliche Kursverläufe können die Schwankungen des Portfolios abmildern.'},
+  {text:'Das Portfolio kann keine Verluste mehr erleiden.'},
+  {text:'Das Portfolio erzielt automatisch eine höhere Rendite als beide Anlagen einzeln.'}],feedback:'Eine Anlage kann Rückgänge der anderen teilweise ausgleichen. Verluste bleiben trotzdem möglich.'},
+ {id:'rueckblick-auswahl',topic:'Vergangenheit und Zukunft',question:'Du testest verschiedene ETF-Gewichtungen. Was zeigt dir das Portfolio mit der höchsten historischen Rendite?',correct:1,options:[
+  {text:'Welche Gewichtung künftig die höchste Rendite erzielen wird.'},
+  {text:'Welche der getesteten Gewichtungen im betrachteten Zeitraum die höchste Rendite erzielte.'},
+  {text:'Welche Gewichtung unabhängig vom Zeitraum überlegen ist.'}],feedback:'Das Portfolio wurde anhand bekannter Kursverläufe ausgewählt. In Zukunft können andere Gewichtungen besser abschneiden.'}
+].map(q=>({...q,options:q.options.map(o=>({...o,explanation:q.feedback}))}));
+
+export const localSavingsQuiz=[
+ {id:'sparformen-endwert',topic:'Ergebnisse einordnen',question:'Im Vergleich erreicht ein Aktien-ETF einen höheren Endwert als Tagesgeld. Ist er deshalb grundsätzlich die bessere Wahl?',correct:1,options:[
+  {text:'Ja, allein der höhere Endwert entscheidet.'},
+  {text:'Nein, auch mögliche Verluste und die benötigte Verfügbarkeit des Geldes sind wichtig.'},
+  {text:'Ja, sofern der Vergleich mehrere Jahre umfasst.'}],feedback:'Der höhere Endwert zeigt den historischen Geldzuwachs. Er sagt allein nicht, welche Sparform zu deinem Geldbedarf passt.'},
+ {id:'sparformen-kombinieren',topic:'Geld für verschiedene Ziele',question:'Du möchtest Geld für unerwartete Ausgaben zurücklegen und gleichzeitig langfristig Vermögen aufbauen. Was ist grundsätzlich möglich?',correct:2,options:[
+  {text:'Du musst dich für dein gesamtes Geld zwischen Tagesgeld und ETFs entscheiden.'},
+  {text:'Eine Aufteilung verhindert sämtliche Verluste.'},
+  {text:'Du kannst einen verfügbaren Geldpuffer halten und einen anderen Teil langfristig in Aktien-ETFs investieren.'}],feedback:'Verschiedene Teile deines Geldes können unterschiedliche Aufgaben erfüllen. Der langfristig investierte Teil bleibt dabei mit Risiken verbunden.'},
+ {id:'sparformen-etf-chance',topic:'Chancen von Aktien-ETFs',question:'Welchen Vorteil kann ein breit gestreuter Aktien-ETF gegenüber Tagesgeld bieten?',correct:0,options:[
+  {text:'Du beteiligst dich an vielen Unternehmen und kannst von deren Gewinnen und steigenden Aktienkursen profitieren.'},
+  {text:'Du erhältst einen fest vereinbarten Zinssatz.'},
+  {text:'Dein angelegtes Geld kann nicht an Wert verlieren.'}],feedback:'Bei Tagesgeld erhältst du Zinsen. Mit einem Aktien-ETF beteiligst du dich an Unternehmen und ihren wirtschaftlichen Chancen – trägst aber auch mögliche Kursverluste mit.'}
+].map(q=>({...q,options:q.options.map(o=>({...o,explanation:q.feedback}))}));
+
+export const localInflationQuiz=[
+ {id:'inflationsrate',topic:'Inflationsrate einordnen',question:'Die Inflationsrate sinkt, bleibt aber positiv. Was bedeutet das?',correct:1,options:[
+  {text:'Die Preise sinken wieder.'},
+  {text:'Die Preise steigen weiter, aber langsamer.'},
+  {text:'Die Preise bleiben unverändert.'}],feedback:'Eine niedrigere positive Inflationsrate bedeutet, dass die Preise langsamer steigen – nicht, dass sie wieder sinken.'},
+ {id:'kaufkraft-zeitvergleich',topic:'Kaufkraft vergleichen',question:'Wie unterschied sich die Kaufkraft von 100 Euro aufgrund der Inflation zwischen 2021 und 2026?',correct:0,options:[
+  {text:'Die Kaufkraft war 2021 höher als 2026.'},
+  {text:'Die Kaufkraft war 2026 höher als 2021.'},
+  {text:'Die Kaufkraft war in beiden Jahren gleich hoch.'}],feedback:'Die Preise stiegen in diesem Zeitraum insgesamt. Deshalb konntest du dir 2021 mit 100 Euro mehr kaufen als 2026.'},
+ {id:'kaufkraft-erhalten',topic:'Kaufkraftverlust entgegenwirken',question:'Welche Aussage trifft zu?',correct:1,options:[
+  {text:'Ein Aktien-ETF ist die einzige Möglichkeit, einem Kaufkraftverlust entgegenzuwirken.'},
+  {text:'Sowohl ein Aktien-ETF als auch ein Tagesgeldkonto können einem Kaufkraftverlust entgegenwirken.'},
+  {text:'Man kann dem Kaufkraftverlust durch Inflation nicht entgegenwirken.'}],feedback:'Zinsen auf Tagesgeld und mögliche Gewinne eines Aktien-ETFs können den Kaufkraftverlust abmildern. Ob sie ihn vollständig ausgleichen, hängt davon ab, wie hoch sie im Verhältnis zur Inflation ausfallen.'}
+].map(q=>({...q,options:q.options.map(o=>({...o,explanation:q.feedback}))}));

@@ -1,6 +1,6 @@
-import {validateData,simulate,customPortfolio,stats,savings,buildingSavings,realValue,volatilityClass,compare,sum,mean,finite,pretty,endOfPreviousMonth,setViewOption,explanationParagraphs,profileQuestions,profileFields,scoreRiskAnswers,profilePolicy,profileOrder,profileReflection,calculateLossExample,drawLossScenario,learningLessonQuestions,createLearningLessonProgress,checkLearningLessonAnswer,ownPortfolioWeights,NASDAQ_SHORT,SP500_DESCRIPTION,assetDescription} from './core.mjs?v=20261122-sync';
-import {depths,depthRule,knowledge,knowledgeKey,mixIds,mixSpec,mixSimulation,findAsset,learningExamples} from './experience.mjs?v=20261122-sync';
-import {lastCompleteMonth,validateRadar,radarRankings,radarPrompt,builtInRadar} from './radar.mjs?v=20261122-sync';
+import {validateData,simulate,customPortfolio,stats,savings,buildingSavings,realValue,volatilityClass,compare,sum,mean,finite,pretty,endOfPreviousMonth,setViewOption,explanationParagraphs,profileQuestions,profileFields,scoreRiskAnswers,profilePolicy,profileOrder,profileReflection,calculateLossExample,drawLossScenario,learningLessonQuestions,createLearningLessonProgress,checkLearningLessonAnswer,ownPortfolioWeights,NASDAQ_SHORT,SP500_DESCRIPTION,assetDescription} from './core.mjs?v=20261127-sync';
+import {depths,depthRule,knowledge,knowledgeKey,mixIds,mixSpec,mixSimulation,findAsset,learningExamples} from './experience.mjs?v=20261127-sync';
+import {lastCompleteMonth,validateRadar,radarRankings,radarPrompt,builtInRadar} from './radar.mjs?v=20261127-sync';
 
 const $=id=>document.getElementById(id),esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const moneyFormat=new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',maximumFractionDigits:2}),percentFormat=new Intl.NumberFormat('de-DE',{style:'percent',maximumFractionDigits:2});
@@ -109,14 +109,14 @@ function modelDescription(n){
  if(n==='Nasdaq-100 (QQQ)')return NASDAQ_SHORT;
  if(n==='S&P 500 (SPY)')return SP500_DESCRIPTION;
  const key=portfolioKey(n);if(key!=='market')return knowledge[key][state.depth]+'\n\n'+knowledge[key].Grenze;
- if(n==='Eigenes Portfolio')return 'Die Gewichte legst du selbst fest. Die Mischung wird nicht optimiert; jährliche Prüfungen können sie auf deine Zielanteile zurücksetzen.';if(n==='Gleichgewichtung')return 'Bei einer Neuberechnung wird das Kapital gleichmäßig auf die Anlagen verteilt. Zwischen den Prüfterminen können die tatsächlichen Anteile durch Kursbewegungen abweichen.';if(n.startsWith('Minimum-Varianz'))return 'Das Ziel sind möglichst geringe geschätzte Gesamtschwankungen. Ausschlaggebend sind die geschätzten Schwankungen und gemeinsamen Bewegungen der Anlagen, nicht eine möglichst hohe Rendite.';if(n.includes('Black-Litterman'))return 'Markowitz nutzt hier die lokal berechneten Black-Litterman-Renditeschätzungen. Die Verteilung hängt zugleich vom gemeinsamen Risiko und der vorgegebenen Risikogrenze ab.';if(n==='Markowitz')return 'Das Verfahren maximiert die geschätzte Rendite unter der lokal festgelegten Risikogrenze des breiten Markt-ETF. Hohe geschätzte Rendite allein erklärt noch nicht das genaue Gewicht.';if(n==='Risk Parity')return 'Die geschätzten Beiträge der Anlagen zum gesamten Risiko sollen möglichst gleichmäßig sein. Das bedeutet nicht, dass gleich viel Geld in jede Anlage fließt.';if(n==='Tangentialportfolio')return 'Das Verfahren sucht das günstigste geschätzte Verhältnis aus Mehr-Rendite gegenüber dem risikofreien Zins und Schwankungen, unter den lokalen Nebenbedingungen.';return 'Festes Vergleichsportfolio aus dem importierten Analyselauf. Die genaue Zusammensetzung ist unten einsehbar; ein Marktindex ist keine Garantie für geringe Schwankungen.';
+ if(n==='Eigenes Portfolio')return 'Die Gewichte legst du selbst fest. Die Mischung wird nicht optimiert und nicht umgeschichtet (Buy and Hold). Die Anteile verändern sich mit den Kursen.';if(n==='Gleichgewichtung')return 'Bei einer Neuberechnung wird das Kapital gleichmäßig auf die Anlagen verteilt. Zwischen den Prüfterminen können die tatsächlichen Anteile durch Kursbewegungen abweichen.';if(n.startsWith('Minimum-Varianz'))return 'Das Ziel sind möglichst geringe geschätzte Gesamtschwankungen. Ausschlaggebend sind die geschätzten Schwankungen und gemeinsamen Bewegungen der Anlagen, nicht eine möglichst hohe Rendite.';if(n.includes('Black-Litterman'))return 'Markowitz nutzt hier die lokal berechneten Black-Litterman-Renditeschätzungen. Die Verteilung hängt zugleich vom gemeinsamen Risiko und der vorgegebenen Risikogrenze ab.';if(n==='Markowitz')return 'Das Verfahren maximiert die geschätzte Rendite unter der lokal festgelegten Risikogrenze des breiten Markt-ETF. Hohe geschätzte Rendite allein erklärt noch nicht das genaue Gewicht.';if(n==='Risk Parity')return 'Die geschätzten Beiträge der Anlagen zum gesamten Risiko sollen möglichst gleichmäßig sein. Das bedeutet nicht, dass gleich viel Geld in jede Anlage fließt.';if(n==='Tangentialportfolio')return 'Das Verfahren sucht das günstigste geschätzte Verhältnis aus Mehr-Rendite gegenüber dem risikofreien Zins und Schwankungen, unter den lokalen Nebenbedingungen.';return 'Festes Vergleichsportfolio aus dem importierten Analyselauf. Die genaue Zusammensetzung ist unten einsehbar; ein Marktindex ist keine Garantie für geringe Schwankungen.';
 }
 function selection(minimum=false){
  const all=names(minimum),groups=minimum?[['simple','Schätzverfahren',all]]:[['simple','Einfache Vergleichsportfolios',all.filter(n=>['Welt-ETF','acwi-import',...mixIds].includes(n)||n.includes('ACWI'))],['markets','Weitere Anlagestrategien und Marktvergleiche',all.filter(n=>!['Welt-ETF','acwi-import',...mixIds].includes(n)&&!n.includes('ACWI')&&!['Gleichgewichtung','Markowitz','Markowitz Black-Litterman','Tangentialportfolio','Risk Parity'].includes(n)&&!n.startsWith('Minimum-Varianz'))],['models','Optimierungs- und Gewichtungsverfahren',all.filter(n=>['Gleichgewichtung','Markowitz','Markowitz Black-Litterman','Tangentialportfolio','Risk Parity'].includes(n)||n.startsWith('Minimum-Varianz'))]];
  return `<section class="section"><h2>Portfolios vergleichen</h2><p class="small">Mehrere Portfolios sind möglich. Das Schließen einer Gruppe ändert deine Auswahl nicht.</p><div class="selected-portfolios" aria-label="Gesamte Portfolioauswahl">${state.selected.filter(n=>all.includes(n)).map(n=>`<button class="selection-chip" data-remove-portfolio="${esc(n)}" aria-label="${esc(displayName(n))} aus Auswahl entfernen">${esc(displayName(n))} <span aria-hidden="true">×</span></button>`).join('')||'<p>Noch kein Portfolio ausgewählt.</p>'}</div>${groups.map(([id,label,items])=>`<details class="portfolio-group" data-group="${id}" ${state.groups[id]?'open':''}><summary>${label}<span class="selection-count">${items.filter(n=>state.selected.includes(n)).length} ausgewählt</span></summary><div class="detail-body">${items.map(n=>`<div class="portfolio-entry"><label class="portfolio-choice"><input data-portfolio="${esc(n)}" type="checkbox" ${state.selected.includes(n)?'checked':''}><span>${esc(n==='acwi-import'?'MSCI ACWI – Industrie- und Schwellenländer':displayName(n))}</span></label><div class="portfolio-brief"><p>${esc((knowledge[portfolioKey(n)]||knowledge.market).Grundlagen.split('Beispiel:')[0])}</p>${info(displayName(n),modelDescription(n),portfolioKey(n))}</div>${mixIds.includes(n)&&state.selected.includes(n)?mixControls(n):''}</div>`).join('')}${id==='simple'&&!all.some(n=>n.includes('ACWI')||n==='acwi-import')?'<p class="small">MSCI ACWI: Noch keine ausdrücklich passende Renditereihe importiert. Die einstellbare World-/Emerging-Markets-Mischung ist kein stillschweigender ACWI-Ersatz.</p>':''}${id==='markets'?'<p class="small">ARERO und Permanent Portfolio sind nicht ergänzt: Ein Gold-ETF ersetzt keinen breiten Rohstoffkorb; passende zusätzliche Daten müssten zuerst vorliegen.</p>':''}</div></details>`).join('')}</section>`;
 }
 function mixControls(id){const isWorld=id==='mix-world',key=isWorld?'em':id==='mix-cash'?'cashEquity':'bondEquity',value=state[key],left=isWorld?100-value:value,right=100-left;
- return `<div class="mix-controls"><div class="mix-inputs"><label class="field"><span>${isWorld?'Emerging-Markets-Anteil':'Aktienanteil'}: ${value} %</span><input aria-label="${id}: Anteil per Regler" data-mix-key="${key}" type="range" min="0" max="100" step="1" value="${value}"></label><label class="field"><span>Direkt eingeben (%)</span><input aria-label="${id}: Anteil direkt eingeben" data-mix-key="${key}" type="number" min="0" max="100" step="1" value="${value}"></label></div><div class="mix-bar" aria-label="${isWorld?'MSCI World':'Aktien'} ${left} Prozent, ${isWorld?'Emerging Markets':id==='mix-cash'?'Tagesgeld':'US-Anleihen'} ${right} Prozent"><span style="width:${left}%"></span><span style="width:${right}%"></span></div><p class="small">${isWorld?'MSCI World': 'MSCI World (Aktien)'}: <strong>${left} %</strong> · ${isWorld?'Emerging Markets':id==='mix-cash'?'Tagesgeld-Szenario':'AGG (US-Dollar-Anleihen, nicht währungsgesichert)'}: <strong>${right} %</strong></p><div class="prompt-actions">${(isWorld?[30]:id==='mix-cash'?[25,50,75]:[40,60,80]).map(v=>`<button class="secondary" data-mix-example="${key}:${v}">${isWorld?'70/30-Beispiel laden':v+'/'+(100-v)+'-Beispiel laden'}</button>`).join('')}</div><p class="small">Lernbeispiele, keine empfohlenen Verteilungen. ${knowledge[portfolioKey(id)].Grenze}</p>${id==='mix-cash'?`<div class="grid three">${field('Aktionszins pro Jahr (%)','mix-rate',state.rate,'number','min="0" max="50" step="0.1"')}${field('Aktionsdauer (Monate)','mix-rateMonths',state.rateMonths,'number','min="0" max="120" step="1"')}${field('Anschlusszins pro Jahr (%)','mix-nextRate',state.nextRate,'number','min="0" max="50" step="0.1"')}</div><p class="small">Eingegebenes Zinsszenario ab Anlagebeginn. Kontoumbuchungen sind kostenfrei; nur ETF-Käufe und -Verkäufe tragen Modellkosten. Keine Zusage historisch verfügbarer Konditionen.</p>`:''}${detail('Regel und Bausteine verstehen',explanation('So wird die Mischung berechnet',portfolioKey(id))+`<p>Alle zwölf Monate wird geprüft: Abweichung größer als min(${pct(state.data.assumptions.absoluteBand)} des gesamten Kapitals, ${pct(state.data.assumptions.relativeBand)} des Zielanteils). Verlässt eine Position ihr Band, werden alle Anteile zurückgesetzt. Monatsrenditen und zwischenzeitliche Gewichte werden einzeln fortgeschrieben. Einzahlungen und Modellkosten sind mit den übrigen Vergleichen identisch.</p>`)}</div>`;
+ return `<div class="mix-controls"><div class="mix-inputs"><label class="field"><span>${isWorld?'Emerging-Markets-Anteil':'Aktienanteil'}: ${value} %</span><input aria-label="${id}: Anteil per Regler" data-mix-key="${key}" type="range" min="0" max="100" step="1" value="${value}"></label><label class="field"><span>Direkt eingeben (%)</span><input aria-label="${id}: Anteil direkt eingeben" data-mix-key="${key}" type="number" min="0" max="100" step="1" value="${value}"></label></div><div class="mix-bar" aria-label="${isWorld?'MSCI World':'Aktien'} ${left} Prozent, ${isWorld?'Emerging Markets':id==='mix-cash'?'Tagesgeld':'US-Anleihen'} ${right} Prozent"><span style="width:${left}%"></span><span style="width:${right}%"></span></div><p class="small">${isWorld?'MSCI World': 'MSCI World (Aktien)'}: <strong>${left} %</strong> · ${isWorld?'Emerging Markets':id==='mix-cash'?'Tagesgeld-Szenario':'AGG (US-Dollar-Anleihen, nicht währungsgesichert)'}: <strong>${right} %</strong></p><div class="prompt-actions">${(isWorld?[30]:id==='mix-cash'?[25,50,75]:[40,60,80]).map(v=>`<button class="secondary" data-mix-example="${key}:${v}">${isWorld?'70/30-Beispiel laden':v+'/'+(100-v)+'-Beispiel laden'}</button>`).join('')}</div><p class="small">Lernbeispiele, keine empfohlenen Verteilungen. ${knowledge[portfolioKey(id)].Grenze}</p>${id==='mix-cash'?`<div class="grid three">${field('Aktionszins pro Jahr (%)','mix-rate',state.rate,'number','min="0" max="50" step="0.1"')}${field('Aktionsdauer (Monate)','mix-rateMonths',state.rateMonths,'number','min="0" max="120" step="1"')}${field('Anschlusszins pro Jahr (%)','mix-nextRate',state.nextRate,'number','min="0" max="50" step="0.1"')}</div><p class="small">Eingegebenes Zinsszenario ab Anlagebeginn. Kontoumbuchungen sind kostenfrei; nur ETF-Käufe und -Verkäufe tragen Modellkosten. Keine Zusage historisch verfügbarer Konditionen.</p>`:''}</div>`;
 }
 function assetTable(){const d=state.data;return detail('Welche ETFs und welcher Marktvergleich werden verwendet?',table([{label:'Interner Name',help:'internal'},{label:'ETF / Anlage',text:'Klicke auf den Instrumentnamen, um seine Beschreibung zu öffnen.'},{label:'Ticker',help:'ticker'}],Object.entries(d.assets).map(([n,a])=>{const id='i'+(++infoSeq);infoMap.set(id,{title:pretty(n),text:assetDescription(a)});return [esc(pretty(n)),`<button class="cell-link" data-info="${id}">${esc(a.label)}</button>`,esc(a.symbol)];})));}
 function results(own=false,minimum=false){
@@ -136,7 +136,7 @@ function lineChart(series,yLabel='Vermögen in Euro'){
  if(yLabel.startsWith('Verlust')&&high<=0)hi=0;
  if(hi===lo)hi+=step;
  const first=series[0].values,count=first.length,x=i=>L+(W-L-R)*i/Math.max(1,count-1),y=v=>H-B-(v-lo)/(hi-lo)*(H-B-T);
- let svg=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(yLabel)}"><defs><clipPath id="clip-${infoSeq}"><rect x="${L}" y="${T}" width="${W-L-R}" height="${H-B-T}"/></clipPath></defs>`;
+ let svg=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(yLabel)}" style="cursor:default"><defs><clipPath id="clip-${infoSeq}"><rect x="${L}" y="${T}" width="${W-L-R}" height="${H-B-T}"/></clipPath></defs>`;
  for(let value=lo;value<=hi+step*.001;value+=step){const py=y(value),label=yLabel.includes('%')?dec(Math.abs(value)<step*1e-9?0:value):Math.round(value).toLocaleString('de-DE');svg+=`<line x1="${L}" x2="${W-R}" y1="${py}" y2="${py}" class="chart-grid"/><text class="chart-tick" x="${L-14}" y="${py+5}" text-anchor="end">${esc(label)}</text>`;}
  // Jahreswechsel unmittelbar neben dem Ausgangsmonat dürfen nicht kollidieren.
  const short=count<=24,candidates=short?first.map((_,i)=>i).filter(i=>i%Math.max(1,Math.ceil(count/5))===0):first.map((p,i)=>p.date.slice(5,7)==='01'?i:null).filter(i=>i!==null);
@@ -147,7 +147,9 @@ function lineChart(series,yLabel='Vermögen in Euro'){
  for(const i of ticks)svg+=`<text class="chart-tick" x="${x(i)}" y="${H-B+28}" text-anchor="middle">${esc(short?month(first[i].date):first[i].date.slice(0,4))}</text>`;
  svg+=`<g clip-path="url(#clip-${infoSeq})">`;
  series.forEach((s,k)=>{svg+=`<path d="${s.values.map((p,i)=>(i?'L':'M')+x(i).toFixed(2)+','+y(p.y).toFixed(2)).join(' ')}" stroke="${colors[k%colors.length]}" stroke-width="2.7" stroke-linejoin="round" fill="none" vector-effect="non-scaling-stroke"/>`;});
- svg+=`</g><line data-crosshair x1="${L}" x2="${L}" y1="${T}" y2="${H-B}" stroke="#8b9f94" stroke-dasharray="4 4" visibility="hidden"/><text class="chart-axis-title" x="${(W+L-R)/2}" y="${H-5}" text-anchor="middle">${short?'Monat / Jahr':'Jahr'}</text></svg>`;
+ svg+='</g><g class="month-points">';
+ series.forEach((s,k)=>{s.values.forEach((v,i)=>{if(finite(v.y))svg+=`<circle data-month-point="${i}" data-point-series="${k}" cx="${x(i).toFixed(2)}" cy="${y(v.y).toFixed(2)}" r="3.5" fill="transparent" stroke="none" style="pointer-events:all;cursor:default" aria-label="${esc(s.name+' · '+months(v.date))}"/>`;});});
+ svg+=`</g><line data-crosshair x1="${L}" x2="${L}" y1="${T}" y2="${H-B}" stroke="#8b9f94" stroke-dasharray="4 4" visibility="hidden" pointer-events="none"/><text class="chart-axis-title" x="${(W+L-R)/2}" y="${H-5}" text-anchor="middle">${short?'Monat / Jahr':'Jahr'}</text></svg>`;
  const id='chart-'+(++infoSeq);chartPayload.set(id,{series,x,L,W,R,T,B,H});
  return `<div class="chart line-chart" id="${id}"><div class="chart-unit">${esc(yLabel)}</div><div class="chart-body"><div class="chart-plot">${svg}</div><div class="legend" aria-label="Farblegende"><h3>${state.page==='sparen'||state.page==='inflation'?'Portfolios und klassische Sparformen':'Portfolios'}</h3>${series.map((s,k)=>`<span><i class="swatch" style="background:${colors[k%colors.length]}"></i>${esc(s.name)}</span>`).join('')}</div></div><div class="tooltip" hidden></div></div>`;
 }
@@ -168,11 +170,15 @@ function chartEvents(){for(const [id,p] of chartPayload){const wrap=$(id),svg=wr
   if(tip.dataset.localMonth!==String(i)){
    if(!htmlCache.has(i))htmlCache.set(i,`<strong>${months(p.series[0].values[i].date)}</strong>`+p.series.map((s,k)=>{const v=s.values[i];return v?`<section class="tooltip-series"><h4><i class="swatch" style="background:${colors[k%colors.length]}"></i>${esc(s.name)}</h4><p>${s.percent?'Verlust':s.name==='Eingezahltes Kapital'?'Eingezahlt':'Vermögenswert'}: <b>${s.percent?pct(v.y/100):money(v.y)}</b></p>${finite(v.return)?`<p>Monatsrendite: <b>${pct(v.return)}</b></p>`:''}</section>`:'';}).join(''));
    tip.innerHTML=htmlCache.get(i);tip.dataset.localMonth=String(i);tip._size=null;
+   p.series.forEach((s,k)=>{const v=s.values[i];if(finite(v?.lossEuro)&&finite(s.exampleCapital))tip.querySelectorAll('.tooltip-series')[k]?.insertAdjacentHTML('beforeend',`<p>Du verlierst <b>${money(v.lossEuro)}</b>.</p><p>Von <b>${money(s.exampleCapital)}</b> bleiben noch <b>${money(Math.max(0,s.exampleCapital-v.lossEuro))}</b> übrig.</p>`);});
   }
   placeTooltip(wrap,tip,x,y);cross?.setAttribute('x1',p.x(i));cross?.setAttribute('x2',p.x(i));cross?.setAttribute('visibility','visible');};
- const point=e=>{const r=svg.getBoundingClientRect(),vx=(e.clientX-r.left)/r.width*p.W,vy=(e.clientY-r.top)/r.height*p.H;if(vx<p.L||vx>p.W-p.R||vy<p.T||vy>p.H-p.B){hide();return;}show(Math.max(0,Math.min(p.series[0].values.length-1,Math.round((vx-p.L)/(p.W-p.L-p.R)*(p.series[0].values.length-1)))),e.clientX,e.clientY);};
+ const point=e=>{const index=e.monthIndex??e.target?.closest?.('[data-month-point]')?.dataset.monthPoint;if(index===undefined||index===null){hide();return;}show(Number(index),e.clientX,e.clientY);};
  svg.setAttribute('tabindex','0');svg.setAttribute('aria-label',svg.getAttribute('aria-label')+'. Monatswerte mit den Pfeiltasten ansehen.');
- svg.addEventListener('pointermove',event=>{pendingPoint={clientX:event.clientX,clientY:event.clientY};if(!pendingFrame)pendingFrame=requestAnimationFrame(()=>{pendingFrame=0;if(svg.isConnected)point(pendingPoint);});});svg.addEventListener('click',point);svg.addEventListener('pointerleave',e=>{if(!tip.contains(e.relatedTarget))hide();});wrap.addEventListener('pointerleave',hide);svg.addEventListener('blur',e=>{if(!tip.contains(e.relatedTarget))hide();});tip.addEventListener('keydown',e=>{if(e.key==='Escape'){hide();svg.focus({preventScroll:true});}});
+ const plot=svg.closest('.chart-plot')||svg;
+ plot.addEventListener('pointerover',point);
+ plot.addEventListener('pointerout',event=>{if(event.target.closest?.('[data-month-point]')&&!event.relatedTarget?.closest?.('[data-month-point]'))hide();});
+ plot.addEventListener('pointermove',event=>{pendingPoint={clientX:event.clientX,clientY:event.clientY,monthIndex:event.target.closest?.('[data-month-point]')?.dataset.monthPoint??null};if(!pendingFrame)pendingFrame=requestAnimationFrame(()=>{pendingFrame=0;if(svg.isConnected)point(pendingPoint);});});plot.addEventListener('click',point);plot.addEventListener('pointerleave',e=>{if(!tip.contains(e.relatedTarget))hide();});wrap.addEventListener('pointerleave',hide);svg.addEventListener('blur',e=>{if(!tip.contains(e.relatedTarget))hide();});tip.addEventListener('keydown',e=>{if(e.key==='Escape'){hide();svg.focus({preventScroll:true});}});
  svg.addEventListener('keydown',e=>{if(e.key==='Escape'){hide();return;}if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const max=p.series[0].values.length-1,i=e.key==='Home'?0:e.key==='End'?max:Math.max(0,Math.min(max,current+(e.key==='ArrowLeft'?-1:1))),r=svg.getBoundingClientRect();show(i,r.left+p.x(i)/p.W*r.width,r.top+r.height*.25);});
  }
  for(const wrap of document.querySelectorAll('.chart:has([data-chart-mark])')){let tip=wrap.querySelector('.tooltip');if(!tip){tip=document.createElement('div');tip.className='tooltip mark-tooltip';tip.hidden=true;wrap.append(tip);}
@@ -212,7 +218,7 @@ function classView(out){
  const selected=out.find(a=>a.name===state.className),isOwn=selected.name==='Eigenes Portfolio';
  // Wie lokal: separate Referenzsimulation ab Beginn der Testhistorie, nicht
  // der eventuell verkürzte Verlauf des Investitionsbeginn-Reglers.
- const full=selected.mixId?mixSimulation(state.data,selected.mixId,selected.settings,0,state.capital,state.payment).returns:isOwn?customPortfolio(state.data,Object.fromEntries(state.own.map(a=>[a.name,a.weight/100])),0).returns:state.data.portfolios[selected.name],cl=full?volatilityClass(state.data,full):null;
+ const full=selected.mixId?mixSimulation(state.data,selected.mixId,selected.settings,0,state.capital,state.payment).returns:isOwn?customPortfolio(state.data,Object.fromEntries(state.own.map(a=>[a.name,a.weight/100])),0).returns:simulate(state.data,selected.name,0,0,0).returns,cl=full?volatilityClass(state.data,full):null;
  const palette=['#4b8e83','#659a7e','#98a36b','#c1a65d','#c59355','#c47c5a','#b86460'],ranges=['unter 0,5 %','0,5 bis unter 2 %','2 bis unter 5 %','5 bis unter 10 %','10 bis unter 15 %','15 bis unter 25 %','ab 25 %'];
  return `<section class="card class-card"><h3>Historische Schwankungsklasse</h3><label class="field"><span>Portfolio für die Schwankungsklasse</span><select id="class-name">${out.map(a=>`<option ${a.name===state.className?'selected':''}>${esc(a.name)}</option>`).join('')}</select></label>${selected.scenario?'<p class="callout">Die Mischung enthält ein rückgerechnetes Zinsszenario. Diese Einordnung ist keine historische Tagesgeld-Produkteinstufung.</p>':''}<p class="small">Festes Fünfjahresfenster, unabhängig von deinem Investitionsbeginn, Startkapital und VaR-Niveau.</p>${cl?`<p><strong>${esc(selected.name)}: Klasse ${cl.class} von 7</strong></p><div class="class-scale" aria-label="Schwankungsklassen von geringeren bis stärkeren Schwankungen">${palette.map((color,i)=>`<button class="${i+1===cl.class?'selected':''}" style="--class-color:${color}" ${i+1===cl.class?'aria-current="true"':''} data-info="${classInfo(i+1,ranges[i])}" aria-label="Klasse ${i+1}: ${ranges[i]} jährliche Schwankungen${i+1===cl.class?', ausgewählt':''}">${i+1}</button>`).join('')}</div><div class="scale-caption"><span>Geringere Schwankungen</span><span>Stärkere Schwankungen</span></div><p>Berechnete Schwankungen: <strong>${pct(cl.vol)} pro Jahr</strong><br><span class="small">${month(cl.from)} bis ${month(cl.to)}</span></p>`:'<p>Für das feste Fünfjahresfenster liegen nicht alle benötigten Monatsrenditen vor. Deshalb wird keine Klasse vergeben.</p>'}<p class="small">Historische SRRI-Klassengrenzen, angewandt auf 60 abgeschlossene Monatsrenditen in Euro vor separat modellierten Kosten und Steuern. Keine offizielle Produkteinstufung und keine aus dem VaR abgeleitete Klasse. Auch Klasse 1 ist nicht risikofrei.</p>${detail('Wie werden die Schwankungsklassen berechnet?','Wir messen die Streuung der monatlichen Renditen im festen Fünfjahresfenster und rechnen sie mit der Wurzel aus zwölf auf ein Jahr hoch. Die Grenzen der Klassen sind unverändert: unter 0,5 % · unter 2 % · unter 5 % · unter 10 % · unter 15 % · unter 25 % · ab 25 %. Auf einer Grenze gilt die höhere Klasse. Anders als beim vollständigen regulatorischen Verfahren verwenden wir simulierte Monatsdaten, keine bevorzugten Wochendaten und keine mehrmonatige Prüfung von Klassenwechseln. Eine höhere Klasse bedeutet stärkere vergangene Schwankungen, nicht automatisch eine schlechtere Anlage.')}</section>`;
 }
@@ -228,7 +234,7 @@ function facts(a){const grouped={};for(const q of a.attr){const x=grouped[q.inst
  const drawdownPhase={von:a.rows[Math.max(0,peakIndex+1)].date,bis:a.rows[trough+1].date,gewichtete_Monatsbeitraege:{}};
  for(const q of a.attr.filter(q=>q.datum>drawdownPhase.von&&q.datum<=drawdownPhase.bis&&q.startgewicht>1e-8))drawdownPhase.gewichtete_Monatsbeitraege[q.instrument_name]=(drawdownPhase.gewichtete_Monatsbeitraege[q.instrument_name]||0)+q.renditebeitrag;
  delete s.drawdowns;
- return {Portfolio:a.name,Modellziel:modelDescription(a.name),Kennzahlen:s,Groesster_Einbruch:drawdownPhase,Endwert_nach_Modellkosten:a.rows.at(-1).value,Handelskosten:a.rows.at(-1).totalCost,Anlagen:assets};}
+ return {Portfolio:a.name,Verwaltung:a.management,Modellziel:modelDescription(a.name),Kennzahlen:s,Groesster_Einbruch:drawdownPhase,Endwert_nach_Modellkosten:a.rows.at(-1).value,Handelskosten:a.rows.at(-1).totalCost,Anlagen:assets};}
 function sourceHints(out){const d=state.data,from=d.dates[state.start].slice(0,7)+'-01',to=d.dates.at(-1),assets=new Set(out.flatMap(a=>a.attr.filter(x=>x.startgewicht>1e-8).map(x=>x.instrument_name)));return d.sources.filter(q=>q.datum>=from&&q.datum<=to&&q.anlagen?.some(n=>assets.has(n))&&safeUrl(q.url)).map((q,i)=>({id:'Q'+(i+1),...q}));}
 function safeUrl(u){try{const x=new URL(u);return x.protocol==='https:'?x.href:null;}catch{return null;}}
 function promptText(kind,out){const from=state.data.dates[state.start],to=state.data.dates.at(-1),f=out.map(facts),comparisons=out[0]?.name==='Eigenes Portfolio'?out.slice(1).map(b=>({Vergleich:b.name,...compare(out[0],b)})):[];const sources=sourceHints(out);let task;
@@ -278,7 +284,7 @@ function guidedLearning(){
  const chart=out.map(a=>({name:a.share+' % Aktien / '+(100-a.share)+' % Tagesgeld',percent:true,values:a.rows.map((r,i)=>({date:r.date,y:a.loss.drawdowns[i]*100}))}));
  const wealth=out.map(a=>({name:a.share+' % Aktien / '+(100-a.share)+' % Tagesgeld',values:a.rows.map(r=>({date:r.date,y:r.value}))}));
  if(out.length)wealth.push({name:'Eingezahltes Kapital',values:out[0].rows.map(r=>({date:r.date,y:r.paid}))});
- return `<section class="section learning-lab" id="learning-lab"><span class="pill">LERNVERGLEICH · KEINE EMPFEHLUNG</span><h2>Aktien und Tagesgeld: Mischungen vergleichen</h2><p>Was verändert sich, wenn du mehr oder weniger deines Geldes in Aktien anlegst und den Rest auf einem Tagesgeldkonto lässt?</p><p>Alle Beispiele verwenden denselben MSCI-World-ETF (URTH): Aktien aus Industrieländern, ohne Schwellenländer. Der Rest folgt demselben Tagesgeld-Szenario. Keine Mischung wird aufgrund deines Profils als passend markiert.</p><div class="card"><h3>Gleiche Bedingungen für alle Beispiele</h3>${inputs()}<div class="grid">${field('Beispielzins p.a. (%)','learning-rate',state.rate,'number','min="0" max="100" step="0.1"')}${field('Dauer des Beispielzinses (Monate)','learning-rate-months',state.rateMonths,'number','min="0" max="1200" step="1"')}${field('Zins danach p.a. (%)','learning-next-rate',state.nextRate,'number','min="0" max="100" step="0.1"')}</div><p class="small">Eingegebene Beispielzinsen ab Anlagebeginn, kein historisch verfügbares Bankangebot. Monatliche Fortschreibung, jährliche Bandprüfung mit den importierten Grenzen. Nur ETF-Käufe und -Verkäufe erhalten die importierten Modellkosten (${money(state.data.assumptions.fixedCost)} je Auftrag plus ${pct(state.data.assumptions.proportionalCost)} des Handelsbetrags); monatliche Sparraten sind kostenfrei. Steuern und Inflation fehlen.</p><label class="field"><span>Eigener Lernvergleich: ${state.learningShare} % Aktien und ${100-state.learningShare} % Tagesgeld</span><input id="learning-share" type="range" min="0" max="100" step="1" value="${state.learningShare}"></label></div><h3>Wie hätte sich dein Vermögen entwickelt?</h3><p>Die Kurven zeigen, wie viel Geld aus deinem Startkapital und deinen Einzahlungen geworden wäre – nach den modellierten Handelskosten. Die zusätzliche Linie zeigt, wie viel du selbst eingezahlt hast.</p>${lineChart(wealth)}<h3>Welche zwischenzeitlichen Verluste gab es?</h3><p>Null Prozent bedeutet: Die Anlage steht auf ihrem bisherigen Höchststand. Minus zehn Prozent bedeutet: Sie liegt zehn Prozent darunter. Einzahlungen werden für dieses Diagramm herausgerechnet, damit sie einen Verlust nicht verdecken.</p>${lineChart(chart,'Rückgang (%)')}<h3>Endwerte und Verluste vergleichen</h3>${table([{label:'Lernbeispiel',text:'Aktienanteil plus Tagesgeldanteil. Keine persönliche Empfehlung.'},{label:'Netto-Endwert',help:'net'},{label:'Größter Rückgang<br>der Anlage',text:'Der größte prozentuale Rückgang gegenüber einem vorherigen Höchststand, nach Modellkosten und bereinigt um Einzahlungen.'},{label:'Kontorückgang<br>in Euro',text:'Die Abnahme des tatsächlichen Kontowerts während seiner größten prozentualen Verlustphase. Einzahlungen können einen solchen Rückgang teilweise ausgleichen oder verdecken.'}],out.map(a=>[a.share+' % Aktien / '+(100-a.share)+' % Tagesgeld',money(a.rows.at(-1).value),a.loss.measurable?pct(a.loss.investment.fraction):'–',a.loss.measurable?money(a.loss.account.euro):'–']))}${detail('Warum unterscheiden sich Anlageverlust und Kontorückgang?',`<p>Der Euro-Rückgang verwendet die tatsächlichen simulierten Kontowerte. Neue Einzahlungen können einen Verlust teilweise ausgleichen oder im Kontostand verdecken.</p><p>Das Verlustdiagramm betrachtet deshalb die Anlageentwicklung ohne den Effekt neuer Einzahlungen. Handelskosten bleiben enthalten. Bei null Kapital und null Einzahlungen ist kein Anlageverlauf messbar. Die größte Verlustphase kann je nach Betrachtung unterschiedlich ausfallen.</p><p>Vergangene Rückgänge sind keine Grenze künftiger Verluste. Eine Erholung ist nicht garantiert.</p>`)}<p><strong>Bleibt dein Eindruck bei einem anderen Beginn derselbe?</strong> Verschiebe den Anlagebeginn und betrachte beide Diagramme erneut.</p><button class="secondary" id="close-learning">Zurück zur Vermögenssimulation</button></section>`;
+ return `<section class="section learning-lab" id="learning-lab"><span class="pill">LERNVERGLEICH · KEINE EMPFEHLUNG</span><h2>Aktien und Tagesgeld: Mischungen vergleichen</h2><p>Was verändert sich, wenn du mehr oder weniger deines Geldes in Aktien anlegst und den Rest auf einem Tagesgeldkonto lässt?</p><p>Alle Beispiele verwenden denselben MSCI-World-ETF (URTH): Aktien aus Industrieländern, ohne Schwellenländer. Der Rest folgt demselben Tagesgeld-Szenario. Keine Mischung wird aufgrund deines Profils als passend markiert.</p><div class="card"><h3>Gleiche Bedingungen für alle Beispiele</h3>${inputs()}<div class="grid">${field('Beispielzins p.a. (%)','learning-rate',state.rate,'number','min="0" max="100" step="0.1"')}${field('Dauer des Beispielzinses (Monate)','learning-rate-months',state.rateMonths,'number','min="0" max="1200" step="1"')}${field('Zins danach p.a. (%)','learning-next-rate',state.nextRate,'number','min="0" max="100" step="0.1"')}</div><p class="small">Eingegebene Beispielzinsen ab Anlagebeginn, kein historisch verfügbares Bankangebot. Monatliche Fortschreibung ohne Umschichtung (Buy and Hold). Nur ETF-Käufe und -Verkäufe erhalten die importierten Modellkosten (${money(state.data.assumptions.fixedCost)} je Auftrag plus ${pct(state.data.assumptions.proportionalCost)} des Handelsbetrags); monatliche Sparraten sind kostenfrei. Steuern und Inflation fehlen.</p><label class="field"><span>Eigener Lernvergleich: ${state.learningShare} % Aktien und ${100-state.learningShare} % Tagesgeld</span><input id="learning-share" type="range" min="0" max="100" step="1" value="${state.learningShare}"></label></div><h3>Wie hätte sich dein Vermögen entwickelt?</h3><p>Die Kurven zeigen, wie viel Geld aus deinem Startkapital und deinen Einzahlungen geworden wäre – nach den modellierten Handelskosten. Die zusätzliche Linie zeigt, wie viel du selbst eingezahlt hast.</p>${lineChart(wealth)}<h3>Welche zwischenzeitlichen Verluste gab es?</h3><p>Null Prozent bedeutet: Die Anlage steht auf ihrem bisherigen Höchststand. Minus zehn Prozent bedeutet: Sie liegt zehn Prozent darunter. Einzahlungen werden für dieses Diagramm herausgerechnet, damit sie einen Verlust nicht verdecken.</p>${lineChart(chart,'Rückgang (%)')}<h3>Endwerte und Verluste vergleichen</h3>${table([{label:'Lernbeispiel',text:'Aktienanteil plus Tagesgeldanteil. Keine persönliche Empfehlung.'},{label:'Netto-Endwert',help:'net'},{label:'Größter Rückgang<br>der Anlage',text:'Der größte prozentuale Rückgang gegenüber einem vorherigen Höchststand, nach Modellkosten und bereinigt um Einzahlungen.'},{label:'Kontorückgang<br>in Euro',text:'Die Abnahme des tatsächlichen Kontowerts während seiner größten prozentualen Verlustphase. Einzahlungen können einen solchen Rückgang teilweise ausgleichen oder verdecken.'}],out.map(a=>[a.share+' % Aktien / '+(100-a.share)+' % Tagesgeld',money(a.rows.at(-1).value),a.loss.measurable?pct(a.loss.investment.fraction):'–',a.loss.measurable?money(a.loss.account.euro):'–']))}${detail('Warum unterscheiden sich Anlageverlust und Kontorückgang?',`<p>Der Euro-Rückgang verwendet die tatsächlichen simulierten Kontowerte. Neue Einzahlungen können einen Verlust teilweise ausgleichen oder im Kontostand verdecken.</p><p>Das Verlustdiagramm betrachtet deshalb die Anlageentwicklung ohne den Effekt neuer Einzahlungen. Handelskosten bleiben enthalten. Bei null Kapital und null Einzahlungen ist kein Anlageverlauf messbar. Die größte Verlustphase kann je nach Betrachtung unterschiedlich ausfallen.</p><p>Vergangene Rückgänge sind keine Grenze künftiger Verluste. Eine Erholung ist nicht garantiert.</p>`)}<p><strong>Bleibt dein Eindruck bei einem anderen Beginn derselbe?</strong> Verschiebe den Anlagebeginn und betrachte beide Diagramme erneut.</p><button class="secondary" id="close-learning">Zurück zur Vermögenssimulation</button></section>`;
 }
 function learningComparisonEntry(){return '<section class="section learning-comparison-entry"><h2>Was macht der Aktienanteil aus?</h2><p>Vergleiche Mischungen aus einem Welt-Aktien-ETF und Tagesgeld: Wie hätten sich dein Vermögen und zwischenzeitliche Verluste verändert?</p><button class="secondary" data-learning-start>Aktien und Tagesgeld: Mischungen vergleichen</button></section>';}
 function simulationPage(own=false,minimum=false){const d=state.data;let html=pageHeading(minimum?'Minimum-Varianz':own?'Eigenes Portfolio erstellen':'Vermögenssimulation',minimum?'Dasselbe Ziel, unterschiedliche Schätzungen: Vergleiche die historischen Ergebnisse der Minimum-Varianz-Varianten.':own?'Stelle eine Mischung zusammen und untersuche, wie sie sich historisch gegenüber den Vergleichsportfolios entwickelt hätte.':'Was wäre aus deinem Geld geworden? Vergleiche historische Portfolios und öffne nur die Informationen, die du sehen möchtest.');
@@ -306,7 +312,7 @@ function radarView(){
  const sourceFooter=`<section class="radar-source-footer" aria-label="Quellenstand"><p class="radar-period"><strong>Zeitraum: ${esc(d.periodLabel||month(d.month+'-01'))}${d.periodLabel?' (Quellenangabe)':''}</strong><span>Abgerufen am ${esc(d.asOf.split('-').reverse().join('.'))}</span></p><p class="radar-update">${esc(d.periodNote||'Der angezeigte Monat ist in der Importdatei angegeben.')} Dies ist ein gespeicherter Quellenstand, keine automatische Live-Aktualisierung.</p></section>`;
  for(const c of rankings){const customer=c.kind==='customer-buys';html+=`<section class="section radar-ranking"><h2 class="radar-ranking-title">${!c.complete?'Unvollständige Kategorie: '+esc(c.label):customer?'Top 3: Von Consorsbank-Kunden am häufigsten gekaufte ETFs':'Top 3 nach '+esc(c.label)}</h2>${c.complete&&c.items.length?c.items.map(p=>`<article class="card radar-product"><header><span class="pill">${customer?'Kauf-Rang':c.kind==='turnover'?'Umsatzrang':'Rang'} ${p.rank}</span><h3>${esc(p.name)}</h3><p class="small radar-isin">ISIN ${esc(p.isin)}</p></header><div class="radar-description"><p><strong>Was steckt darin?</strong> ${esc(p.focus)}</p>${p.risk?`<p><strong>Worauf solltest du achten?</strong> ${esc(p.risk)}</p>`:''}</div>${customer?'':`<p class="radar-value"><strong>${esc(c.label)} im Monat:</strong> ${dec(p.value)} ${esc(c.unit)}</p>`}<footer><p class="small radar-links">${p.sources.map((s,i)=>`<a href="${esc(safeUrl(s.url))}" target="_blank" rel="noopener noreferrer">[Q${i+1}] Originalrangliste</a>`).join(' · ')}${p.productUrl?` · <a href="${esc(safeUrl(p.productUrl))}" target="_blank" rel="noopener noreferrer">ETF beim Anbieter</a>`:''}</p><button class="secondary" data-radar-prompt="${esc(p.isin)}">Kurzbericht-Prompt für diesen ETF erzeugen</button></footer></article>`).join(''):'<p>Keine belastbare Top 3: Die Datengrundlage fehlt oder ist unvollständig. Es werden keine fehlenden Plätze ergänzt.</p>'}${detail('Wie wird die Rangliste berechnet?',`<p>${esc(c.coverage)}</p><p>${esc(c.method)}</p><p>${esc(c.rights)}</p>${customer?'<p>Die Rangliste ist keine repräsentative Stichprobe aller Anleger. Produktangebot, Gebühren und Zusammensetzung der Kundschaft können die Platzierungen beeinflussen. Aus einem Platz lassen sich keine zukünftigen Renditen oder Gründe für einen Kauf ableiten.</p>':'<p>Auswertung pro ISIN; gleichartige Börsennotierungen werden zusammengeführt.</p>'}`)}</section>`;}
  const saved=promptCache.get('radar'),stale=saved&&saved.fingerprint!==radarFingerprint();
- html+=`<section class="section report-section"><h2>Kurze ETF-Berichte mit KI erstellen</h2><p>Pro ETF ein Bericht mit 5–10 Sätzen: kurz erklärt und mit Nachrichten aus dem betrachteten Monat eingeordnet. Der Prompt ist für eine KI mit Websuche gedacht; Kaufmotive dürfen nicht als bewiesen dargestellt werden.</p>${valid.length?'<button class="primary" data-radar-prompt="all">Kurzbericht-Prompts für alle drei ETFs erzeugen</button>':'<p>Für einen Bericht fehlen vollständig belegte Kategorien.</p>'}${stale?'<p class="error" role="status">Dieser Prompt ist nicht mehr aktuell. Bitte mit dem neuen Datenstand oder Erklärstil neu erzeugen.</p>':''}<div id="prompt-radar" ${saved?'':'hidden'}><label class="field"><span>Prompt prüfen und kopieren</span><textarea class="prompt" readonly aria-label="Monatsradar: kopierbarer Prompt">${esc(saved?.text||'')}</textarea></label><button class="secondary" data-copy="radar">Prompt kopieren</button><button class="secondary" data-download="radar">Als Text speichern</button><p class="small" data-copy-status></p></div></section>`;
+ html+=`<section class="section report-section"><h2>Kurze ETF-Berichte mit KI erstellen</h2>${valid.length?'<button class="primary" data-radar-prompt="all">Kurzbericht-Prompts für alle drei ETFs erzeugen</button>':'<p>Für einen Bericht fehlen vollständig belegte Kategorien.</p>'}${stale?'<p class="error" role="status">Dieser Prompt ist nicht mehr aktuell. Bitte mit dem neuen Datenstand oder Erklärstil neu erzeugen.</p>':''}<div id="prompt-radar" ${saved?'':'hidden'}><label class="field"><span>Prompt prüfen und kopieren</span><textarea class="prompt" readonly aria-label="Monatsradar: kopierbarer Prompt">${esc(saved?.text||'')}</textarea></label><button class="secondary" data-copy="radar">Prompt kopieren</button><button class="secondary" data-download="radar">Als Text speichern</button><p class="small" data-copy-status></p></div></section>`;
  return html+radarMethods()+detail('Optional: eigenen geprüften Monatsstand laden',`<p>Der bereitgestellte Radar funktioniert bereits ohne Import. Hier kannst du ihn für diese Sitzung durch eine andere geprüfte Monatsdatei ersetzen.</p><input id="radar-file" type="file" accept=".json,application/json" aria-label="Monatsradar-Datei auswählen"><p id="radar-error" class="error" hidden></p><button class="secondary" id="radar-reset">Bereitgestellten Monatsstand wiederherstellen</button><button class="secondary" id="radar-template">Leere Importvorlage herunterladen</button>`)+sourceFooter+'</div>';
 }
 function radarMethods(){return detail('Datenquellen und Grenzen',`<p>Quelle ist die <a href="https://www.consorsbank.de/web/Sparen-Anlegen/Anlegen/Das-kauften-Kunden" target="_blank" rel="noopener noreferrer">öffentliche Consorsbank-Rangliste</a> mit den Filtern „Alle Kunden“, „Letzter Monat“, „Gekauft“ und „ETFs“. Beim Öffnen des Links musst du diese Filter gegebenenfalls erneut wählen.</p><p>Absolute Kundenzahlen und die genauen Monatsgrenzen werden dort nicht angezeigt. Kauf-Ranglisten nach Kundenanzahl sind weder Handelsumsatz noch Nettofondsflüsse. Die Ergebnisse dürfen nicht als repräsentative Rangliste des gesamten Börsenhandels ausgegeben werden.</p><p>Verkäufe und Bestände sind nur im eingeloggten Bereich verfügbar und werden hier nicht übernommen. Es werden keine Zugangsdaten benötigt oder gespeichert. Ein optionaler eigener Import wird auf Struktur geprüft; diese Prüfung ersetzt keine Quellen- oder Lizenzprüfung.</p>`);}
@@ -327,7 +333,7 @@ function analyses(){
  let html=pageHeading('Weitere Analysen','Wähle die zusätzlichen Darstellungen links in der Navigation. Sie erscheinen immer in derselben Reihenfolge.');
  if(!state.data)return html+withoutData('analysen');
  const out=results();lastResults=out;html+=selection()+inputs();
- if(option('analysen','walkforward'))html+=`<section class="section"><h2>Walk-Forward-Test</h2><p>Vor jedem Prüftermin werden ausschließlich die davor verfügbaren Schätzmonate verwendet. Die nächsten zwölf Monate zeigen anschließend, wie sich die berechnete Mischung historisch entwickelt hätte.</p><p class="small">Optimierte Portfolios verwenden lokal berechnete Gewichte. Ein anderer Anlagebeginn schätzt sie nicht neu. Einstellbare Mischungen beginnen dagegen mit deinen Zielgewichten und prüfen danach jährlich die Bänder.</p>${out.length?lineChart(out.map(a=>({name:a.name,values:a.rows.map(r=>({date:r.date,y:r.value}))}))):'<p>Wähle ein Portfolio aus.</p>'}</section>`;
+ if(option('analysen','walkforward'))html+=`<section class="section"><h2>Walk-Forward-Test</h2><p>Vor jedem Prüftermin werden ausschließlich die davor verfügbaren Schätzmonate verwendet. Die nächsten zwölf Monate zeigen anschließend, wie sich die berechnete Mischung historisch entwickelt hätte.</p><p class="small">Optimierte Portfolios verwenden lokal berechnete Gewichte. Ein anderer Anlagebeginn schätzt sie nicht neu. Passive Mischungen beginnen mit deinen Startanteilen und werden danach nicht umgeschichtet (Buy and Hold).</p>${out.length?lineChart(out.map(a=>({name:a.name,values:a.rows.map(r=>({date:r.date,y:r.value}))}))):'<p>Wähle ein Portfolio aus.</p>'}</section>`;
  if(option('analysen','kennzahlen'))html+=`<section class="section"><h2>Vergleichskennzahlen</h2>${statTable(out)}</section>`;
  if(!extras.analysen.some(([key])=>option('analysen',key)))html+='<p class="callout">Wähle unter „Weitere Analysen“ eine Darstellung aus.</p>';
  return html+detail('Funktionsumfang der Webversion','Effizienzgrenze, Kapitalmarktlinie und CAPM-Diagramme sind noch nicht übertragen. Das historische Rendite-Schwankungs-Diagramm ist keine Effizienzgrenze und wird nicht als solche dargestellt.');
@@ -467,18 +473,18 @@ $('accept').addEventListener('click',()=>{if(!$('accept-check').checked)return;$
 $('disclaimer').addEventListener('cancel',e=>e.preventDefault());
 if(innerWidth<760){document.body.classList.add('nav-closed');$('nav-toggle').setAttribute('aria-expanded','false');}
 render();$('welcome-guide').innerHTML=guideFigure('welcome');$('disclaimer').showModal();$('disclaimer').scrollTop=0;
-import {startOnlineAI} from './online-ai.mjs?v=20261122-sync';
-startOnlineAI();
+import {startOnlineAI} from './online-ai.mjs?v=20261127-sync';
 
 // BEGIN SHARED LEARNING RUNTIME (generated by Web.sync_public)
 
 // Wird nur an das lokal ausgelieferte app.mjs angehängt. Öffentliche Dateien
 // werden nicht geändert. Berechnungen und Diagramminteraktionen bleiben gleich.
-import {localLearningSteps,localLearningSymbols,localLearningPortfolios,localLearningRoute,localLearningSelection,localBasicsDialogue,localBasicsMove,localNoticeSlides,localStockQuestion,localNutshellCards,localBeginnerPages,localActivePortfolio,localBeginnerComparisons,localShuffledQuiz,localEntryRoute,localOnboardingProfile} from './learning-core.mjs?v=20261122-sync';
+import {localInflationQuiz,localSavingsQuiz,localOwnPortfolioQuiz,localSimulationQuiz,localQuizProgress,localLearningSteps,localLearningSymbols,localLearningPortfolios,localLearningRoute,localLearningSelection,localBasicsDialogue,localBasicsMove,localNoticeSlides,localStockQuestion,localNutshellCards,localBeginnerPages,localActivePortfolio,localBeginnerComparisons,localShuffledQuiz,localEntryRoute,localOnboardingProfile} from './learning-core.mjs?v=20261127-sync';
 const localScale=.9;
 const localJourney={mode:null,data:null,selectionInitialized:false,freeSelection:null,basicsIndex:0,noticeIndex:0,quizPassed:false,tourFinished:false};
 const localOriginal={render,nav,selection,radarView,profileView,learningView,learningLessonsView,simulationPage,savingsPage,renderLearningCompanion,names,results,formatExplanationParagraphs};
-let localQuizQuestions=learningLessonQuestions.map(q=>q.id==='world'?localStockQuestion:q);
+const localBasicsQuiz=learningLessonQuestions.map(q=>q.id==='world'?localStockQuestion:q);
+let localQuizKind='basics',localQuizQuestions=localBasicsQuiz;
 const localEntry=document.createElement('dialog');
 localEntry.id='local-entry';localEntry.setAttribute('aria-labelledby','local-entry-title');
 localEntry.addEventListener('cancel',e=>e.preventDefault());document.body.append(localEntry);
@@ -529,7 +535,7 @@ function localTourRunning(){return localGuided()&&!localJourney.tourFinished;}
 nav=function(){
  if(!localGuided()){
   localOriginal.nav();
-  for(const row of $('navigation').querySelectorAll('.nav-row'))if(row.querySelector('a[href="#lernen"],a[href="#lektionen"]'))row.remove();
+  for(const row of $('navigation').querySelectorAll('.nav-row'))if(row.querySelector('a[href="#lernen"],a[href="#lektionen"],a[href="#methodik"]'))row.remove();
   return;
  }
  $('navigation').innerHTML=localBeginnerPages.map(id=>`<div class="nav-row ${state.page===id?'active':''}"><a href="#${id}" ${state.page===id?'aria-current="page"':''}>${esc(pages.find(p=>p[0]===id)[1])}</a></div>`).join('');
@@ -546,7 +552,10 @@ selection=function(minimum=false){
 };
 radarView=function(){
  const template=document.createElement('template');template.innerHTML=localOriginal.radarView();
- for(const section of template.content.querySelectorAll('details'))if(section.querySelector('#radar-file'))section.remove();
+ for(const section of template.content.querySelectorAll('details')){const title=section.querySelector(':scope > summary')?.textContent.trim();if(section.querySelector('#radar-file')||localGuided()&&['Wie wird die Rangliste berechnet?','Datenquellen und Grenzen'].includes(title))section.remove();}
+ const lead=template.content.querySelector('.lead');
+ if(lead){lead.insertAdjacentHTML('afterend',guideMessage('Was zeigt dir der Monatsradar?','Hier kannst du entdecken, welche drei ETFs bei den erfassten Consorsbank-Kunden besonders häufig gekauft wurden und was in ihnen steckt. Gezählt wird, wie viele Kunden einen ETF gekauft haben – nicht, wie viel Geld sie angelegt oder verdient haben. Das ist nur ein Einblick in diese Kundengruppe, keine Übersicht über den ganzen Markt und keine Empfehlung für deinen nächsten Kauf.','think'));lead.remove();}
+ template.content.querySelector('.radar-intro')?.remove();
  return template.innerHTML;
 };
 profileView=function(){
@@ -574,17 +583,21 @@ function localNoticeRender(){
  });
 }
 function localStepNavigation(){
+ if(state.page==='inflation')return '<nav class="local-step-actions local-quiz-entry" aria-label="Lernquiz"><button class="primary" data-local-quiz="inflation">Weiter zum Grundlagenquiz</button></nav>';
+ if(state.page==='sparen')return '<nav class="local-step-actions local-quiz-entry" aria-label="Lernquiz"><button class="primary" data-local-quiz="savings">Weiter zum Grundlagenquiz</button></nav>';
+ if(state.page==='eigen')return '<nav class="local-step-actions local-quiz-entry" aria-label="Lernquiz"><button class="primary" data-local-quiz="own">Weiter zum Grundlagenquiz</button></nav>';
+ if(state.page==='simulation')return '<nav class="local-step-actions local-quiz-entry" aria-label="Lernquiz"><button class="primary" data-local-quiz="simulation">Weiter zum Grundlagenquiz</button></nav>';
  if(localJourney.tourFinished)return '';
  const i=localLearningSteps.findIndex(s=>s.page===state.page),previous=state.page==='simulation'?localLearningSteps.find(s=>s.page==='kurz'):localLearningSteps[i-1],next=localLearningSteps[i+1];
- return `<nav class="local-step-actions" aria-label="Lernweg"><button class="secondary" ${previous?`data-local-page="${previous.page}"`:'data-local-change'}>${previous?'Zurück '+esc(previous.destination):'Zurück zur Einstiegsauswahl'}</button><button class="primary" ${next?`data-local-page="${next.page}"`:'data-local-finish'}>${next?'Weiter '+esc(next.destination):'Lernweg abschließen'}</button></nav>`;
+ return `<nav class="local-step-actions" aria-label="Lernweg">${previous?`<button class="secondary" data-local-page="${previous.page}">Zurück ${esc(previous.destination)}</button>`:''}<button class="primary" ${next?`data-local-page="${next.page}"`:'data-local-finish'}>${next?'Weiter '+esc(next.destination):'Lernweg abschließen'}</button></nav>`;
 }
 function localLessonHeader(title,text,mood='explain'){
  const speechTitle={lernen:'Ein Schritt nach dem anderen',inflation:'Ein anderer Blick auf dein Geld',simulation:'Wie hätte sich dein Kapital entwickelt?',eigen:'Du bestimmst die Mischung',sparen:'Gleicher Betrag, andere Sparform'}[state.page]||title;
- return `<div class="local-journey-header"><span>Portfolio Lab · ${localTourRunning()?'Geführter Einstieg':'Anfängeransicht'}</span><button class="local-entry-change" data-local-change>Einstieg wechseln</button></div><h1 tabindex="-1">${esc(title)}</h1>${guideMessage(speechTitle,text,mood)}`;
+ return `<div class="local-journey-header"><span>Portfolio Lab · ${localTourRunning()?'Geführter Einstieg':'Anfängeransicht'}</span></div><h1 tabindex="-1">${esc(title)}</h1>${guideMessage(speechTitle,text,mood)}`;
 }
 function localBasics(){
  const i=localJourney.basicsIndex,slide=localBasicsDialogue[i];
- return `<div class="local-journey-header"><span>Portfolio Lab · Gemeinsam die Grundlagen entdecken</span><button class="local-entry-change" data-local-change>Einstieg wechseln</button></div>
+ return `<div class="local-journey-header"><span>Portfolio Lab · Gemeinsam die Grundlagen entdecken</span></div>
  <section class="local-basics-dialog" aria-label="Grundlagen im Dialog">
   <div class="guide-bubble local-basics-speech" aria-live="polite" aria-atomic="true"><span class="local-speaker">Lotti</span><h1 id="local-basics-title" tabindex="-1">${esc(slide.title)}</h1><p>${esc(slide.sentences.join(' '))}</p></div>
   <div class="local-basics-character">${guideFigure(slide.mood)}</div>
@@ -614,8 +627,27 @@ function localCurves(out,label='Vermögen in Euro'){
  return lineChart(out.map(a=>({name:a.name,values:a.rows.map((r,i)=>({date:r.date,y:r.value,return:i?a.returns?.[i-1]:null}))})),label);
 }
 function localResultSentence(out){
- if(!out.length)return '';
- return `<p class="local-result"><strong>Am Ende des gewählten Zeitraums:</strong> ${out.map(a=>`${esc(a.name)}: ${money(a.rows.at(-1).value)}`).join(' · ')}.</p>`;
+ return '';
+}
+let localRiskBenchmark='XLK';
+function localRiskCurves(out,own=false){
+ const comparisons=Object.entries(state.data.assets).filter(([,a])=>a.role!=='MARKTINDEX').map(([name,a])=>({symbol:a.symbol,name,label:'Nur '+pretty(name)+' ('+a.symbol+')'}));
+ const curves=[...out];
+ const selected=own?comparisons.find(a=>a.symbol===localRiskBenchmark):null;
+ if(selected){const name=selected.label,existing=curves.findIndex(a=>a.name===pretty(selected.name)+' ('+selected.symbol+')');if(existing>=0)curves[existing]={...curves[existing],name};else curves.push(simulate(state.data,name,state.start,state.capital,state.payment,customPortfolio(state.data,{[selected.name]:1},state.start)));}
+ return curves.filter(a=>a.returns?.length).map(a=>({name:a.name,percent:true,exampleCapital:state.capital,values:[{date:a.rows[0].date,y:0,lossEuro:0},...stats(a.returns).drawdowns.map((v,i)=>({date:a.rows[i+1].date,y:v*100,lossEuro:Math.max(0,-v*state.capital)}))]}));
+}
+function localRiskLesson(out,own=false){
+ const comparisons=Object.entries(state.data.assets).filter(([,a])=>a.role!=='MARKTINDEX').map(([name,a])=>({symbol:a.symbol,name,label:'Nur '+pretty(name)+' ('+a.symbol+')'}));
+ const series=localRiskCurves(out,own);
+ if(!series.length)return '';
+ return `<section class="section" data-local-target="risk-history"><h2>${own?'Wie stark ging es zwischenzeitlich bergab?':'Gewinne am Ende schließen Rückgänge nicht aus'}</h2><p>Die Verlustkurven zeigen den Rückgang vom jeweils vorherigen Höchststand. Je tiefer die Kurve fällt, desto stärker ist der Wert zwischenzeitlich gesunken; bei null ist der frühere Höchststand wieder erreicht. Auch ein breit gestreuter ETF kann deutlich verlieren, etwa wenn eine Krise viele Unternehmen gleichzeitig trifft. Brauchst du dein Geld dann, könntest du mit Verlust verkaufen müssen; eine spätere Erholung ist nicht garantiert.</p><p class="small">Im Infofenster spielst du den jeweiligen prozentualen Rückgang mit deinem Startbetrag von ${money(state.capital)} durch. Die Eurobeträge sind Rechenbeispiele ohne zusätzliche Einzahlungen und keine Abrechnung deiner Vermögenskurve.</p>${own?`<label class="field"><span>Zusätzlich mit einer einzelnen Branche oder Anlage vergleichen</span><select id="local-risk-benchmark"><option value="">Nur die oben ausgewählten Vergleiche</option>${comparisons.map(a=>`<option value="${esc(a.symbol)}" ${a.symbol===localRiskBenchmark?'selected':''}>${esc(a.label)}</option>`).join('')}</select></label>`:''}${lineChart(series,'Verlust vom Höchststand (%)')}${own?'<p>Verändere oben ETF-Anzahl und Anteile und beobachte die Verlustkurven. Unterschiedliche Inhalte können Rückgänge abfedern; mehrere ähnliche ETFs bringen nicht automatisch mehr Streuung. Auch eine breite Mischung kann verlieren.</p>':''}</section>`;
+}
+function localRiskBind(){
+ document.querySelector('#local-risk-benchmark')?.addEventListener('change',event=>{localRiskBenchmark=event.target.value;const position=window.scrollY;render();window.scrollTo({top:position,behavior:'instant'});document.querySelector('#local-risk-benchmark')?.focus({preventScroll:true});});
+}
+function localSavingsPurpose(){
+ return `<section class="card" data-local-target="savings-purpose"><h2>Wann ist Tagesgeld sinnvoll?</h2><p>Wenn du <strong>Geld bald brauchst</strong> oder für <strong>unerwartete Ausgaben</strong> zurücklegen möchtest, kann ein Tagesgeldkonto praktisch sein: Du kommst kurzfristig an dein Geld. Anders als bei einem ETF schwankt dein Guthaben nicht mit den Börsenkursen, sodass du für eine anstehende Rechnung keine Anlagen mit Kursverlust verkaufen musst. </p><p>Falls eine Bank zahlungsunfähig wird, sind in der EU in der Regel bis zu <strong>100.000 € pro Person und Bank</strong> gesetzlich abgesichert. </p><p>Die <strong>Zinsen können sich ändern</strong>, und wenn die Preise stärker steigen als dein Guthaben, kannst du dir davon <strong>weniger kaufen</strong>. </p><p>Du musst dich auch nicht für eines entscheiden: Geld für baldige Ausgaben kann auf dem Tagesgeldkonto bleiben, während du für <strong>langfristige Ziele</strong> ein ETF-Portfolio nutzt.</p></section>`;
 }
 function localBeginnerSimulation(own=false){
  const title=own?'Dein eigenes ETF-Portfolio':'Was wäre aus deinem Geld geworden?';
@@ -624,10 +656,26 @@ function localBeginnerSimulation(own=false){
  html+=(own?localBeginnerOwn()+localBeginnerSelection():localBeginnerSelection())+localBeginnerInputs();
  try{
   const out=results(own);lastResults=out;
-  if(out.length){html+=`<section class="section" data-local-target="chart"><h2>Historische Vermögensentwicklung</h2>${localCurves(out)}${localResultSentence(out)}<p class="small">Nach modellierten Handelskosten, ohne Steuern und Inflation. Vergangene Ergebnisse sagen die Zukunft nicht voraus.</p></section>`;if(!localTourRunning())html+=reports(out);}
+  if(out.length){html+=`<section class="section" data-local-target="chart"><h2>Historische Vermögensentwicklung</h2>${localCurves(out)}<p class="small">Nach modellierten Handelskosten, ohne Steuern und Inflation. Vergangene Ergebnisse sagen die Zukunft nicht voraus.</p></section>${localRiskLesson(out,own)}`;if(!localTourRunning())html+=reports(out);}
   else html+='<p>Wähle einen ETF aus, um seinen Verlauf zu sehen.</p>';
  }catch(error){html+=`<p class="error" role="status">${esc(error.message)}</p>`;}
  return html+localStepNavigation();
+}
+function localInflationExplanation(){
+ const facts=localInflationFacts(state.data.dates,state.data.cpi,state.start);if(!facts)return '';
+ const factor=1+facts.total;
+ const prices=facts.total>0?`Die Preise stiegen im ausgewählten Zeitraum insgesamt um <strong>${pct(facts.total)}</strong>.`:facts.total<0?`Die Preise sanken im ausgewählten Zeitraum insgesamt um <strong>${pct(-facts.total)}</strong>.`:'Die Preise waren zu Beginn und am Ende des ausgewählten Zeitraums im Durchschnitt gleich hoch.';
+ const purchasing=facts.loss>0?`Ein unveränderter Geldbetrag verlor dadurch <strong>${pct(facts.loss)} seiner ursprünglichen Kaufkraft</strong>.`:facts.loss<0?`Ein unveränderter Geldbetrag gewann dadurch <strong>${pct(-facts.loss)} an Kaufkraft</strong>.`:'Die Kaufkraft eines unveränderten Geldbetrags blieb dadurch gleich.';
+ const meaning=facts.loss>0?'Der Kontostand wird dadurch nicht kleiner – du kannst dir damit weniger kaufen.':facts.loss<0?'Der Kontostand wird dadurch nicht größer – du kannst dir damit mehr kaufen.':'Der Kontostand und seine Kaufkraft blieben in diesem Vergleich unverändert.';
+
+ return `<section class="card" data-local-inflation-explanation><h2>Inflation und deine Kaufkraft</h2>
+ <p><strong>Inflation:</strong> Die Preise steigen im Durchschnitt. Mit demselben Geld kannst du dir weniger kaufen.</p>
+ <p><strong>Inflationsrate:</strong> Sie zeigt, wie stark sich die Preise verändern, meist gegenüber dem Vorjahresmonat. Sinkt die Rate, bleibt aber positiv, steigen die Preise weiter – nur langsamer. Eine <strong>negative Inflationsrate</strong> bedeutet, dass die Preise im Durchschnitt niedriger sind als im Vergleichszeitraum.</p>
+ <p>${prices} ${purchasing}</p>
+ <p>${meaning}</p>
+
+ ${detail('Am Beispiel von 100 Euro verstehen',`<p>Ein Warenkorb für <strong>100 Euro</strong> im Ausgangsmonat ${month(facts.base)} kostete im letzten verfügbaren Monat ${month(facts.last)} rechnerisch <strong>${money(100*factor)}</strong>.</p><p>Mit unveränderten 100 Euro konntest du dann noch <strong>${pct(1/factor)}</strong> dieses Warenkorbs kaufen.</p>${facts.total!==0?'<p>Der Preisanstieg beschreibt, wie viel teurer der Warenkorb wurde. Der Kaufkraftverlust beschreibt, wie viel weniger du dir mit demselben Geld kaufen konntest. Deshalb unterscheiden sich die Prozentwerte.</p>':''}`)}
+ </section>`;
 }
 function localBeginnerInflation(){
  let html=localLessonHeader('Was passiert, wenn dein Geld liegen bleibt?','Dein Kontostand kann gleich bleiben, während Preise steigen. Dann reicht derselbe Betrag für weniger Einkäufe. Investieren kann helfen, Kaufkraft zu erhalten – garantiert ist das nicht.');
@@ -636,7 +684,7 @@ function localBeginnerInflation(){
  const cash=savings(d.dates.slice(state.start),state.capital,state.payment,0,0,0),real=realValue(cash.rows,d.cpi);
  if(real.length){
   const dates=new Set(real.map(r=>r.date));
-  html+=`<section class="section" data-local-target="chart"><h2>Kontostand und Kaufkraft</h2>${localCurves([{name:'Geld auf dem Konto · ohne Zinsen',rows:cash.rows.filter(r=>dates.has(r.date))},{name:'Was du dafür kaufen konntest',rows:real}])}<p>Die Kaufkraftkurve zeigt den Wert bei den Preisen vor dem ersten gewählten Anlagemonat. Es wird kein Geld vom Konto abgezogen.</p></section>`;
+  html+=`<section class="section" data-local-target="chart"><h2>Kontostand und Kaufkraft</h2>${localCurves([{name:'Geld auf dem Konto · ohne Zinsen',rows:cash.rows.filter(r=>dates.has(r.date))},{name:'Was du dafür kaufen konntest',rows:real}])}${localInflationExplanation()}</section>`;
  }else html+='<p>Für diesen Beginn fehlen passende Inflationsdaten. Wähle einen anderen Monat.</p>';
  return html+localStepNavigation();
 }
@@ -649,7 +697,7 @@ function localBeginnerSavings(){
   const cash=savings(state.data.dates.slice(state.start),state.capital,state.payment,state.rate/100,0,state.rate/100);cash.name='Tagesgeld · dein Zinsbeispiel';
   html+=`<section class="section" data-local-target="chart"><h2>So hätten sich die Beträge entwickelt</h2>${localCurves([...out,cash])}${localResultSentence([...out,cash])}<p class="small">Ohne Steuern und Inflation; bei Anlagen mit modellierten Handelskosten. Tagesgeld und Aktien-ETF erfüllen unterschiedliche Zwecke.</p></section>`;
  }catch(error){html+=`<p class="error">${esc(error.message)}</p>`;}
- return html+localStepNavigation();
+ return html+localSavingsPurpose()+localStepNavigation();
 }
 learningComparisonEntry=()=>'';
 names=function(minimum=false){const all=localOriginal.names(minimum).filter(n=>n!=='mix-cash');return [...(localGuided()?localBeginnerComparisons(all):all),...(!minimum&&localGuided()&&localGoldAsset()?['local-gold']:[])];};
@@ -659,24 +707,32 @@ results=function(own=false,minimum=false){
  finally{state.selected=selected;}
 };
 function localNutshell(){
- return pageHeading('Investieren in a nutshell','')+`<div class="local-summary-intro">${guideFigure('explain')}<div class="guide-bubble"><span class="local-speaker">Lotti</span><p>Hier findest du die wichtigsten Begriffe noch einmal kurz zusammengefasst.</p></div></div><div class="local-summary-grid">${localNutshellCards.map(card=>`<article class="card"><h2>${esc(card.title)}</h2><p>${esc(card.text)}</p></article>`).join('')}</div><nav class="local-step-actions" aria-label="Lernweg">${localJourney.tourFinished?'<button class="primary" data-local-page="simulation">Weiter zur Vermögenssimulation</button>':'<button class="secondary" data-local-page="lernen">Zurück zu den Grundlagen</button><button class="primary" data-local-quiz>Weiter zum Grundlagen-Quiz</button>'}</nav>`;
+ return pageHeading('Investieren in a nutshell','')+`<div class="local-summary-intro">${guideFigure('explain')}<div class="guide-bubble"><span class="local-speaker">Lotti</span><p>Hier findest du die wichtigsten Begriffe noch einmal kurz zusammengefasst.</p></div></div><div class="local-summary-grid">${localNutshellCards.map(card=>`<article class="card"><h2>${esc(card.title)}</h2><p>${esc(card.text)}</p></article>`).join('')}</div><nav class="local-step-actions local-quiz-entry" aria-label="Lernweg"><button class="primary" data-local-quiz="basics">Weiter zum Grundlagenquiz</button></nav>`;
 }
 function localQuiz(){
+ const inflationQuiz=localQuizKind==='inflation',simulation=localQuizKind==='simulation',own=localQuizKind==='own',savingsQuiz=localQuizKind==='savings',quizTitle=inflationQuiz?'Quiz zu Inflation und Kaufkraft':savingsQuiz?'Quiz zum Sparformenvergleich':own?'Quiz zu deinem Portfolio':simulation?'Quiz zur Vermögenssimulation':'Grundlagen-Quiz',destination=savingsQuiz?'inflation':own?'sparen':simulation?'eigen':'simulation',nextLabel=savingsQuiz?'Weiter zu den Inflationsauswirkungen':own?'Weiter zum Sparformenvergleich':simulation?'Weiter zur eigenen Portfolioerstellung':'Weiter zur Vermögenssimulation';
  if(state.lessons.complete){
   const score=localQuizQuestions.filter((q,i)=>state.lessons.choices[i]===q.correct).length,success=score===localQuizQuestions.length;
-  localJourney.quizPassed=true;
-  return pageHeading('Grundlagen-Quiz','')+guideMessage('Wie möchtest du weitermachen?',`Du hast ${score} von ${localQuizQuestions.length} Fragen richtig beantwortet. ${success?'Die Grundlagen hast du richtig eingeordnet.':'Nicht alles war richtig – das gehört zum Lernen dazu.'} Du kannst das ganze Quiz mit neu gemischten Fragen und Antworten wiederholen oder direkt mit der Vermögenssimulation weitermachen.`,'happy')+`<nav class="local-step-actions"><button class="secondary" data-local-quiz-retry>Quiz wiederholen</button><button class="primary" data-local-page="simulation">Weiter zur Vermögenssimulation</button></nav>`;
+  if(localQuizKind==='basics')localJourney.quizPassed=true;
+  return pageHeading(quizTitle,'')+guideMessage('Wie möchtest du weitermachen?',`Du hast ${score} von ${localQuizQuestions.length} Fragen richtig beantwortet. ${success?'Die Grundlagen hast du richtig eingeordnet.':'Nicht alles war richtig – das gehört zum Lernen dazu.'} Du kannst das ganze Quiz mit neu gemischten Fragen und Antworten wiederholen oder direkt zum nächsten Bereich weitergehen.`,'happy')+`<nav class="local-step-actions"><button class="secondary" data-local-quiz-retry>Quiz wiederholen</button><button class="primary" ${inflationQuiz?'data-local-finish':`data-local-page="${destination}"`}>${inflationQuiz?'Lernweg abschließen':nextLabel}</button></nav>`;
  }
  const l=state.lessons,i=l.index,q=localQuizQuestions[i],checked=l.checked[i],answer=q.options[l.choices[i]],correct=l.choices[i]===q.correct;
- return pageHeading('Grundlagen-Quiz','')+`<section class="card lesson-card"><p class="eyebrow">Frage ${i+1} von ${localQuizQuestions.length} · ${esc(q.topic)}</p><div class="lesson-dialogue">${guideFigure(checked?(correct?'happy':'explain'):'think')}<div class="guide-bubble"><h2 id="lesson-question" tabindex="-1">${esc(q.question)}</h2>${checked?`<div id="lesson-feedback" class="lesson-feedback-content" tabindex="-1" role="status"><h3>${correct?'Richtig eingeordnet':'Noch nicht ganz'}</h3><p>${esc(answer.explanation)}</p>${correct?'':`<p><strong>Richtig ist:</strong> ${esc(q.options[q.correct].text)}</p>`}</div>`:'<p>Wähle eine Antwort.</p>'}</div></div><fieldset class="lesson-answers"><legend class="sr-only">Eine Antwort auswählen</legend>${q.options.map((option,j)=>`<label class="lesson-choice${checked&&j===q.correct?' is-answer':''}${checked&&j===l.choices[i]&&j!==q.correct?' is-mistake':''}"><input type="radio" name="lesson-answer" data-lesson-choice="${j}" ${l.choices[i]===j?'checked':''} ${checked?'disabled':''}><span>${esc(option.text)}${checked&&j===q.correct?'<small>Richtige Antwort</small>':checked&&j===l.choices[i]?'<small>Deine Antwort – noch nicht richtig</small>':''}</span></label>`).join('')}</fieldset><nav class="local-step-actions">${i?'<button class="secondary" id="lesson-back">Vorherige Frage</button>':'<button class="secondary" data-local-page="kurz">Zurück zu Investieren in a nutshell</button>'}<button class="primary" id="local-quiz-next" data-local-quiz-next ${Number.isInteger(l.choices[i])?'':'disabled'}>${checked?(l.checked.every(Boolean)?'Rückblick ansehen':'Nächste Frage'):'Antwort prüfen'}</button></nav></section>`;
+ return pageHeading(quizTitle,'')+`<section class="card lesson-card"><p class="eyebrow">Frage ${i+1} von ${localQuizQuestions.length} · ${esc(q.topic)}</p><div class="lesson-dialogue">${guideFigure(checked?(correct?'happy':'explain'):'think')}<div class="guide-bubble"><h2 id="lesson-question" tabindex="-1">${esc(q.question)}</h2>${checked?`<div id="lesson-feedback" class="lesson-feedback-content" tabindex="-1" role="status"><h3>${correct?'Richtig eingeordnet':'Noch nicht ganz'}</h3><p>${esc(answer.explanation)}</p>${correct?'':`<p><strong>Richtig ist:</strong> ${esc(q.options[q.correct].text)}</p>`}</div>`:'<p>Wähle eine Antwort.</p>'}</div></div><fieldset class="lesson-answers"><legend class="sr-only">Eine Antwort auswählen</legend>${q.options.map((option,j)=>`<label class="lesson-choice${checked&&j===q.correct?' is-answer':''}${checked&&j===l.choices[i]&&j!==q.correct?' is-mistake':''}"><input type="radio" name="lesson-answer" data-lesson-choice="${j}" ${l.choices[i]===j?'checked':''} ${checked?'disabled':''}><span>${esc(option.text)}${checked&&j===q.correct?'<small>Richtige Antwort</small>':checked&&j===l.choices[i]?'<small>Deine Antwort – noch nicht richtig</small>':''}</span></label>`).join('')}</fieldset><nav class="local-step-actions">${i?'<button class="secondary" id="lesson-back">Vorherige Frage</button>':`<button class="secondary" data-local-page="${inflationQuiz?'inflation':savingsQuiz?'sparen':own?'eigen':simulation?'simulation':'kurz'}">${inflationQuiz?'Zurück zu den Inflationsauswirkungen':savingsQuiz?'Zurück zum Sparformenvergleich':own?'Zurück zur eigenen Portfolioerstellung':simulation?'Zurück zur Vermögenssimulation':'Zurück zu Investieren in a nutshell'}</button>`}<button class="primary" id="local-quiz-next" data-local-quiz-next ${Number.isInteger(l.choices[i])?'':'disabled'}>${checked?(l.checked.every(Boolean)?'Rückblick ansehen':'Nächste Frage'):'Antwort prüfen'}</button></nav></section>`;
 }
 learningView=function(short=false){return localGuided()?(short?localNutshell():localBasics()):localOriginal.learningView(short);};
 learningLessonsView=function(){return localQuiz();};
 simulationPage=function(own=false,minimum=false){return localGuided()?localBeginnerSimulation(own):localOriginal.simulationPage(own,minimum);};
-savingsPage=function(inflation=false){return localGuided()?(inflation?localBeginnerInflation():localBeginnerSavings()):localOriginal.savingsPage(inflation);};
+savingsPage=function(inflation=false){
+ if(localGuided())return inflation?localBeginnerInflation():localBeginnerSavings();
+ const html=localOriginal.savingsPage(inflation);
+ return inflation?html.replace(/<div class="callout"><h3>Wie stark veränderte sich die Kaufkraft\?<\/h3>[\s\S]*?<\/div>/,()=>localInflationExplanation()):html;
+};
 renderLearningCompanion=function(){if(!localGuided())localOriginal.renderLearningCompanion();};
-formatExplanationParagraphs=function(){if(!localGuided())localOriginal.formatExplanationParagraphs();};
+formatExplanationParagraphs=function(){};
+const localOriginalShowInfo=showInfo;
+showInfo=function(...args){localOriginalShowInfo(...args);for(const detail of $('info-dialog').querySelectorAll('details'))if(detail.querySelector(':scope > summary')?.textContent.trim().startsWith('Mehr erfahren'))detail.remove();};
 render=function(){
+ if(state.page==='methodik'){state.page='simulation';history.replaceState(null,'','#simulation');}
  const focus=document.activeElement,scroll={x:scrollX,y:scrollY},preserve=localJourney.renderedPage===state.page&&(focus?.id==='start'||focus?.dataset?.ownWeight!==undefined);
  if(localJourney.mode==='experienced'&&['lernen','lektionen'].includes(state.page)){state.page='kurz';history.replaceState(null,'','#kurz');}
  if(localGuided()){
@@ -698,6 +754,16 @@ render=function(){
  document.body.classList.toggle('local-practice-mode',practice);
  document.body.classList.toggle('local-summary-mode',localGuided()&&state.page==='kurz');
  localOriginal.render();
+ for(const detail of $('content').querySelectorAll('details')){
+  const title=detail.querySelector(':scope > summary')?.textContent.trim()||'';
+  if(title.startsWith('Mehr erfahren')||!localGuided()&&state.page==='profil'&&title==='Fragebogen, Lernregeln und Grenzen'||!localGuided()&&state.page==='analysen'&&title==='Funktionsumfang der Webversion')detail.remove();
+ }
+ if(!localGuided()){
+  if(state.page==='kurz'){for(const link of $('content').querySelectorAll('.learning-journey a[href="#lernen"]'))link.remove();const next=$('content').querySelector('.learning-journey a[href="#simulation"]');if(next)next.textContent='Weiter zur Vermögenssimulation';}
+  if(['simulation','eigen'].includes(state.page))for(const strong of $('content').querySelectorAll('.callout>strong'))if(strong.textContent.startsWith('Dein Lernweg:'))strong.closest('.callout').remove();
+  for(const heading of $('content').querySelectorAll('h2'))if(heading.textContent.trim()==='Die Schätzverfahren verstehen')heading.closest('section').remove();
+ }
+ localRiskBind();
  document.querySelector('#sidebar .brand')?.setAttribute('href',localGuided()?(localTourRunning()?'#lernen':'#kurz'):'#simulation');
  if(practice&&focus?.tagName==='INPUT'){
   const replacement=focus.id?$(focus.id):focus.dataset.ownWeight!==undefined?document.querySelector(`[data-own-weight="${focus.dataset.ownWeight}"]`):null;
@@ -719,10 +785,10 @@ render=function(){
  for(const button of document.querySelectorAll('[data-local-page]'))button.addEventListener('click',()=>{
   localNavigate(button.dataset.localPage);
  });
- for(const button of document.querySelectorAll('[data-local-quiz]'))button.addEventListener('click',()=>{state.lessons=createLearningLessonProgress();localNavigate('lektionen');});
+ for(const button of document.querySelectorAll('[data-local-quiz]'))button.addEventListener('click',()=>{localQuizKind=['simulation','own','savings','inflation'].includes(button.dataset.localQuiz)?button.dataset.localQuiz:'basics';localQuizQuestions=localShuffledQuiz(localQuizKind==='inflation'?localInflationQuiz:localQuizKind==='savings'?localSavingsQuiz:localQuizKind==='own'?localOwnPortfolioQuiz:localQuizKind==='simulation'?localSimulationQuiz:localBasicsQuiz);state.lessons=localQuizProgress(localQuizQuestions);localNavigate('lektionen');});
  for(const button of document.querySelectorAll('[data-local-quiz-retry]'))button.addEventListener('click',()=>{
   localQuizQuestions=localShuffledQuiz(localQuizQuestions);
-  state.lessons=createLearningLessonProgress();render();window.scrollTo({top:0});$('lesson-question')?.focus({preventScroll:true});
+  state.lessons=localQuizProgress(localQuizQuestions);render();window.scrollTo({top:0});$('lesson-question')?.focus({preventScroll:true});
  });
  for(const button of document.querySelectorAll('[data-local-quiz-next]'))button.addEventListener('click',()=>{
   const l=state.lessons;if(!Number.isInteger(l.choices[l.index]))return;
@@ -740,7 +806,7 @@ render();
 
 
 // Lokale, deterministische Bedienhilfe. Keine KI-Anfragen und kein Training.
-import {localTutorialSpecs,localTutorialReady,localInflationFacts,localInflationNarrative,tutorialMaskRects} from './learning-core.mjs?v=20261122-sync';
+import {localTutorialSpecs,localTutorialReady,localInflationFacts,localInflationNarrative,tutorialMaskRects} from './learning-core.mjs?v=20261127-sync';
 const localTour={records:{},key:'',inert:[],target:null,preview:null,frame:0,observer:null};
 const localTourRoot=document.createElement('div');localTourRoot.id='local-tour-root';document.body.append(localTourRoot);
 const localTourDialog=document.createElement('dialog');localTourDialog.id='local-tour-dialog';localTourDialog.className='local-tour-dialog';
@@ -781,7 +847,7 @@ function localTourRefresh(){
  if(!spec||!button)return;
  const ready=!!state.data&&localTutorialReady(spec.kind,localTourSnapshot(),[...localTourRecord().touched]);
  button.disabled=!ready;
- const hint=localTourRoot.querySelector('[data-tour-hint]');if(hint)hint.textContent=ready?(['capital','start','payment','rate'].includes(spec.kind)?'Du kannst den Beispielwert übernehmen oder ihn verändern.':'Du kannst zum nächsten Schritt gehen.'):spec.kind==='weights'?`Deine Anteile ergeben derzeit ${dec(sum(state.own.map(r=>r.weight)))} %. Zusammen müssen es 100 % sein.`:spec.kind==='choice'?'Wähle mindestens eine Vergleichsanlage aus.':spec.kind==='own-choice'?'Wähle in jeder hinzugefügten Zeile eine Anlage aus.':'Bitte verwende einen gültigen Beispielwert.';
+ const hint=localTourRoot.querySelector('[data-tour-hint]');if(hint)hint.textContent=ready?(['capital','start','payment','rate'].includes(spec.kind)?'Du kannst den Beispielwert übernehmen oder ihn verändern.':'Du kannst zum nächsten Schritt gehen.'):['weights','diversify'].includes(spec.kind)?`Wähle für jede Zeile eine Anlage. Deine Anteile ergeben derzeit ${dec(sum(state.own.map(r=>r.weight)))} %. Zusammen müssen es 100 % sein.`:spec.kind==='choice'?'Wähle mindestens eine Vergleichsanlage aus.':spec.kind==='own-choice'?'Wähle in jeder hinzugefügten Zeile eine Anlage aus.':'Bitte verwende einen gültigen Beispielwert.';
 }
 function localTourText(spec){
  if(spec.kind!=='history'||!state.data)return spec.text;
@@ -792,12 +858,12 @@ function localTourNext(){
  if(spec.kind!=='intro'&&(!state.data||!localTutorialReady(spec.kind,localTourSnapshot(),[...record.touched])))return;
  if(localTourDialog.open)localTourDialog.close();
  record.index++;
- if(record.index>=specs.length){record.done=true;render();if(state.page==='inflation')localShowFinish();return;}
+ if(record.index>=specs.length){record.done=true;render();return;}
  render();
 }
 function localShowFinish(){
  localTourClear();
- localFinishDialog.innerHTML=`<div class="local-tour-conversation">${guideFigure('happy')}<div class="guide-bubble"><span class="local-speaker">Lotti</span><h2 id="local-finish-title">Jetzt bist du dran.</h2><p>Du hast die Grundlagen und die wichtigsten Ansichten kennengelernt. Jetzt kannst du die ganze Anfängeransicht frei erkunden. Die Auswahl bleibt übersichtlich: ETFs, einfache Mischungen, Sparformen und Inflation. Über „Einstieg wechseln“ erreichst du bei Bedarf später die Fortgeschrittenenansicht.</p><div class="local-step-actions"><button class="secondary" data-finish-back>Zurück zur Inflation</button><button class="primary" data-finish-explore>Zur Vermögenssimulation</button></div></div></div>`;
+ localFinishDialog.innerHTML=`<div class="local-tour-conversation">${guideFigure('happy')}<div class="guide-bubble"><span class="local-speaker">Lotti</span><h2 id="local-finish-title">Jetzt bist du dran.</h2><p>Du hast die Grundlagen und die wichtigsten Ansichten kennengelernt. Nun kannst du die Lernplattform frei erkunden, eigene Vergleiche ausprobieren und dich weiter mit ETFs beschäftigen.</p><div class="local-step-actions"><button class="secondary" data-finish-back>Zurück zur Inflation</button><button class="primary" data-finish-explore>Zur Vermögenssimulation</button></div></div></div>`;
  localFinishDialog.querySelector('[data-finish-back]').addEventListener('click',()=>localFinishDialog.close());
  localFinishDialog.querySelector('[data-finish-explore]').addEventListener('click',()=>{
   localFinishDialog.close();localJourney.tourFinished=true;
@@ -827,6 +893,7 @@ function localTourSync(){
  localTourRoot.innerHTML=`<div class="local-tour-mask"></div><div class="local-tour-mask"></div><div class="local-tour-mask"></div><div class="local-tour-mask"></div><section class="local-tour-panel" role="dialog" aria-labelledby="local-tour-step-title" aria-describedby="local-tour-step-text"><div class="local-tour-avatar">${guideFigure('think')}</div><div class="guide-bubble"><span class="local-speaker">Lotti</span><h2 id="local-tour-step-title">${esc(spec.title)}</h2><p id="local-tour-step-text">${esc(spec.text)}</p><p class="local-tour-hint" data-tour-hint role="status"></p><nav class="local-step-actions"><button class="secondary" data-tour-back>Zurück zum Vorherigen</button><button class="primary" data-tour-next>${record.index===specs.length-1?'Jetzt selbst ausprobieren':'Weiter zum nächsten Schritt'}</button></nav></div></section>`;
  localTour.target=localTourTarget(spec);
  if(['capital','start','payment','rate'].includes(spec.kind))localTour.preview=document.querySelector('[data-local-target="chart"]');
+ if(spec.kind==='diversify')localTour.preview=document.querySelector('[data-local-target="risk-history"]');
  if(localTour.target){
   localTour.target.classList.add('local-tutorial-target');if(moved)localTour.target.scrollIntoView({block:'start',behavior:'instant'});
  }
@@ -869,7 +936,7 @@ window.addEventListener('portfolio-local-chat-context',event=>{
   const guided=typeof localGuided==='function'&&localGuided();
   const context={page:state.page,area:pages.find(([id])=>id===state.page)?.[1]||state.page,
    depth:state.depth,dataRevision:state.dataRevision,
-   visibleSections:guided?[]:(extras[state.page]||[]).filter(([key])=>option(state.page,key)).map(([,label])=>label),
+   visibleSections:guided?Array.from(document.querySelectorAll('#content h2,#content h3')).map(e=>e.textContent.trim()):(extras[state.page]||[]).filter(([key])=>option(state.page,key)).map(([,label])=>label),
    knowledge:Object.fromEntries(Object.entries(knowledge).map(([key,entry])=>[key,{Erklaerung:entry[state.depth],Grenze:entry.Grenze}])),terms:help};
   if(d&&!['profil','lernen','lektionen','kurz','radar'].includes(state.page)){
    // Auch unmittelbar nach einer Eingabe neue Werte nutzen, nicht den letzten
@@ -879,17 +946,31 @@ window.addEventListener('portfolio-local-chat-context',event=>{
     try{out=guided&&state.page==='inflation'?[]:results(state.page==='eigen');}catch{inputError='Die aktuelle Portfolioeingabe ist noch nicht vollständig oder gültig; es liegen dafür keine berechneten Ergebnisse vor.';}
    }
    context.asOf=d.asOf;context.period={from:d.dates[state.start],to:d.dates.at(-1)};
-   context.portfolios=out.slice(0,10).map(a=>{
-    const f=facts(a);f.Anlagenzahl=f.Anlagen.length;f.NichtEinzelnDargestellteAnlagen=Math.max(0,f.Anlagen.length-4);
-    f.Anlagen=f.Anlagen.slice(0,4).map(x=>({...x,Beschreibung:(x.Beschreibung||'').slice(0,500)}));
-    return f;
-   });
-   context.omittedPortfolios=Math.max(0,out.length-10);
+   context.portfolios=out.map(a=>facts(a));
+   context.omittedPortfolios=0;
+   // Vollständige Monatsdaten, platzsparend mit gemeinsamer Datumsachse.
+   context.monthlyData={
+    Einheiten:'Renditen, Gewichte und Beiträge sind Dezimalanteile. Renditebeitrag = Monatsanfangsgewicht × Anlagenrendite; Beiträge ergeben die Portfoliorendite vor separaten Kosten. Nicht mit kumulierten Gewinnen oder einem Rückgang seit Höchststand gleichsetzen.',
+    AlleMonate:d.dates,
+    Anlagen:Object.entries(d.assets||{}).map(([name,a])=>({Name:name,Renditen:a.returns})),
+    Portfolios:out.map(a=>({Name:a.name,Monate:a.rows.slice(1).map(r=>r.date),Renditen:a.returns,Nettoverlauf:a.rows,
+     Beitragsspalten:['Monat','Anlage','Anfangsgewicht','Anlagenrendite','Renditebeitrag'],
+     Monatsbeitraege:(a.attr||[]).map(x=>[x.datum,x.instrument_name,x.startgewicht,x.instrumentrendite,x.renditebeitrag])}))
+   };
    context.scenario={Startkapital:state.capital,MonatlicheEinzahlung:state.payment,
     TagesgeldZinsProzent:state.rate,ZinsDanachProzent:guided?state.rate:state.nextRate,ZinsDauerMonate:guided?0:state.rateMonths,
     Kosten:d.assumptions,SteuernBeruecksichtigt:false,
     InflationImVermoegensvergleich:state.page==='inflation'};
    if(inputError)context.scenario.Eingabehinweis=inputError;
+   if(guided&&['simulation','eigen'].includes(state.page)&&!inputError&&typeof localRiskCurves==='function'){
+    const curves=localRiskCurves(out,state.page==='eigen');
+    context.scenario.Verlustdiagramm={
+     Bedeutung:'Rückgang vom jeweils vorherigen Höchststand, nicht Verlust seit Anlagebeginn. Null bedeutet bisherigen Höchststand wieder erreicht. Monatsrenditen ohne Einzahlungen und separate Handelskosten.',
+     Eurobeispiel:'Prozentualen Rückgang mit dem eingegebenen Startbetrag durchspielen; keine Abrechnung des tatsächlichen Vermögensverlaufs.',
+     Monate:curves[0]?.values.map(v=>v.date)||[],
+     Kurven:curves.map(s=>{const min=s.values.reduce((a,b)=>b.y<a.y?b:a,s.values[0]);return {Name:s.name,VerlustProzent:s.values.map(v=>v.y),GroessterRueckgang:{Monat:min.date,Prozent:min.y,Eurobeispiel:min.lossEuro,VerbleibenderBeispielbetrag:state.capital-min.lossEuro},LetzterMonat:s.values.at(-1)};})
+    };
+   }
    if(state.page==='eigen')context.ownWeights=state.own.filter(x=>x.name&&x.weight>0).map(x=>({Anlage:x.name,Prozent:x.weight}));
    if(state.page==='eigen'&&out[0]?.name==='Eigenes Portfolio')context.comparison=out.slice(1,6).map(b=>({Vergleich:b.name,...compare(out[0],b)}));
    if(['sparen','inflation'].includes(state.page)){
@@ -909,7 +990,7 @@ window.addEventListener('portfolio-local-chat-context',event=>{
   if(state.page==='profil')context.scenario={Profilabschnitt:state.profileStep,
    AktuelleFrage:['quiz','intro'].includes(state.profileStep)?profileQuestions[state.question]?.[0]:null,
    Hinweis:'Freiwillige Selbstauskunft. Die Frage erklären, aber keine persönliche Antwort für den Nutzer auswählen. Ohne Freigabe werden keine Antworten übertragen.'};
-  if(guided)context.scenario={...context.scenario,Lernansicht:'Geführter Einstieg mit wenigen ETF-Beispielen. Kurz und ohne unnötige Kennzahlen erklären; keine Optimierungsverfahren in dieser Ansicht.'};
+  if(guided)context.scenario={...context.scenario,Lernansicht:'Anfängeransicht: ohne Vorwissen, zwei bis vier kurze Sätze, Fachbegriffe sofort erklären, Zusammenhänge statt Kennzahlenlisten. Keine Optimierungsverfahren voraussetzen.'};
   if(guided&&state.page==='lernen'){
    const slide=localBasicsDialogue[localJourney.basicsIndex];
    context.scenario.AktuellerLernabschnitt=slide.title;
@@ -919,6 +1000,11 @@ window.addEventListener('portfolio-local-chat-context',event=>{
    const record=localTour.records[state.page];
    if(record&&!record.done){const step=localTutorialSpecs[state.page][record.index];context.scenario={...context.scenario,Tutorialschritt:step.title,Erklaerung:step.text};}
   }
+  const initialProfile=state.profileDraft||state.profile;
+  context.investorContext={Selbstauskunft:true,Angaben:profileFields.filter(([key])=>['goal','horizon'].includes(key)).flatMap(([key,label,values])=>{
+   const answer=values.find(([value])=>value===initialProfile?.context?.[key]);
+   return answer?[{Frage:label,Antwort:answer[1]}]:[];
+  })};
   if(includeProfile){
    const p=state.profileDraft||state.profile;
    const fields=profileFields.flatMap(([key,label,values])=>{
@@ -932,6 +1018,9 @@ window.addEventListener('portfolio-local-chat-context',event=>{
  }catch(error){event.detail.reject(Error('Der aktuelle Seitenkontext konnte nicht gelesen werden. Bitte Eingaben und Portfolioauswahl prüfen.'));}
 });
 
-import {beginnerReportPrompt} from './learning-utils.mjs?v=20261122-sync';
+import {beginnerReportPrompt} from './learning-utils.mjs?v=20261127-sync';
+import {REPORT_INSTRUCTIONS} from './learning-chat-system.mjs?v=20261127-sync';
 const publicOriginalPrompt=promptText;
-promptText=function(kind,out){const text=publicOriginalPrompt(kind,out);return localGuided()?beginnerReportPrompt(text,kind):text;};
+promptText=function(kind,out){const text=publicOriginalPrompt(kind,out),styled=localGuided()?beginnerReportPrompt(text,kind):text;return styled+(REPORT_INSTRUCTIONS[kind]?'\n\nVERBINDLICHE BERICHTSVORGABEN\n'+REPORT_INSTRUCTIONS[kind]:'');};
+
+startOnlineAI();

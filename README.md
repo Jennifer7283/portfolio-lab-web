@@ -239,3 +239,27 @@ Die Beispielwerte sind kein historisches Angebot oder zugesicherter Auszahlungsw
 Keine Tracker, externen Schriftarten, Diagramm-CDNs oder Werbedienste. Externe
 Quellen werden erst nach einem Klick geöffnet. GitHub kann wie bei anderen
 gehosteten Webseiten Verbindungsdaten verarbeiten. Keine Anlageberatung.
+
+
+## Abgleich vom 27.11.2026
+
+Gemeinsame Lerninhalte werden mit `Web.sync_public` aus den lokalen redaktionellen
+Quellen erzeugt. Enthalten sind die drei Einstiegswege, die reduzierte Anfängeransicht,
+alle fünf Quizze (Grundbegriffe, Simulation, eigenes Portfolio, Sparformen und Inflation),
+aktualisierte Inflations- und Tagesgeldkästen sowie der geführte Lernabschluss.
+
+Passive und selbst erstellte Portfolios werden ohne Umschichtung als Buy and Hold
+simuliert. Einzahlungen folgen im vereinfachten Renditeserienmodell den jeweils aktuellen
+Anteilen; aktive Verfahren behalten die importierten Handelsregeln. Diese Angaben
+ersetzen ältere Beschreibungen jährlicher Bandprüfungen für passive Mischungen in diesem Dokument.
+
+Die Ergebniszusammenfassung vergleicht alle ausgewählten Portfolios gemeinsam. Die
+Berichtsvorgaben und die Lotti-Anweisungen entsprechen den lokalen Vorlagen. Lotti erhält
+monatliche Renditen, Gewichte und Beiträge der angezeigten Portfolios, außerdem Anlageziel
+und Anlagehorizont. Weitere Profilangaben benötigen eine zusätzliche Freigabe.
+
+Die öffentliche Version behält freiwillige eigene API-Schlüssel und kopierbare Prompts.
+Sie veröffentlicht keinen Schlüssel, keinen gemeinsamen OpenAI-Zugang, keine lokale
+Datenbank und keinen privaten Marktdatenexport. Direkter Webzugriff und lokaler
+Nachrichtencache des Python-Servers stehen auf GitHub Pages nicht zur Verfügung;
+kopierte Rechercheprompts benötigen eine KI mit Websuche.

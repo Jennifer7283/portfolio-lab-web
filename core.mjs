@@ -230,12 +230,7 @@ export function profileOrder(data,names,sort='standard'){
 // Nur Textgliederung: keine Änderungen an Zahlen, Aussagen oder Berechnungen.
 // Die deutsche Satzsegmentierung lässt Datums- und Dezimalwerte zusammen.
 export function explanationParagraphs(text) {
-  return String(text??'').split(/\n\s*\n/).flatMap(block=>{
-    const clean=block.trim();if(!clean)return [];
-    return typeof Intl.Segmenter==='function'
-      ? [...new Intl.Segmenter('de',{granularity:'sentence'}).segment(clean)].map(s=>s.segment.trim()).filter(Boolean)
-      : clean.split(/(?<=[.!?])\s+(?=[A-ZÄÖÜ])/).filter(Boolean);
-  });
+  return String(text??'').split(/\n\s*\n/).map(block=>block.trim()).filter(Boolean);
 }
 
 // Eine Zusatzoption öffnet stets ihre zugehörige Ansicht, nicht nur das Menü.
@@ -256,13 +251,13 @@ export function validateData(d) {
   return d;
 }
 
-export function customPortfolio(data, weights, start=0) {
+export function customPortfolio(data, weights, start=0, rebalance=false) {
   const entries=Object.entries(weights).filter(([,w])=>w>0);
   if(!entries.length||Math.abs(sum(entries.map(([,w])=>w))-1)>1e-8||entries.some(([n,w])=>!data.assets[n]||!finite(w)||w<0))throw Error('Die Anteile müssen zusammen genau 100 % ergeben.');
   let current=entries.map(([,w])=>w); const target=[...current],returns=[],attr=[],trades=[];
   for(let i=start;i<data.dates.length;i++) {
     const date=data.dates[i];
-    if(i>start&&(i-start)%12===0&&current.some((w,j)=>Math.abs(w-target[j])>Math.min(data.assumptions.absoluteBand,data.assumptions.relativeBand*target[j])+1e-12)) {
+    if(rebalance&&i>start&&(i-start)%12===0&&current.some((w,j)=>Math.abs(w-target[j])>Math.min(data.assumptions.absoluteBand,data.assumptions.relativeBand*target[j])+1e-12)) {
       entries.forEach(([n],j)=>trades.push({neuberechnung:date,instrument_name:n,handelsgewicht:target[j]-current[j],gewicht:target[j]}));current=[...target];
     }
     const values=entries.map(([n],j)=>current[j]*(1+data.assets[n].returns[i])),r=sum(values)-1;
@@ -275,6 +270,13 @@ export function customPortfolio(data, weights, start=0) {
 
 export function simulate(data,name,start,capital,payment,custom=null,costs=true) {
   if(!finite(capital)||!finite(payment)||capital<0||payment<0||!Number.isInteger(start)||start<0||start>=data.dates.length)throw Error('Startkapital, Einzahlung oder Beginn sind ungültig.');
+  // Passive Vergleichsportfolios ab dem gewählten Einstieg ohne Zielgewichts-Rücksetzung.
+  const active=/^(Minimum-Varianz|Markowitz|Tangentialportfolio|Risk Parity|Gleichgewichtung)/.test(name);
+  if(!custom&&!active){
+    const first=data.attribution.filter(a=>a.portfolio===name&&a.datum===data.dates[start]);
+    const weights=Object.fromEntries(first.filter(a=>a.startgewicht>0).map(a=>[a.instrument_name,a.startgewicht]));
+    if(Object.keys(weights).length)custom=customPortfolio(data,weights,start);
+  }
   const dates=data.dates.slice(start),returns=custom?custom.returns:data.portfolios[name]?.slice(start);
   if(!returns||returns.length!==dates.length)throw Error('Für das Portfolio fehlen Monatsrenditen.');
   const attr=custom?custom.attr:data.attribution.filter(a=>a.portfolio===name&&a.datum>=dates[0]);
@@ -291,7 +293,7 @@ export function simulate(data,name,start,capital,payment,custom=null,costs=true)
     value-=fee;cost+=fee;if(i===0)value+=payment;paid+=payment;value*=1+returns[i];
     rows.push({date,value,paid,cost:fee,totalCost:cost});
   });
-  return {name,rows,returns,attr,events};
+  return {name,rows,returns,attr,events,management:active&&!custom?'Aktives Verfahren: importierte Umschichtungsregeln':'Buy and Hold: keine Umschichtung; Einzahlungen gemäß jeweils aktuellen Anteilen'};
 }
 
 export function stats(returns,rf=[]) {

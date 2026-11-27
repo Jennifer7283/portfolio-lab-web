@@ -1,6 +1,6 @@
-import {onlineAIState,askLotti} from './online-ai.mjs?v=20261122-sync';
+import {onlineAIState,askLotti} from './online-ai.mjs?v=20261127-sync';
 // Nur lokale Browser-Version. Keine Gesprächs- oder Profildaten dauerhaft speichern.
-import {renderReport,relevantContentMutation} from './learning-utils.mjs?v=20261122-sync';
+import {renderReport,relevantContentMutation} from './learning-utils.mjs?v=20261127-sync';
 const $=id=>document.getElementById(id);
 let config,context,history=[],controller=null,busy=false,revision=0,refreshRevision=0;
 
@@ -42,7 +42,7 @@ async function refresh(){
   const items=[['Bereich',next.area],['Erklärstil',next.depth],['Datenstand',next.asOf],
    ['Zeitraum',next.period?next.period.from+' bis '+next.period.to:null],
    ['Portfolios',next.portfolios?.map(p=>p.Portfolio).join(', ')],
-   ['Profil',next.profile?'Freigegebene Zusammenfassung (siehe unten)':'Wird nicht übertragen']];
+   ['Profil',next.profile?'Freigegebene Zusammenfassung (siehe unten)':'Anlageziel und Anlagehorizont; weitere Angaben nur mit Freigabe']];
   for(const [name,value]of items){if(!value)continue;const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=name;dd.textContent=value;list.append(dt,dd);}
   $('igel-chat-context-data').textContent=JSON.stringify(next,null,2);
   const profile=$('igel-chat-profile-preview');profile.replaceChildren();
@@ -85,7 +85,7 @@ async function start(){
   <header class="igel-chat-header"><img id="igel-chat-avatar" src="./hedgehog-explain.png" alt="" width="72" height="72"><div><h2>Lotti</h2><p id="igel-chat-area" hidden></p></div><button id="igel-chat-close" aria-label="Chat schließen">×</button></header>
   <div id="igel-chat-messages" role="region" aria-label="Chatverlauf" tabindex="0"></div>
   <details class="igel-chat-settings"><summary>Datenschutz und Chat-Einstellungen</summary><p class="igel-chat-small">KI-Chat über die Hochschulinstanz. Kann Fehler machen und hat keinen Webzugriff. Bitte keine Namen, Kontodaten oder Schlüssel in deine Frage schreiben.</p>
-   <details id="igel-chat-context"><summary>Was wird bei meiner nächsten Frage übertragen?</summary><div class="igel-chat-context-body"><p>Deine Frage, die letzten Gesprächsbeiträge und der aktuelle Toolkontext werden an GPUStack gesendet. Keine vollständigen Kursreihen und keine einzelnen Antworten aus dem Risikofragebogen.</p><dl id="igel-chat-context-summary"></dl><div id="igel-chat-profile-preview"></div><details><summary>Kontextdaten im Detail</summary><pre id="igel-chat-context-data"></pre></details></div></details>
+   <details id="igel-chat-context"><summary>Was wird bei meiner nächsten Frage übertragen?</summary><div class="igel-chat-context-body"><p>Deine Frage, die letzten Gesprächsbeiträge und der aktuelle Toolkontext werden an GPUStack gesendet. Übertragen werden auch monatliche Renditen, Gewichte und Beiträge der angezeigten Portfolios sowie dein Anlageziel und Anlagehorizont. Weitere Profilangaben nur mit deiner Freigabe; keine einzelnen Antworten aus dem Risikofragebogen.</p><dl id="igel-chat-context-summary"></dl><div id="igel-chat-profile-preview"></div><details><summary>Kontextdaten im Detail</summary><pre id="igel-chat-context-data"></pre></details></div></details>
    <label class="igel-chat-profile-choice"><input type="checkbox" id="igel-chat-profile"><span>Meine Profilzusammenfassung für diesen Chat freigeben</span></label>
    <p class="igel-chat-small">Enthält auch finanzielle Rahmenbedingungen. Die Vorschau oben zeigt die Angaben. Ein Wechsel beginnt ein neues Gespräch.</p>
   </details>
